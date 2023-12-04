@@ -1,0 +1,18 @@
+<h2 class="accordion-header">
+  <button class="accordion-button fs-4 fw-bold" type="button" data-bs-toggle="collapse"
+    data-bs-target="#kt_accordion_1_body_1" aria-expanded="true" aria-controls="kt_accordion_1_body_1">
+    <section class="d-flex product-row align-items-center">
+      <div class="w-835px">{{item.name}}</div>
+    </section>
+  </button>
+</h2>
+<div id="kt_accordion_1_body_1" class="accordion-collapse collapse show" aria-labelledby="kt_accordion_1_header_1"
+  data-bs-parent="#kt_accordion_1">
+  <div class="accordion-body px-3 py-4">
+    <section class="d-flex product-row mb-3">
+      <div class="ps-2 w-100">
+        <input type="text" [(ngModel)]="item.name" class="form-control">
+      </div>
+    </section>
+  </div>
+</div>

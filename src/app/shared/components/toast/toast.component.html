@@ -1,0 +1,27 @@
+<div (click)="closeToast()" class="toast show" [@fadeAnimation]="{value: animationState, params:
+        { fadeIn: toastConfig?.animation?.fadeIn, fadeOut: toastConfig?.animation?.fadeOut }}"
+   (@fadeAnimation.done)="onFadeFinished($event)" [class]="bg_color">
+   <div class="toast-header" *ngIf="data.title">
+      <strong class="me-auto text-dark"> {{ data.title }}</strong>
+      <fa-icon (click)="close()" [icon]="times"></fa-icon>
+   </div>
+   <div class="toast-body d-flex fs-sm-4" *ngIf="data.text">
+      <div class="px-2">
+         <fa-icon [icon]="iconType"></fa-icon>
+      </div>
+      <div class="px-2 text-dark">{{ data.text }}</div>
+      <div class="px-2" *ngIf="data?.apiUrl">
+         <a (click)="showDetails = !showDetails">
+            <fa-icon [icon]="showDetails ? chevronUp : chevronDown"></fa-icon>
+         </a>
+      </div>
+   </div>
+   <div class="toast-body fs-sm-4" *ngIf="showDetails">
+      <div class="px-2">
+         <p *ngIf="states.message != ''"> {{ states.message }}</p>
+         <p *ngIf="states.computer != ''"> {{ states.computer }}</p>
+         <p *ngIf="states.printer != ''"> {{ states.printer }}</p>
+         <p *ngIf="states.printJob != ''"> {{ states.printJob }}</p>
+      </div>
+   </div>
+</div>

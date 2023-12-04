@@ -1,0 +1,46 @@
+#till-items-accordion .accordion-item,
+.accordion-item .accordion-button {
+	border-radius: 0 !important;
+	border-left: 0 !important;
+	border-right: 0 !important;
+}
+
+.container {
+	display: grid;
+}
+
+.content,
+.overlay {
+	grid-area: 1 / 1;
+}
+.search-button{
+	min-width:140px;
+}
+ 
+.create-order {
+	position: relative;
+	border: 1px solid #EFF2F5;
+	border-radius: 10px;
+	margin-top: 10px;
+
+	.topright {
+		position: absolute;
+		top: 8px;
+		right: 16px;
+		font-size: 18px;
+	}
+}
+
+.overlay-full {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background: #56acacc4;
+	z-index: 9999;
+}
+
+.highlight-search:focus {
+	box-shadow: 0px 0px 5px 1px #4ab69c !important;
+}

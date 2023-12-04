@@ -1,0 +1,37 @@
+<div class="card shadow-sm">
+  <div class="card-header p-4 px-5">
+    <h3 class="card-title">{{ "WARNING" | translate}}</h3>
+    <div class="card-toolbar m-0">
+      <button type="button" class="btn btn-icon btn-secondary w-35px h-35px" (click)="close()">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+  </div>
+  <div class="card-body card-scroll">
+    <h3> {{ "SELLING_PRODUCT_WHICH_IS_STILL_NOT_CONNECTED_TO_SUPPLIER_THIS_WILL_IMPACT_ON_YOUR_STATISTICS" | translate
+      }}</h3>
+    <!-- <h3>You're selling a product which is still not connected to a 'proper' supplier. This will impact your statistics on the longer term.
+      If this is your first day working with PrismaNote try to merge all suppliers in the coming 1/2 days.</h3> -->
+    <h2>
+      :
+      {{ "PLEASE_CONNECT_YOUR_BUSINESSPARTNERS_HERE" | translate}} :
+    </h2>
+    <div class="row" *ngFor="let url of urls">
+      <div class="col-9">
+        <a [href]="'http://localhost:4202/#/business/suppliers/'+url.iBusinessPartnerId+'?from=supplier&page=1'"
+          target="_blank">{{url.name}}</a>
+      </div>
+      <div class="col-3">
+        <a class="btn btn-danger btn-sm fw-bolder"
+          [href]="'http://localhost:4202/#/business/suppliers/'+url.iBusinessPartnerId+'?from=supplier&page=1'"
+          target="_blank">
+          {{"CONNECT_BUTTON" | translate}}
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    <button class="btn btn-secondary float-end" type="button" (click)="close()">{{ "CONTINUE" |
+      translate}}</button>
+  </div>
+</div>

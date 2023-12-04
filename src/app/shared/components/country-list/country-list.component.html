@@ -1,0 +1,5 @@
+<div class="country-list-container">
+    <ng-select [(ngModel)]="value" (search)="onModelChange($event.term)" class="form-control form-control-solid p-1 country-list-input" [clearable]="false" (change)="changeSelected($event)">
+        <ng-option *ngFor="let option of filteredOptions$" [value]="option">{{option.value}}</ng-option>
+    </ng-select>
+</div>

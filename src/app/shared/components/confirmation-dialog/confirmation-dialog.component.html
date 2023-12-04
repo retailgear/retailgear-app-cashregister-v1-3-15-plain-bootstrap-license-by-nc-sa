@@ -1,0 +1,20 @@
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3 class="card-title">{{ header | translate}}</h3>
+        <div class="card-toolbar">
+            <button type="button" class="btn btn-sm btn-light" (click)="confirmed(false)">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div class="card-body card-scroll">
+      <p>
+        {{ bodyText | translate}}
+      </p>
+    </div>
+    <div class="card-footer">
+      <div class="input-group mb-5">
+        <button class="btn" [ngClass]="btn.class" (click)="confirmed(btn.value)" *ngFor="let btn of buttonDetails">{{ btn.text | translate}}</button>
+      </div>
+    </div>
+</div>

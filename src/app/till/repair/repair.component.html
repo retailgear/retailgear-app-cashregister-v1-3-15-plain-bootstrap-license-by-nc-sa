@@ -1,0 +1,380 @@
+<h2 class="accordion-header">
+  <button class="accordion-button fs-4 fw-bold pe-0 ps-4" type="button" data-bs-toggle="collapse"
+    data-bs-target="#kt_accordion_1_body_1" aria-expanded="true" aria-controls="kt_accordion_1_body_1">
+    <section class="row product-row align-items-center w-100">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-1" *ngIf="!item.tType || item.tType !== 'refund'">
+            {{ item.quantity }}
+          </div>
+          <div class="col-1" *ngIf="item.tType === 'refund'">
+            <svg width="15" height="15" class="m-1">
+              <rect width="15" height="15" style="fill: #f7422e; stroke-width: 1; stroke: rgb(0, 0, 0)" />
+              {{ "YOUR_BROWSER_DOES_NOT_SUPPORT_INLINE_SVG" | translate }}
+            </svg>{{ item.quantity }}
+          </div>
+          <div class="col-4 text-truncate">{{ item.name }}</div>
+          <div class="col">{{ item.price | currency: tillService.currency }}</div>
+          <div class="col">
+            {{ item.nDiscount * item.quantity | currency: tillService.currency }}
+          </div>
+          <div class="col">{{ item.tax }}%</div>
+          <div class="col">
+            {{ (item.price - item.nDiscount) * item.quantity | currency: tillService.currency }}
+          </div>
+          <div class="col">{{ item.paymentAmount | currency: tillService.currency }}</div>
+        </div>
+      </div>
+    </section>
+  </button>
+</h2>
+<div id="kt_accordion_1_body_1" class="accordion-collapse collapse show" aria-labelledby="kt_accordion_1_header_1"
+  data-bs-parent="#kt_accordion_1">
+  <div class="accordion-body px-3 py-4">
+    <section class="row product-row ">
+
+      <div class="col-2">
+        <div class="row">
+          <!-- quantity  -->
+          <div class="col-12">
+            <app-dialer [(quantity)]="item.quantity" (quantityChange)="updatePayments()"></app-dialer>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-3">
+        <div class="row">
+          <!-- NAME  -->
+          <div class="col-12">
+            <div class="form-group mb-4">
+              <label class="form-control-label mb-3">{{ "NAME" | translate}}</label>:
+              <input class="form-control mb-3 mb-lg-0" type="text" name="name" [(ngModel)]="item.name">
+            </div>
+          </div>
+          <!-- DESCRIPTION -->
+          <div class="col-12">
+            <div class="form-group mb-4">
+              <label class="form-control-label mb-3">{{ "DESCRIPTION" | translate}}</label>:
+              <textarea class="form-control mb-3 mb-lg-0" type="text" name="description" lines="10"
+                [(ngModel)]="item.description"></textarea>
+            </div>
+          </div>
+          <!-- IsEstimatedDate -->
+          <div class="col-12 my-3">
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <button [ngClass]="{active:item.eActivityItemStatus === 'new'}" type="button"
+                class="btn btn-primary fs-6 p-2" (click)="item.eActivityItemStatus ='new'"> {{ "PRICE_AGREED" |
+                translate}}</button>
+              <button [ngClass]="{active:item.eActivityItemStatus === 'offer'}" type="button"
+                class="btn btn-primary fs-6 p-2 " (click)="item.eActivityItemStatus = 'offer'">{{ "QUOTATION" |
+                translate}}</button>
+            </div>
+          </div>
+          <!-- bShowServicePartnerRemark -->
+          <div class="col-12 my-3">
+            <button (click)="bShowServicePartnerRemark = !bShowServicePartnerRemark" type="button"
+              class="btn btn-outline-primary fs-6 p-2 ">
+              {{ (bShowServicePartnerRemark? 'HIDE' : 'SHOW') | translate}} {{ "SERVICE_PARTNER_REMARK" | translate }}
+            </button>
+            <ng-container *ngIf="bShowServicePartnerRemark">
+
+              <textarea class="form-control" name="REMARK_FOR_SERVICE_PARTNERS"
+                placeholder="{{ 'REMARK_FOR_SERVICE_PARTNERS' | translate }}" lines="10"
+                [(ngModel)]="item.sServicePartnerRemark"></textarea>
+            </ng-container>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-4">
+        <div class="row my-3">
+          <!-- BAG_NUMBER  -->
+          <div class="col-12">
+            <div class="form-group mb-4">
+              <label class="form-control-label mb-3">{{ "BAG_NUMBER" | translate}}</label>:
+              <input class="form-control  mb-3 mb-lg-0" type="text" name="bagNumber" [(ngModel)]="item.sBagNumber">
+            </div>
+          </div>
+          <!-- PRICE -->
+          <div class="col-12">
+            <div class="form-group mb-4">
+              <label class="form-control-label mb-3">{{ "PRICE" | translate}}</label>:
+              <input class="form-control  mb-3 mb-lg-0" type="text" name="price"
+                (change)="updatePayments(); changeInMargin()" placeholder="{{ 'PRICE' | translate}}" id="price"
+                [(ngModel)]="item.price" [disabled]="item.oType?.bRefund || item.tType === 'pay'">
+            </div>
+          </div>
+          <!-- MORE -->
+          <div class="col-12 mb-7">
+            <button class="btn btn-bg-light btn-active-color-primary mt-2" type="button" data-bs-toggle="collapse"
+              (click)="collapsedBtn = !collapsedBtn" [ngClass]="{'collapsed': collapsedBtn }"
+              data-bs-target="#kt_accordion_123" aria-expanded="true" aria-controls="kt_accordion_123">
+              More
+              <fa-icon *ngIf="!collapsedBtn" [icon]="faArrowDown"></fa-icon>
+              <fa-icon *ngIf="collapsedBtn" [icon]="faArrowUp"></fa-icon>
+            </button>
+          </div>
+
+          <div class="col-12">
+            <div id="kt_accordion_123" [ngClass]="{'show': collapsedBtn }" class="accordion-collapse collapse">
+              <div class="row">
+                <!-- MARGIN -->
+                <div class="col-6">
+                  <div class="form-group mb-1">
+                    <label class="form-control-label mb-1">{{ "MARGIN" | translate}}</label>:
+                    <input class="form-control mb-3 mb-lg-0" type="number" step="any" (keyup)="changeInMargin()"
+                      [(ngModel)]="item.nMargin" [disabled]="item.oType.bRefund || item.oType.bPrepayment">
+                  </div>
+                </div>
+                <!-- PURCHASE_PRICE -->
+                <div class="col-6">
+                  <div class="form-group mb-1">
+                    <label class="form-control-label mb-1">{{ "PURCHASE_PRICE" | translate}}</label>:
+                    <input class="form-control mb-3 mb-lg-0" type="number" step="any" (keyup)="changeInPurchasePrice()"
+                      [(ngModel)]="item.nPurchasePrice" [disabled]="item.oType.bRefund || item.oType.bPrepayment">
+                  </div>
+                </div>
+                <!-- PURCHASE_PRICE -->
+                <div class="col-6">
+                  <div class="form-group mb-1">
+                    <label class="form-control-label mb-1">{{ "DISCOUNT" | translate}}</label>:
+                    <input *ngIf="
+                    !item.oType.bRefund &&
+                    !item.oType.bDiscount &&
+                    !item.oType.bPrepayment
+                  " type="number" step="any" name="discount" class="form-control mb-3 mb-lg-0"
+                      [(ngModel)]="item.nDiscount" (ngModelChange)="updatePayments()"/>
+                    <input *ngIf="
+                    item.oType.bRefund ||
+                    item.oType.bDiscount ||
+                    item.oType.bPrepayment
+                  " type="number" step="any" name="discount" class="form-control mb-3 mb-lg-0"
+                      [value]="item.nDiscount - (item.nRedeemedLoyaltyPoints || 0)" disabled />
+
+                    <label for="discount" *ngIf="item.oType.bRefund">{{ "LOYALTY_POINTS" | translate }}:
+                      {{ item.nRedeemedLoyaltyPoints }}</label>
+                  </div>
+                </div>
+                <!-- PREPAYMENT -->
+                <div class="col-6">
+                  <div class="form-group mb-1">
+                    <label class="form-control-label mb-1">
+                      <span *ngIf="item.oType.bPrepayment===true">{{ "PREPAYMENT" | translate}}</span>
+                      <span *ngIf="item.oType.bPrepayment===false">{{ "FULL_PAYMENT" | translate}}</span>
+                    </label>:
+                    <span style="color:red;font-weight:bolder">Don't touch this field untill you filled in the payments on the right side</span>
+                    <input class="form-control mb-3 mb-lg-0" type="number" step="any" name="bagNumber" id="bagNumber"
+                      (keyup)="updatePayments()" [(ngModel)]="item.paymentAmount" [disabled]="item.isExclude" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+          </div>
+
+        </div>
+      </div>
+
+      <div class="col-3">
+        <div class="row">
+          <div class="col-12">
+            <div class="form-group mb-4">
+              <label class="form-control-label mb-3">{{ "TAX" | translate}}</label>:
+              <ng-select name="taxRate" id="taxRate" class="form-control  mb-3 mb-lg-0" [(ngModel)]="item.tax">
+                <ng-option *ngFor="let rate of taxes" [value]="rate.nRate">{{rate.sName}}</ng-option>
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-group mb-4">
+              <label class="form-control-label mb-3">
+                <span *ngIf="item.eActivityItemStatus === 'new'; else otherstatus">{{"ESTIMATED_DATE_READY" | translate}}</span>
+                <ng-template #otherstatus>{{"ESTIMATED_QUOTE_DATE" | translate}}</ng-template>
+              </label>:
+              <input type="date" class="form-control mb-3 mb-lg-0 datetimepicker-input" [ngModel]="item.dEstimatedDate"
+                (ngModelChange)="item.dEstimatedDate = $event" />
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="row my-3">
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <button (click)="item.eEstimatedDateAction='call_on_ready'"
+                  [ngClass]="{active:item.eEstimatedDateAction==='call_on_ready'}" type="button"
+                  class="btn btn-primary fs-6 p-2">
+                  <fa-icon [icon]="faPhone"></fa-icon>
+                </button>
+                <button (click)="item.eEstimatedDateAction='email_on_ready'"
+                  [ngClass]="{active:item.eEstimatedDateAction==='email_on_ready'}" type="button"
+                  class="btn btn-primary fs-6 p-2">
+                  <fa-icon [icon]="faAt"></fa-icon>
+                </button>
+                <button (click)="item.eEstimatedDateAction='whatsapp_on_ready'"
+                  [ngClass]="{active:item.eEstimatedDateAction==='whatsapp_on_ready'}" type="button"
+                  class="btn btn-primary fs-6 p-2">
+                  <i class="bi bi-whatsapp"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-12" *ngIf="contactType">
+            <div class="row my-3">
+              <!--begin::Alert-->
+              <div class="alert alert-warning d-flex align-items-center p-5">
+                <!--begin::Wrapper-->
+                <div class="d-flex flex-column">
+                  <!--begin::Title-->
+                  <!--end::Title-->
+                  <!--begin::Content-->
+                  <span>No Customer Selected</span>
+                  <!--end::Content-->
+                </div>
+                <!--end::Wrapper-->
+              </div>
+              <!--end::Alert-->
+            </div>
+          </div>
+          <div class="col-12">
+            <button class="btn btn-bg-light btn-active-color-primary mt-2" (click)="openImageModal()"> Photos
+              <fa-icon [icon]="faUpload"></fa-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="col-4">
+        <div class="row">
+          <!-- REPAIRER -->
+
+          <div class="col-12">
+            <div class="mb-4">
+              <label class="form-control-label mb-3">{{ "REPAIRER" | translate }}</label>
+              <ng-select *ngIf="!oRepairer.sName" [(ngModel)]="oRepairer.sName" (search)="searchEmployees($event.term)"
+                class="form-control form-control-solid p-0 w-100 custom" placeholder="{{ 'SEARCH_EMPLOYEES' | translate }}"
+                [minTermLength]="2" [clearable]="false" [isOpen]="filteredEmployees.length > 0"
+                (change)="selectAssignee($event, item)">
+                <ng-option *ngFor="let option of filteredEmployees" [value]="option">{{ option.sName || "Unknown" }}
+                </ng-option>
+              </ng-select>
+              <div class="chip d-flex py-4 px-8" *ngIf="oRepairer.sName">
+                {{ oRepairer.sName }}
+                <div (click)="oRepairer.sName = null">
+                  &nbsp;<i class="close fas fa-times cursor-pointer"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="mb-4">
+              <label for="supplier">{{ "OR" | translate }}</label>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="mb-4">
+              <ng-select *ngIf="!supplier" [(ngModel)]="supplier" (search)="searchSuppliers($event.term)"
+                class="form-control form-control-solid p-0 w-100 custom" placeholder="{{'SEARCH_REPAIRER' | translate}}"
+                [minTermLength]="2" [clearable]="false" [isOpen]="supplierOptions.length > 0" (change)="
+              supplier = $event.sName;
+              item.iSupplierId = $event._id;
+              supplierOptions = []
+            ">
+                <ng-option *ngFor="let option of supplierOptions" [value]="option">{{
+                  option.sName || "Unknown"
+                  }}</ng-option>
+              </ng-select>
+              <div class="chip d-flex py-4 px-8" *ngIf="supplier">
+                {{ supplier }}
+                <div (click)="supplier = null">
+                  &nbsp;<i class="close fas fa-times cursor-pointer"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="mb-4">
+              <label class="form-control-label mb-3">{{ "BRAND" | translate }}</label>
+              <ng-select *ngIf="!brand" [(ngModel)]="brand" (search)="searchBrands($event.term)"
+                class="form-control form-control-solid p-0 w-100 custom" placeholder="{{'SEARCH_BRAND' | translate}}" [minTermLength]="2"
+                [clearable]="false" [isOpen]="filteredBrands.length > 0" (change)="
+            brand = $event.sName;
+            item.iBusinessBrandId = $event._id;
+            filteredBrands = []
+          ">
+                <ng-option *ngFor="let option of filteredBrands" [value]="option">{{
+                  option.sName || "Unknown"
+                  }}</ng-option>
+              </ng-select>
+              <div class="chip d-flex py-4 px-8" *ngIf="brand">
+                {{ brand }}
+                <div (click)="brand = null">
+                  &nbsp;<i class="close fas fa-times cursor-pointer"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-4">
+        <div class="row">
+          <!-- EXCLUDE_ITEM -->
+
+          <div class="col-12">
+            <div class="form-group mb-4">
+              <label class="form-control-label mb-3">{{ "EXCLUDE_ITEM" | translate}}</label>:
+              <label class="form-check form-switch form-check-custom form-check-solid mb-3 mb-lg-0">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="item.isExclude" (ngModelChange)="updatePayments()">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="form-group mb-4">
+            <label class="form-control-label mb-3">{{ "PROPERTIES" | translate}}</label>:
+            <div class="overflow-scroll py-1 h-150px">
+        
+              <div class="d-flex" *ngFor="
+                    let property of item.oArticleGroupMetaData.aProperty; let pIndex = index">
+                <div class="w-100" *ngIf="propertyOptions[property.iPropertyId]?.length > 0">
+                  <ng-select class="form-control p-0 w-100" [(ngModel)]="selectedProperties[property.iPropertyId]"
+                    (change)="setPropertyOption(property, pIndex)" [clearable]="false">
+                    <ng-option *ngFor="let option of propertyOptions[property.iPropertyId]" [value]="option.sCode">{{
+                      option.sName }}</ng-option>
+                  </ng-select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-4">
+        <div class="p-2" *ngFor="let image of item.aImage; let i = index" (mouseover)="showDeleteBtn = true"
+          (mouseout)="showDeleteBtn = false">
+          <div class="image-input" data-kt-image-input="true"
+            style="background-image: url('assets/media/svg/avatars/blank.svg')">
+            <div class="image-input-wrapper w-125px h-125px"
+              style="background-image: url(assets/media/avatars/300-1.jpg)">
+              <img src="{{ image }}" width="125px" height="125px" />
+            </div>
+
+            <div>
+              <button class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Remove image"
+                (click)="removeImage(i)">
+                <i class="bi bi-x fs-2" (click)="removeImage(i)"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

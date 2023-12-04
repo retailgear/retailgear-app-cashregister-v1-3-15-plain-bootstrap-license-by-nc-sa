@@ -1,0 +1,113 @@
+<div class="container">
+    <div class="card card-flush">
+        <div class="card-body">
+            <div class="d-flex flex-column mb-5">
+                <h1>{{"DAY_CLOSURE_OVERVIEW" | translate}}</h1>
+                <p>{{"DAY_CLOSURE_DESCRIPTION" | translate}}</p>
+            </div>
+            <div class="row mb-5">
+                <div class="col-md-4">
+                    <label class="fs-6 form-label fw-bolder text-dark">{{'LOCATION' | translate}}</label>
+                    <div class="w-100" *ngIf="aLocation?.length">
+                        <ng-select [multiple]="true" [items]="aLocation" [(ngModel)]="aSelectedLocation" (ngModelChange)="selectedLocationChanged()"
+                            name="iLocationId" bindValue="_id" bindLabel="sName" placeholder="{{'SELECT' | translate}}" required
+                            [closeOnSelect]="false">
+                            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                <input id="item-{{index}}" type="checkbox" name="item-{{index}}"
+                                    [ngModel]="item$.selected" />
+                                {{item.sName}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="fs-6 form-label fw-bolder text-dark">{{'WORK_STATION' | translate}}</label>
+                    <ng-select class="form-control p-0" [(ngModel)]="oSelectedWorkStation" placeholder="{{'SELECT' | translate}}"
+                        [clearable]="true">
+                        <ng-option *ngFor="let oWorkStation of aWorkStation" [value]="oWorkStation">
+                            {{oWorkStation.sName}}
+                        </ng-option>
+                    </ng-select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <button type="button" class="btn btn-primary" data-kt-roles-modal-action="submit"
+                            (click)="fetchDayClosureList()">
+                            <span class="indicator-label">{{ "APPLY_FILTER" | translate}}</span>
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" routerLink="/business/transactions-audit">
+                            {{"GENERATE_REPORT" | translate}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <table class="table table-hover table-rounded table-striped border gy-7 gs-7">
+                    <thead>
+                        <tr class="fw-bold fs-6 text-gray-400 border-bottom-2 border-gray-200">
+                            <th scope="col">{{ 'OPEN_DATE' | translate }}</th>
+                            <th scope="col">{{ 'CLOSE_DATE' | translate }}</th>
+                            <th scope="col">{{ 'PAYMENT_TOTAL' | translate }}</th>
+                            <th scope="col">{{ 'REVENUE' | translate }}</th>
+                            <th scope="col">{{ 'CASH_START' | translate }}</th>
+                            <th scope="col">{{ 'CASH_COUNTED' | translate }}</th>
+                            <th scope="col">{{ 'SKIMMED' | translate }}</th>
+                            <th scope="col">{{ 'CASH_REMAIN' | translate }}</th>
+                            <th scope="col">{{ 'ACTION' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let oDayClosure of aDayClosure | paginate: paginationConfig; let i = index; ">
+                            <td scope="row">{{oDayClosure?.dOpenDate | date: 'yyyy-MM-dd HH:mm'}}</td>
+                            <td>{{oDayClosure?.dCloseDate | date: 'yyyy-MM-dd HH:mm' }}</td>
+                            <td>{{oDayClosure?.nPaymentMethodTotal}}</td>
+                            <td>{{oDayClosure?.nTotalRevenue}}</td>
+                            <td>{{oDayClosure?.oCountings?.nCashAtStart}}</td>
+                            <td>{{oDayClosure?.oCountings?.nCashCounted}}</td>
+                            <td>{{oDayClosure?.oCountings?.nSkim}}</td>
+                            <td>{{oDayClosure?.oCountings?.nCashRemain}}</td>
+
+                            <td>
+                                <button class="btn btn-primary" (click)="goToView(oDayClosure._id, oDayClosure?.dOpenDate, oDayClosure?.dCloseDate)">
+                                    {{"VIEW" | translate}}
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex">
+                <h5 *ngIf='!aDayClosure?.length && !showLoader' style="text-align: center;"> {{ "NO_DATA_FOUND" |
+                    translate }}
+                </h5>
+                <div *ngIf="showLoader" class="spinner-border mx-auto"></div>
+            </div>
+            <div class="row">
+                <div
+                    class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
+                    <div class="dataTables_length" id="kt_ecommerce_sales_table_length">
+                        <label>
+                            <select name="kt_ecommerce_sales_table_length" aria-controls="kt_ecommerce_sales_table"
+                                class="form-select form-select-sm form-select-solid" [(ngModel)]="requestParams.limit"
+                                (change)="changeItemsPerPage(requestParams.limit)">
+                                <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{ pageNum }}
+                                </option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-9 d-flex align-items-center justify-content-center justify-content-md-end">
+                    <pagination-controls [hidden]="aDayClosure.length === 0" (pageChange)="pageChanged($event)"
+                        (pageBoundsCorrection)="pageChanged($event)" [maxSize]="setPaginateSize"
+                        [previousLabel]="'PREVIOUS' | translate" [nextLabel]="'NEXT' | translate"
+                        screenReaderPaginationLabel="Pagination" [screenReaderPageLabel]="'PAGE' | translate">
+                    </pagination-controls>
+                </div>
+            </div>
+        </div>
+
+    </div>

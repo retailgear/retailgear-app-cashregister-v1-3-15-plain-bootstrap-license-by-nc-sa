@@ -1,0 +1,6 @@
+<br><br>
+<input type="text" [(ngModel)]="barcode" placeholder="Barcode" (ngModelChange)="onInputChange()" />
+<br>
+<br>
+<p> {{ "ENTERED_BARCODE" | translate}}: {{barcode}}</p>
+<p> {{ "HARDWARE_SCANNER_DETECTED" | translate }}: {{scannerUsed}}</p>

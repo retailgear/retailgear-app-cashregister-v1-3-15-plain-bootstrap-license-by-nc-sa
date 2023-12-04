@@ -1,0 +1,111 @@
+<div class="card mb-5 mb-xl-10 d-flex">
+    <div class="card-header row">
+        <div class="card-title">
+            <div class="col-md-11">
+                <span>{{'WORKSTATIONS'}}</span>
+            </div>
+            <div class="col-md-1">
+                <span>
+                    <button *ngIf="!addNew" class="btn btn-primary" (click)="addNew = !addNew">New</button>
+                </span>
+            </div>
+        </div>
+        <div *ngIf="addNew" class="card-body">
+            <div class="row">
+                <div class="col-md-6 padding-top-10">
+                    <input class="form-control" [placeholder]="'NAME' | translate" [(ngModel)]="workstation.sName" />
+                </div>
+                <div class="col-md-6 padding-top-10">
+                    <input class="form-control" [placeholder]="'DESCRIPTION' | translate"
+                        [(ngModel)]="workstation.sDescription" />
+                </div>
+                <div class="row col-md-2 padding-top-10 d-flex">
+                    <button class="btn btn-primary" (click)="createWorkstation()"> {{"CREATE" | translate}} </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6" *ngFor="let workstation of workstations">
+        <div class="card mb-5 mb-xl-10 d-flex">
+            <div class="card-header row">
+                <div class="card-title">
+                    <div class="col-md-10">
+                        {{workstation.sName}}
+                    </div>
+                    <div class="col-md-1">
+                        <button class="btn ms-1" type="submit">
+                            <fa-icon [icon]="faPencilAlt"></fa-icon>
+                        </button>
+                    </div>
+                    <div class="col-md-1">
+                        <button class="btn ms-1" type="submit" (click)="createWorkstationSettings(workstation)">
+                            <fa-icon [icon]="faTrash"></fa-icon>
+                        </button>
+                    </div>
+                    <!-- <div class="col-md-1">
+                        <button data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end" data-kt-menu-flip="bottom" class="btn btn-sm btn-icon btn-bg-secondary btn-active-color-primary float-righ">
+                            <i class="bi bi-three-dots fs-3"></i>
+                        </button>
+                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-200px py-4"
+                        data-kt-menu="true">
+                            <div class="menu-item px-3" *ngFor="let hMenu of downloadOptions">
+                                <div class="menu-link px-3" (click)="selectDropDown(hMenu.key)">{{ hMenu.title}}</div>
+                            </div>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <div class="card-body">
+                {{workstation.sDescription}}
+                <div class="card shadow-sm mb-5 mb-xl-10 d-flex">
+                    <div class="card-header row">
+                        <div class="card-title">
+                            <div class="col-md-10">
+                                {{ "REPAIR_FOR_CUSTOMER" | translate}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div *ngFor="let setting of workstation.settings">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label>{{ "DEVICE" | translate}}</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control form-control-solid w-250px ps-14"
+                                        placeholder="Device" [(ngModel)]="setting.device" (value)="setting.device">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label>{{ "DEVICE" | translate}}</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control form-control-solid w-250px ps-14"
+                                        placeholder="Device" [(ngModel)]="setting.device" (value)="setting.device">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label>{{ "DEVICE" | translate}}</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control form-control-solid w-250px ps-14"
+                                        placeholder="Device" [(ngModel)]="setting.device" (value)="setting.device">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-5 mb-xl-10 d-flex">
+    <h5 *ngIf='!workstations.length && !loading' style="text-align: center;">{{ "NO_DATA_FOUND" | translate}}!</h5>
+    <div *ngIf="loading" class="spinner-border mx-auto"></div>
+</div>

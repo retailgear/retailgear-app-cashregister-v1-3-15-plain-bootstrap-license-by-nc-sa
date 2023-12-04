@@ -1,0 +1,227 @@
+<div class="container" *ngIf="aStatistic.length">
+  <div>
+    <div class="row" *ngIf="aStatistic[0].overall.length">
+      <div class="col-md-4">
+        <span class="">{{ 'QUANTITY' | translate}}</span>
+        <h3 class="text-black">{{aStatistic[0].overall[0].nQuantity}}</h3>
+      </div>
+      <div class="col-md-4">
+        <span class="">{{ 'TOTAL' | translate}}</span>
+        <h3 class="text-black">{{aStatistic[0].overall[0].nTotal}}</h3>
+      </div>
+      <div class="col-md-4">
+        <select class="form-select" id="product-attributes" [(ngModel)]="sDisplayMethod"
+          (click)="changeDisplayMethod($event)">
+          <option *ngFor="let option of aDisplayMethod" [value]="option.sKey">{{ option.sValue | translate}}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <hr>
+
+  <div class="card overflow-y-auto" *ngIf="sDisplayMethod === 'revenuePerBusinessPartner'">
+    <p> revenuePerBusinessPartner </p>
+    <div class="card-body">
+      <div class="table-responsive" *ngFor="let oStatistic of aStatistic; let statisticIndex = index">
+        <table
+          class="table table-rounded border border-gray-300 table-row-bordered table-row-gray-300 gy-5 gs-5 text-gray-600"
+          *ngFor="let oSupplier of oStatistic.individual; let supplierIndex = index">
+          <thead>
+            <tr>
+              <th><span class="">{{ 'SUPPLIER' | translate}}</span>
+                <h3 class="text-black">{{oSupplier.sBusinessPartnerName}}</h3>
+              </th>
+              <th class="w-150px"><span class="">{{"QUANTITY" | translate}}</span>
+                <h4 class="text-black">{{oSupplier.nQuantity}}</h4>
+              </th>
+              <th class="w-150px"><span class="">{{"PRICE_WITH_VAT" | translate}}</span>
+                <h4 class="text-black">{{oSupplier.nTotalRevenue}}</h4>
+              </th>
+              <th class="w-150px"><span class="">{{"PURCHASE_PRICE" | translate}}</span>
+                <h4 class="text-black">{{oSupplier.nTotalPurchaseAmount}}</h4>
+              </th>
+              <th class="w-150px"><span class="">{{"GROSS_PROFIT" | translate}}</span>
+                <h4 class="text-black">{{oSupplier.nProfit}}</h4>
+              </th>
+              <th class="w-150px"><span class="">{{"MARGIN" | translate}}</span>
+                <h4 class="text-black">{{oSupplier.nMargin}}</h4>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="oSupplier.aArticleGroups?.length">
+              <td colspan="6" class="p-2">
+                <table class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border"
+                  *ngFor="let oArticleGroup of oSupplier.aArticleGroups; let articleGroupIndex = index">
+                  <!-- start of article-group -->
+                  <thead class="bg-gray-100">
+                    <tr class="fw-bold fs-6 text-gray-800">
+                      <th scope="col">{{oArticleGroup.sName}}</th>
+                      <th scope="col" class="w-150px">{{oArticleGroup.nQuantity}}</th>
+                      <th scope="col" class="w-150px">{{oArticleGroup.nTotalRevenue}}</th>
+                      <th scope="col" class="w-150px">{{oArticleGroup.nTotalPurchaseAmount}}</th>
+                      <th scope="col" class="w-150px">{{oArticleGroup.nProfit}}</th>
+                      <th scope="col" class="w-150px">{{oArticleGroup.nMargin}}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="p-2"
+                    *ngFor="let oRevenueByProperty of oArticleGroup.aRevenueByProperty; let revenuePropertyIndex = index">
+                    <!--start of dynamic property -->
+                    <tr>
+                      <td class="ps-9">{{oRevenueByProperty.sCategory}}</td>
+                      <td>{{oRevenueByProperty.nQuantity}}</td>
+                      <td>{{oRevenueByProperty.nTotalRevenue}}</td>
+                      <td>{{oRevenueByProperty.nTotalPurchaseAmount}}</td>
+                      <td>{{oRevenueByProperty.nProfit}}</td>
+                      <td>{{oRevenueByProperty.nMargin}}</td>
+                    </tr>
+                  </tbody>
+                  <!-- start of articlegroup -->
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="sDisplayMethod === 'revenuePerSupplierAndArticleGroup'">
+    <p> Supplier and Article Group revenuePerArticleGroup (Article Group) </p>
+    <div class="card-body">
+      <div class="table-responsive" *ngFor="let oStatistic of aStatistic; let i = index">
+        <table
+          class="table table-rounded border border-gray-300 table-row-bordered table-row-gray-300 gy-5 gs-5 text-gray-600"
+          *ngFor="let oSupplier of oStatistic.individual; let supplierIndex = index">
+          <thead>
+            <tr>
+              <th><span class="">{{ 'SUPPLIER' | translate}}</span>
+                <h3 class="text-black">{{oSupplier.sBusinessPartnerName}}</h3>
+              </th>
+              <th class="w-150px"><span class="">{{"QUANTITY" | translate}}</span>
+                <h4 class="text-black">{{oSupplier.nQuantity}}</h4>
+              </th>
+              <th class="w-150px"><span class="">{{"PRICE_WITH_VAT" | translate}}</span>
+                <h4 class="text-black">{{oSupplier.nTotalRevenue}}</h4>
+              </th>
+              <th class="w-150px"><span class="">{{"PURCHASE_PRICE" | translate}}</span>
+                <h4 class="text-black">{{oSupplier.nTotalPurchaseAmount}}</h4>
+              </th>
+              <th class="w-150px"><span class="">{{"GROSS_PROFIT" | translate}}</span>
+                <h4 class="text-black">{{oSupplier.nProfit}}</h4>
+              </th>
+              <th class="w-150px"><span class="">{{"MARGIN" | translate}}</span>
+                <h4 class="text-black">{{oSupplier.nMargin}}</h4>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngIf="oSupplier.aArticleGroups?.length">
+              <td colspan="6" class="p-2">
+                <table class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border"
+                  *ngFor="let oArticleGroup of oSupplier.aArticleGroups; let articleGroupIndex = index">
+                  <thead class="bg-gray-100">
+                    <tr class="fw-bold fs-6 text-gray-800">
+                      <th scope="col">{{oArticleGroup.sName}}</th>
+                      <th scope="col" class="w-150px">{{oArticleGroup.nQuantity}}</th>
+                      <th scope="col" class="w-150px">{{oArticleGroup.nTotalRevenue}}</th>
+                      <th scope="col" class="w-150px">{{oArticleGroup.nTotalPurchaseAmount}}</th>
+                      <th scope="col" class="w-150px">{{oArticleGroup.nProfit}}</th>
+                      <th scope="col" class="w-150px">{{oArticleGroup.nMargin}}</th>
+                    </tr>
+                  </thead>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="sDisplayMethod === 'revenuePerArticleGroupAndProperty'">
+    <p>revenuePerArticleGroupAndProperty</p>
+    <div class="card-body">
+      <div class="table-responsive" *ngFor="let oStatistic of aStatistic; let i = index">
+        <table class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border"
+          *ngFor="let oArticleGroup of oStatistic.individual; let articleGroupIndex = index">
+          <!-- start of articlegroup -->
+          <thead class="bg-gray-100">
+            <tr class="fw-bold fs-6 text-gray-800">
+              <th scope="col">{{oArticleGroup._id}}</th>
+              <th scope="col" class="w-150px">{{oArticleGroup.nQuantity}}</th>
+              <th scope="col" class="w-150px">{{oArticleGroup.nTotalRevenue}}</th>
+              <th scope="col" class="w-150px">{{oArticleGroup.nTotalPurchaseAmount}}</th>
+              <th scope="col" class="w-150px">{{oArticleGroup.nProfit}}</th>
+              <th scope="col" class="w-150px">{{oArticleGroup.nMargin}}</th>
+            </tr>
+          </thead>
+          <tbody class="p-2"
+            *ngFor="let oRevenueByProperty of oArticleGroup.aRevenueByProperty; let revenuePropertyIndex = index">
+            <!--start of Dynamic property -->
+            <tr>
+              <td class="ps-9">{{oRevenueByProperty.sCategory}}</td>
+              <td>{{oRevenueByProperty.nQuantity}}</td>
+              <td>{{oRevenueByProperty.nTotalRevenue}}</td>
+              <td>{{oRevenueByProperty.nTotalPurchaseAmount}}</td>
+              <td>{{oRevenueByProperty.nProfit}}</td>
+              <td>{{oRevenueByProperty.nMargin}}</td>
+            </tr>
+          </tbody>
+          <!-- start of articlegroup -->
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="sDisplayMethod === 'revenuePerProperty'">
+    <p>Table no 1 revenuePerProperty</p>
+
+    <div class="card-body">
+      <div class="table-responsive" *ngFor="let oStatistic of aStatistic; let i = index">
+        <table class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border"
+          *ngFor="let oRevenueByProperty of oStatistic.individual; let articleGroupIndex = index">
+          <!-- start of article-group -->
+          <thead class="bg-gray-100">
+            <tr class="fw-bold fs-6 text-gray-800">
+              <th scope="col">{{oRevenueByProperty.sCategory}}</th>
+              <th scope="col" class="w-150px">{{oRevenueByProperty.nPropertyName}}</th>
+              <th scope="col" class="w-150px">{{oRevenueByProperty.nTotalRevenue}}</th>
+              <th scope="col" class="w-150px">{{oRevenueByProperty.nTotalPurchaseAmount}}</th>
+              <th scope="col" class="w-150px">{{oRevenueByProperty.nProfit}}</th>
+              <th scope="col" class="w-150px">{{oRevenueByProperty.nMargin}}</th>
+            </tr>
+          </thead>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="sDisplayMethod === 'revenuePerArticleGroup'">
+    <p>Table No 5 revenuePerArticleGroup</p>
+    <div class="card-body">
+      <div class="table-responsive" *ngFor="let oStatistic of aStatistic; let i = index">
+        <table class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border"
+          *ngFor="let oArticleGroup of oStatistic.individual; let articleGroupIndex = index">
+          <!-- start of articlegroup -->
+          <thead class="bg-gray-100">
+            <tr class="fw-bold fs-6 text-gray-800">
+              <th scope="col">{{oArticleGroup._id}}</th>
+              <th scope="col" class="w-150px">{{oArticleGroup.nQuantity}}</th>
+              <th scope="col" class="w-150px">{{oArticleGroup.nTotalRevenue}}</th>
+              <th scope="col" class="w-150px">{{oArticleGroup.nTotalPurchaseAmount}}</th>
+              <th scope="col" class="w-150px">{{oArticleGroup.nProfit}}</th>
+              <th scope="col" class="w-150px">{{oArticleGroup.nMargin}}</th>
+            </tr>
+          </thead>
+          <!-- start of articlegroup -->
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+</div>

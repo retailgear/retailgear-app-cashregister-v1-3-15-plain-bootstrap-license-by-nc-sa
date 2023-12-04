@@ -1,0 +1,18 @@
+.work-break {
+  word-break: break-word;
+}
+
+.chip {
+  margin-top: 10px;
+  border-radius: 25px;
+  background-color: #f1f1f1;
+}
+
+.custom ::ng-deep .ng-placeholder::before {
+  font-family: FontAwesome;
+  content: "\f002";
+}
+
+.accordion-button::after {
+  content: none;
+}

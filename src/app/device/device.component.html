@@ -1,0 +1,52 @@
+<div class="card mb-5 mb-xl-10">
+  <div class="card-header">
+    <div class="card-title">
+      <span>{{"YOUR_CONNECTED_DEVICES" | translate}}</span>
+    </div>
+  </div>
+  <div class="card-body p-9">
+    <div class="row">
+      <div class="col-md-6 mb-8">
+        <div class="d-flex align-items-center position-relative my-1">
+          <span class="svg-icon svg-icon-4 position-absolute ms-4">
+            <i class="fas fa-xs fa-search"></i>
+          </span>
+          <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 ps-10"
+            [(ngModel)]="requestParams.searchValue" (change)="getDevices()"
+            placeholder="{{'SEARCH_YOUR_DEVICE' | translate}}">
+        </div>
+      </div>
+      <div class="col-md-6 d-flex align-items-center position-relative mb-8">
+        <button type="submit" class="btn btn-primary ms-xxl-auto" (click)="addNewDevice()"> {{
+          "ADD_NEW_DEVICE"}}</button>
+      </div>
+    </div>
+
+
+    <div class="row gx-9 gy-6">
+      <div class="col-lg-12" *ngFor="let device of devices">
+
+        <div class="card card-dashed h-xl-100 flex-row flex-stack flex-wrap p-6">
+          <div class="d-flex flex-column">
+            <div class="d-flex align-items-center fs-4 fw-bolder">
+              <span>{{device.sName}}</span>
+              <!-- <span class="badge badge-light-success fs-7 ms-2">Primary</span> -->
+              <div class="fs-6 fw-bold text-gray-600 ms-2">{{device.sDescription}}</div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center ">
+            <button class="btn btn-light btn-active-light-primary me-3" (click)="removeDevice(device)">{{ "DELETE" |
+              translate }}</button>
+            <button class="btn btn-light btn-active-light-primary" (click)="editDevice(device)">{{ "EDIT" |
+              translate}}</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="d-flex">
+      <h5 *ngIf='!devices.length && !loading' style="text-align: center;"> {{ "NO_DATA_FOUND" | translate}}!</h5>
+      <div *ngIf="loading" class="spinner-border mx-auto"></div>
+    </div>
+  </div>
+</div>

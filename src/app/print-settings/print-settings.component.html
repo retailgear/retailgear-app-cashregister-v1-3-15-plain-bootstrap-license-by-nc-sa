@@ -1,0 +1,347 @@
+<div class="card mb-5 mb-xl-10 d-flex" data-kt-scroll-section="print-settings">
+  <div class="card-header row">
+    <div class="card-title">
+      <div class="col-md-11">
+        <span></span>
+        <br>
+        <span>{{ 'FIRST_STEP_TO_PRINT' | translate}}</span>
+      </div>
+      <div class="col-md-1">
+      </div>
+    </div>
+    <div class="card-body">
+      <p *ngIf="businessDetails?.oPrintNode" class="my-2">
+      <p *ngIf="businessDetails?.oPrintNode?.nAccountId" class="my-2">
+        <label>Account ID: </label> {{businessDetails?.oPrintNode?.nAccountId}}
+      </p>
+      <p *ngIf="businessDetails?.oPrintNode" class="my-2">
+        <strong class="py-2"> Log in op PrintNode met deze gegevens: </strong>
+        <span class="d-block border bg-gray-300 p-2">
+          <label> Gebruikersnaam : </label> {{businessDetails?.oPrintNode?.sEmail}}
+          <br>
+          <label> Wachtwoord : </label> {{businessDetails?.oPrintNode?.sPassword}}
+          <br>
+          <label> API Key : </label> {{businessDetails?.oPrintNode?.sApiKey}}
+        </span>
+      </p>
+
+      <p>
+        {{"INSTALL_A_HELP_PROGRAM_TO_SET_YOUR_PRINTERS" | translate}} &nbsp;
+        <a href="https://support.prismanote.com/nl/support/solutions/articles/101000096958-prismanote-printhelper-installeren"
+          target="_blank">
+          <strong>{{"CLICK_HERE_FOR_INSTRUCTIONS" | translate}}</strong>
+        </a>
+      </p>
+      <!-- <div>
+        <span>
+          {{"CLICK_TO_LOAD_PRINT_SETTINGS_1" | translate}} '{{"LOAD_SETTINGS" | translate}}'
+          {{"CLICK_TO_LOAD_PRINT_SETTINGS_2" | translate}}
+          <strong> &nbsp; {{device.name}}</strong>
+        </span>
+      </div>
+      <div>
+        <button class="btn btn-primary btn-sm" type="submit" status="success">
+          <fa-icon [icon]="faRefresh"></fa-icon>
+          <span> &nbsp; {{"LOAD_SETTINGS" | translate}}</span>
+        </button>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<div class="card d-flex" data-kt-scroll-section="print-settings-letter-paper">
+  <div class="card-header row">
+    <div class="card-title justify-content-between">
+
+      <div>
+        <span>{{"PRINT_SETTINGS_LETTERPAPER" | translate}}</span>
+      </div>
+      <div class="">
+        <button class="btn btn-primary" (click)="createPrintSettings()"> {{ "NEW" | translate}}</button>
+      </div>
+
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <print-workstation *ngIf="businessDetails" [businessDetails]="businessDetails" [iLocationId]="iLocationId">
+      </print-workstation>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="card mb-5 mb-xl-10 d-flex" data-kt-scroll-section="label-definition">
+  <div class="card-header row">
+    <div class="card-title">
+      <div class="col-md-11">
+        <span> {{"LABEL" | translate}} {{"DEFINITIONS" | translate}}</span>
+      </div>
+      <div class="col-md-1">
+        <button class="btn btn-primary" (click)="openToolsModal()"> {{ "TOOLS" | translate}}</button>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div class="row my-3">
+        <div class="col-12">
+          <div class="d-flex flex-column">
+            <div class="h5">{{"LABEL_TEMPLATE"|translate}}</div>
+            <div class="dataTables_wrapper dt-bootstrap4 no-footer">
+
+              <div class="table-responsive">
+                <table class="table table-striped table-rounded table-hover fs-6 gy-5 gs-5 dataTable no-footer">
+                  <thead>
+                    <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                      <th class="mw-100px sorting" tabindex="0">#</th>
+                      <th class="mw-100px sorting" tabindex="0">{{ "NAME" | translate}}</th>
+                      <th class="mw-100px sorting" tabindex="0"> {{ "ACTION" | translate}}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="fw-bold text-gray-600">
+                    <ng-container *ngIf="!isLoadingTemplatesLabel && businessDetails?._id">
+                      <tr *ngFor='let label of LabelTemplatesData; let i = index'>
+                        <td class="mw-100px text-truncate">
+                          {{i+1}}
+                        </td>
+                        <td class="mw-200px text-truncate" [title]="label.name || ''">
+                          {{label.name || ''}}
+                        </td>
+                  
+                        <td>
+                          <div class="d-flex">
+                            <button (click)="openLabelTemplateModal(label,'edit')" class="btn btn-primary btn-sm">
+                              {{'EDIT'| translate}}
+                            </button>
+                  
+                            <button class="btn btn-icon btn-secondary btn-sm mx-2" (click)="deleteLabelTemplate(label._id)">
+                              <i class="fa fa-trash"></i>
+                            </button>
+                  
+                            <button (click)="sentToLayout(label)" class="btn btn-primary btn-sm">
+                              {{'SENT_TO_LAYOUT'| translate}}
+                            </button>
+                  
+                            <button (click)="printSample(label)" class="btn btn-primary btn-sm ms-2">
+                              {{'PRINT_SAMPLE'| translate}}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </ng-container>
+                    <div class="d-flex">
+                      <h5 *ngIf='!LabelTemplatesData.length && !isLoadingTemplatesLabel' style="text-align: center;"> {{
+                        "NO_DATA_FOUND" | translate}}!</h5>
+                      <div class="row h-200px" *ngIf="isLoadingTemplatesLabel || !businessDetails?._id">
+                        <div class="spinner-box h-200px">
+                          <div class="three-quarter-spinner">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="d-flex flex-column">
+            <div class="h5">{{"DEFAULT_LABEL"|translate}}</div>
+            <div class="dataTables_wrapper dt-bootstrap4 no-footer">
+
+              <div class="table-responsive">
+                <table class="table table-striped table-rounded table-hover fs-6 gy-5 gs-5 dataTable no-footer">
+                  <thead>
+                    <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                      <th class="mw-100px sorting" tabindex="0">#</th>
+                      <th class="mw-100px sorting" tabindex="0">{{ "NAME" | translate}}</th>
+                      <th class="mw-100px sorting" tabindex="0">{{ "ACTION" | translate}}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="fw-bold text-gray-600">
+                    <tr *ngFor='let label of defaultLabelsData; let i = index'>
+                      <td class="mw-100px text-truncate">
+                        {{i+1}}
+                      </td>
+                      <td class="mw-200px text-truncate" [title]="label.name || ''">
+                        {{label.name || ''}}
+                      </td>
+
+                      <td>
+
+                        <button (click)="openLabelTemplateModal(label,'create')" class="btn btn-primary btn-sm">
+                          {{'CREATE'| translate}}
+
+                        </button>
+
+                      </td>
+                    </tr>
+                    <div class="d-flex">
+                      <h5 *ngIf='!defaultLabelsData.length && !isLoadingDefaultLabel' style="text-align: center;"> {{
+                        "NO_DATA_FOUND" | translate}}!</h5>
+                      <div class="row h-200px" *ngIf="isLoadingDefaultLabel">
+                        <div class="spinner-box h-200px">
+                          <div class="three-quarter-spinner">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+<div class="card mb-5 mb-xl-10 d-flex" data-kt-scroll-section="print-action">
+  <div class="card-header row">
+    <div class="card-title flex-wrap">
+      <div class="d-flex justify-content-between align-items-center flex-grow-1">
+        <span>{{"PRINT_ACTIONS" | translate}}</span>
+        <button class="btn btn-primary btn-sm" (click)="openActionSetting()">{{"ADD_NEW_ACTION" | translate}}</button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <ng-container *ngIf="bShowActionSettingsLoader; else actionsLoaded">
+      <div class="d-flex">
+        <div class="spinner-border mx-auto"></div>
+      </div>
+    </ng-container>
+    <ng-template #actionsLoaded>
+      <table class="table table-row-gray-400 gx-2 mt-4 table-row-bordered table-rounded border border-gray-400">
+        <thead>
+          <tr>
+            <th class="border border-gray-400 text-center">{{'TYPE' | translate}}</th>
+            <th class="border border-gray-400 text-center">{{'SITUATION' | translate}}</th>
+            <th class="border border-gray-400 text-center">{{'ACTION_TO_PERFORM' | translate}}</th>
+            <th class="border border-gray-400 text-center">{{'ACTION' | translate}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="" *ngFor="let item of aActionSettings.aActions;let index=index;">
+            <td class="border border-gray-400 text-center">{{item.eType}}</td>
+            <td class="border border-gray-400 text-center">{{item.eSituation}}</td>
+            <td class="border border-gray-400 text-center">
+              <span class="badge badge-success" *ngFor="let action of item.aActionToPerform">
+                {{action}}
+              </span>
+            </td>
+            <td class="border border-gray-400 text-center">
+              <div class="d-flex justify-content-center">
+                <button class="btn btn-info btn-sm me-2" (click)="openActionSetting('update', index)">
+                  <fa-icon [icon]="faPencilAlt"></fa-icon>
+                </button>
+                <button class="btn btn-danger btn-sm" (click)="removeActionSetting(index)">
+                  <fa-icon [icon]="faXmark"></fa-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-template>
+  </div>
+</div>
+
+
+<!-- <div class="card mb-5 mb-xl-10 d-flex" data-kt-scroll-section="thermal-printer">
+  <div class="card-header row">
+    <div class="card-title">
+      {{"THERMAL_PRINTER" | translate}}
+    </div>
+    <div class="card-body">
+      <span class="label label-info"> {{"SETTINGS_FOR_DEVICE" | translate}}: {{device.name}} </span>
+      <br>
+      <div *ngIf="!newPrinter" class="custom-margin-t10">
+        <form name="thermalPrinterForm">
+          <diV class="row">
+            <div class="col-md-4">
+              <label class="form-label">{{"ENABLE" | translate}}</label>
+            </div>
+            <div class="col-md-8">
+              <label class="form-check form-switch form-check-custom form-check-solid">
+                <input type="checkbox" class="form-check-input">
+              </label>
+            </div>
+          </diV>
+          <br>
+          <label for="deviceIdPrinter">{{"DEVICE_ID" | translate}}</label>
+          <br>
+          <input type="text" class="form-control" fullWidth id="deviceIdPrinter" required="true" name="deviceIdPrinter">
+          <label for="ipPrinter">{{"IP_ADDRESS" | translate}}</label>
+          <br>
+          <input type="text" class="form-control" fullWidth id="ipPrinter" required="true" name="ipPrinter">
+          <label for="portPrinter">{{"PORT" | translate}}</label>
+          <br>
+          <input type="text" class="form-control" fullWidth id="portPrinter" required="true" name="portPrinter">
+          <p class="help-block" *ngIf="device.thermalPrinter && device.thermalPrinter.brand === 'EPSON'">
+            {{"PORT_8008_FOR_HTTP_AND_PORT_8043_FOR_HTTPS" | translate}}
+          </p>
+          <button type="submit" class="btn btn-primary custom-margin-t10">
+            {{"SAVE" | translate}}
+          </button>
+        </form>
+      </div>
+      <div *ngIf="newPrinter" class="custom-margin-t10">
+        <form name="thermalPrinterForm">
+          <diV class="row">
+            <div class="col-md-4">
+              <label class="form-label">{{"ENABLE" | translate}}</label>
+            </div>
+            <div class="col-md-8">
+              <label class="form-check form-switch form-check-custom form-check-solid">
+                <input type="checkbox" class="form-check-input">
+              </label>
+            </div>
+          </diV>
+          <br>
+          <label for="thermalPrinterName">{{"PRINTER_NAME" | translate}} </label>
+          <br>
+          <select class="form-select" id="thermalPrinterName" required="true" name="thermalPrinterName">
+            <option *ngFor="let p of printers" [value]="p">{{ p }}</option>
+          </select>
+          <diV class="row">
+            <div class="col-md-4">
+              <label class="form-label">{{"USE_STAR_SYNTAX" | translate}}</label>
+            </div>
+            <div class="col-md-8">
+              <label class="form-check form-switch form-check-custom form-check-solid">
+                <input type="checkbox" class="form-check-input">
+              </label>
+            </div>
+          </diV>
+          <label for="drawerPort">{{"DRAWER_CONNECTION" | translate}}</label>
+          <select class="form-select" id="drawerPort" required="true" name="drawerPort">
+            <option value=""></option>
+            <option value="PIN2">Pin 2</option>
+            <option value="PIN5">Pin 5</option>
+          </select>
+          <br>
+          <button type="submit" class="btn btn-primary custom-margin-t10">
+            {{"MEASURE_RECEIPT" | translate}}
+          </button>
+          <p class="help-block">{{"PRINT_THE_MEASURE_RECEIPT_AND_FOLLOW_THE_PRINTED_INSTRUCTIONS" | translate}}</p>
+          <label for="line_n">{{"LINELENGTH_NORMAL" | translate}}</label>
+          <input type="text" id="line_n" name="line_n" class="form-control" fullWidth>
+          <br>
+          <label for="line_l">{{"LINELENGTH_LARGE" | translate}}</label>
+          <input type="text" id="line_l" name="line_l" class="form-control" fullWidth>
+          <button type="submit" class="btn btn-primary custom-margin-t10">
+            {{"SAVE" | translate}}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div> -->

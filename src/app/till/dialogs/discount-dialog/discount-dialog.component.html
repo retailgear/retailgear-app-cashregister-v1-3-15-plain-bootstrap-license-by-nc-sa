@@ -1,0 +1,85 @@
+<div class="card shadow-sm">
+  <div class="card-header p-4 px-5">
+    <h3 class="card-title">{{ "SET_DISCOUNT_FOR" | translate}} {{item.name}}</h3>
+    <div class="card-toolbar m-0">
+      <button type="button" class="btn btn-icon btn-secondary w-35px h-35px" (click)="close()">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+  </div>
+  <div class="card-body card-scroll">
+    <div class="input-group mb-5">
+      <button class="btn btn-secondary" type="button" (click)="switchMode('fixed')">{{ "FIXED_PRICE" |
+        translate}}</button>
+      <button class="btn btn-secondary" type="button" (click)="switchMode('percent')">{{ "PERCENT" |
+        translate}}</button>
+    </div>
+
+    <h2 class="text-center" *ngIf="showCurrentDiscount">{{ "CURRENT_DISCOUNT_PER_ITEM" | translate}}:
+      {{currentDiscount}}</h2>
+
+    <div data-kt-buttons="true">
+      <ng-container *ngFor="let discount of discounts">
+        <label class="btn btn-outline btn-outline-dashed d-flex flex-stack text-start p-4 mb-2"
+          *ngIf="discount.disabled === false">
+          <div class="d-flex align-items-center me-2">
+            <div class="form-check form-check-custom form-check-solid form-check-primary me-6">
+              <input class="form-check-input" type="radio" name="discount" [disabled]="discount.disabled"
+                [value]="discount.amount" [(ngModel)]="selectedDiscount" (change)="setDiscount(discount)" />
+            </div>
+            <div class="flex-grow-1">
+              <h2 class="d-flex align-items-center fs-3 fw-bolder flex-wrap">
+                <div *ngIf="mode === 'fixed'; then fixed else percent"></div>
+
+                <ng-template #fixed>{{discount.amount | currency: tillService.currency }}</ng-template>
+                <ng-template #percent>{{discount.amount}}%</ng-template>
+
+              </h2>
+
+            </div>
+          </div>
+          <div class="ms-5">
+            <span class="mb-2">{{ tillService.currency }}</span>
+            <span class="fs-2x fw-bolder">
+              {{discount.price}}
+            </span>
+            <span class="fs-7 opacity-50">/
+              <span data-kt-element="period">{{ "PER_UNIT" | translate}}</span>
+            </span>
+          </div>
+        </label>
+      </ng-container>
+      <label class="btn btn-outline btn-outline-dashed d-flex flex-stack text-start p-4 mb-5">
+        <div class="d-flex align-items-center me-2 flex-row-fluid">
+          <div class="form-check form-check-custom form-check-solid form-check-primary me-6 flex-row-auto w-50px">
+            <input class="form-check-input" type="radio" name="discount" value="custom" [(ngModel)]="selectedDiscount"
+              (change)="setCustomDiscount()" (click)="enterCustomDiscount()" />
+          </div>
+          <div class="flex-grow-1 flex-row-fluid">
+            {{ "CUSTOM_DISCOUNT" | translate}}
+            <input #customDiscountRef type="text" class="form-control mb-3" [(ngModel)]="customDiscount"
+              (ngModelChange)="enterCustomDiscount()" [disabled]="selectedDiscount !== 'custom'">
+            <app-alert [alert]="{title: '', message: alertMessage}" type="danger" *ngIf="showDiscountAlert"></app-alert>
+          </div>
+        </div>
+        <div class="ms-5" *ngIf="mode === 'percent'">
+          <span class="mb-2">&euro;</span>
+          <span class="fs-2x fw-bolder">
+            {{customDiscountValuePercent}}
+          </span>
+          <span class="fs-7 opacity-50">/
+            <span data-kt-element="period">{{ "PER_UNIT" | translate}}</span>
+          </span>
+        </div>
+      </label>
+      <h1 class="text-center">{{ "TOTAL_PRICE" | translate}}: {{getTotalPrice()}}</h1>
+    </div>
+  </div>
+  <div class="card-footer">
+    <button class="btn btn-secondary" type="button" (click)="save()" [disabled]="showDiscountAlert">{{ "SAVE" |
+      translate}}</button>
+    <button class="btn btn-danger" type="button" (click)="removeDiscount()" *ngIf="showCurrentDiscount">{{
+      "REMOVE_DISCOUNT" | translate}}</button>
+
+  </div>
+</div>

@@ -1,0 +1,334 @@
+<div class="container">
+  <div class="my-4 px-7 py-7 card card-flush">
+    <div class="d-flex align-items-center my-3">
+      <div class="position-relative w-md-400px me-md-2">
+        <fa-icon [icon]="faSearch" class="text-gray-500 position-absolute top-50 translate-middle ms-6"></fa-icon>
+        <!--end::Svg Icon-->
+        <input type="text" class="form-control form-control-solid ps-10" [(ngModel)]="requestParams.searchValue"
+          (keyup.enter)="loadTransaction()" name="search" value="" placeholder="{{ 'SEARCH' | translate }}" />
+      </div>
+      <div class="d-flex align-items-center">
+        <button type="submit" class="btn btn-primary me-5" (click)="loadTransaction()">{{ 'SEARCH' | translate
+          }}</button>
+        <a id="kt_horizontal_search_advanced_link" class="btn btn-link" data-toggle="collapse"
+          data-target="#kt_advanced_search_form" aria-expanded="true" aria-controls="kt_advanced_search_form"
+          (click)="showAdvanceSearch = !showAdvanceSearch">{{ 'ADVANCED_SEARCH' | translate }}</a>
+      </div>
+      <div class="d-flex align-items-right ms-auto">
+        <button class="btn btn-primary" (click)="goToCashRegister()">{{ 'NEW' | translate }}</button>
+      </div>
+    </div>
+    <div class="collapse row" id="kt_advanced_search_form" data-kt-search-minimize="on"
+      [ngClass]="{'show' : showAdvanceSearch}">
+      <div class="col-12">
+        <!-- <div class="separator separator-dashed"></div> -->
+        <div class="row g-4 mb-2">
+
+              <div class="col-lg-2">
+                <label class="fs-6 form-label fw-bolder text-dark">{{ "CREATE_MIN_DATE" | translate}}</label>
+                <input type="date" class="form-control form-control form-control-solid" name="createMinDate"
+                  [ngModel]="filterDates.create.minDate | date:'yyyy-MM-dd'"
+                  (ngModelChange)="filterDates.create.minDate = $event" />
+              </div>
+              <div class="col-lg-2">
+                <label class="fs-6 form-label fw-bolder text-dark">{{ "CREATE_MAX_DATE" | translate}}</label>
+                <input type="date" class="form-control form-control form-control-solid" name="createMaxDate"
+                  [ngModel]="filterDates.create.maxDate | date:'yyyy-MM-dd'" (ngModelChange)="filterDates.create.maxDate = $event" />
+              </div>
+
+              <div class="col-lg-2">
+                <label class="fs-6 form-label fw-bolder text-dark">{{ "ESTIMATE_MIN_DATE" | translate}}</label>
+                <input type="date" class="form-control form-control form-control-solid" name="estimateMinDate"
+                  [ngModel]="filterDates.estimate.minDate | date:'yyyy-MM-dd'"
+                  (ngModelChange)="filterDates.estimate.minDate = $event" />
+              </div>
+              <div class="col-lg-2">
+                <label class="fs-6 form-label fw-bolder text-dark">{{ "ESTIMATE_MAX_DATE" | translate}}</label>
+                <input type="date" class="form-control form-control form-control-solid" name="estimateMaxDate"
+                  [ngModel]="filterDates.estimate.maxDate | date:'yyyy-MM-dd'" (ngModelChange)="filterDates.estimate.maxDate = $event" />
+              </div>
+
+              <div class="col-lg-3" *ngIf="isFor !== 'activity'">
+                <label class="fs-6 form-label fw-bolder text-dark">{{ "PAYMENT_METHOD" | translate}}</label>
+                <ng-select class="form-control form-control-solid p-0" [(ngModel)]="methodValue" [clearable]="false">
+                  <ng-option *ngFor="let method of paymentMethods" [value]="method">{{method}}</ng-option>
+                </ng-select>
+              </div>
+              <div class="col-lg-3">
+                <label class="fs-6 form-label fw-bolder text-dark">{{ "TRANSACTION_TYPE" | translate}}</label>
+                <ng-select class="form-control form-control-solid p-0" [(ngModel)]="transactionValue"
+                  [clearable]="false">
+                  <ng-option *ngFor="let type of transactionTypes" [value]="type">{{type}}</ng-option>
+                </ng-select>
+              </div>
+              <div class="col-lg-3">
+                <label class="fs-6 form-label fw-bolder text-dark" *ngIf="isFor !== 'activity'">{{'TRANSACTION_STATUS' | translate}}</label>
+                <label class="fs-6 form-label fw-bolder text-dark" *ngIf="isFor == 'activity'"> {{ 'ACTIVITY_STATUS' | translate }}</label>
+                <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+                  [(ngModel)]="requestParams.selectedTransactionStatuses" [clearable]="false">
+                  <ng-option *ngFor="let status of requestParams.transactionStatuses" [value]="status">{{status}}
+                  </ng-option>
+                </ng-select>
+              </div>
+              <!-- <div class="row g-4"> -->
+                <div class="col-lg-3" *ngIf="isFor !== 'activity'">
+                  <label class="fs-6 form-label fw-bolder text-dark">{{ "INVOICE_STATUS" | translate}}</label>
+                  <div class="nav-group nav-group-fluid">
+                    <label>
+                      <input type="radio" class="btn-check" name="invoice" value="all" [(ngModel)]="invoiceStatus"
+                        checked="checked" />
+                      <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bolder px-4">All</span>
+                    </label>
+                    <label>
+                      <input type="radio" class="btn-check" name="invoice" value="invoiced" [(ngModel)]="invoiceStatus" />
+                      <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bolder px-4"> {{ "INVOICED"
+                        | translate}}</span>
+                    </label>
+                    <label>
+                      <input type="radio" class="btn-check" name="invoice" value="uninvoiced"
+                        [(ngModel)]="invoiceStatus" />
+                      <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bolder px-4">{{
+                        "UNINVOICED" | translate}}</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-lg-3">
+                  <label class="fs-6 form-label fw-bolder text-dark">{{"IMPORT_STATUS" | translate}}</label>
+                  <div class="nav-group nav-group-fluid">
+                    <label>
+                      <input type="radio" class="btn-check" name="import" value="all" [(ngModel)]="importStatus"
+                        checked="checked" />
+                      <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bolder px-4">{{ "ALL" |
+                        translate}}</span>
+                    </label>
+                    <label>
+                      <input type="radio" class="btn-check" name="import" value="true" [(ngModel)]="importStatus" />
+                      <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bolder px-4">{{ "IMPORTED"
+                        | translate}}</span>
+                    </label>
+                    <label>
+                      <input type="radio" class="btn-check" name="import" value="false" [(ngModel)]="importStatus" />
+                      <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bolder px-4">{{"UNIMPORTED"
+                        | translate}}</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-lg-2">
+                  <label class="fs-6 form-label fw-bolder text-dark">{{ 'BUSINESS_PARTNER' | translate }}</label>
+                  <ng-select class="form-control form-control-solid p-0" [multiple]="true" [(ngModel)]="requestParams.aSelectedBusinessPartner"
+                    [clearable]="false">
+                    <ng-option *ngFor="let oBusinessPartner of aFilterBusinessPartner" [value]="oBusinessPartner.iBusinessPartnerId">{{oBusinessPartner.sBusinessPartnerName}}
+                    </ng-option>
+                  </ng-select>
+                </div>
+                <div class="col-lg-2">
+                  <label class="fs-6 form-label fw-bolder text-dark">{{ "EMPLOYEES" | translate}}</label>
+                  <ng-select class="form-control form-control-solid p-0" [clearable]="false" [(ngModel)]="requestParams.iEmployeeId">
+                    <ng-option *ngFor="let employeeObj of employees" [value]="employeeObj._id">{{employeeObj.sFirstName}}
+                      {{employeeObj.sLastName || ''}}</ng-option>>
+                  </ng-select>
+                </div>
+
+                <div class="col-lg-2">
+                  <label class="fs-6 form-label fw-bolder text-dark">{{ "ASSIGNEE" | translate}}</label>
+                  <ng-select class="form-control form-control-solid p-0" [clearable]="false" [(ngModel)]="requestParams.iAssigneeId">
+                    <ng-option *ngFor="let employeeObj of employees" [value]="employeeObj._id">{{employeeObj.sFirstName}}
+                      {{employeeObj.sLastName || ''}}</ng-option>>
+                  </ng-select>
+                </div>
+
+                <div class="col-lg-2">
+                  <label class="fs-6 form-label fw-bolder text-dark">{{ 'WORKSTATION' | translate }}</label>
+                  <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+                    [(ngModel)]="selectedWorkstations" [clearable]="false">
+                    <ng-option *ngFor="let workstation of workstations" [value]="workstation._id">{{workstation.sName}}
+                    </ng-option>
+                  </ng-select>
+                </div>
+                <div class="col-lg-2">
+                  <label class="fs-6 form-label fw-bolder text-dark">{{ 'LOCATION' | translate }}</label>
+                  <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+                    [(ngModel)]="requestParams.selectedLocations" [clearable]="false">
+                    <ng-option *ngFor="let location of requestParams.locations" [value]="location._id">{{location.sName}}
+                    </ng-option>
+                  </ng-select>
+                </div>
+            </div>
+        
+        <div class="row g-4">
+          <div class="col-xxl-12">
+      
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- <div class="mt-3 mb-6"></div> -->
+    <table class="table table-hover table-rounded table-striped gy-7 gs-7">
+      <thead>
+        <tr class="fw-bold fs-6 text-gray-400 text-uppercase border-gray-200">
+          <th scope="col" *ngFor="let th of tableHeaders"
+            [ngClass]="{'fw-bolder': th.selected, 'cursor-pointer': !th.disabled, 'pe-none': th.disabled}"
+            (click)="setSortOption(th)">
+            {{ th.key | translate}}
+            <fa-icon *ngIf="th.selected" [icon]=" th.sort ==='asc' ? faArrowDown : faArrowUp"></fa-icon>
+          </th>
+          <!-- <th scope="col"></th> -->
+        </tr>
+      </thead>
+      <tbody class="fw-bold text-gray-600">
+        <tr *ngFor="let activity of activities | paginate: paginationConfig, let i = index;">
+          <td>{{activity?.sNumber}}</td>
+          <td>{{activity?.sReceiptNumber || '-'}}</td>
+          <td>{{getTypes(activity.activityitems)}}</td>
+          <td scope="row">{{activity?.dCreatedDate | date: 'yyyy-MM-dd HH:mm'}}</td>
+          <td scope="row">{{activity?.dEstimatedDate | date: 'yyyy-MM-dd HH:mm'}}</td>
+          <td>{{activity?.eActivityItemStatus || '-'}}</td>
+          <td>{{activity?.sBusinessPartnerName || '-'}}</td>
+          <!-- <td>{{'-'}}</td> -->
+          <td>{{activity?.oCustomer?.sFirstName}} {{activity?.oCustomer?.sLastName || '-'}}</td>
+
+          <td>
+            <div class="btn-group">
+              <span class="btn btn-primary fs-bold px-6" (click)="openActivities(activity)">
+                <span class="indicator-label">{{ "VIEW" | translate}}</span>
+              </span>
+              <span class="btn btn-primary btn-icon fs-bold" role="button">
+                <div class="btn btn-icon" data-kt-menu-trigger="hover" data-kt-menu-attach="parent"
+                  data-kt-menu-placement="bottom-end" data-kt-menu-flip="bottom">
+                  <span class="svg-icon svg-icon-2 m-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M11.4343 12.7344L7.25 8.55005C6.83579 8.13583 6.16421 8.13584 5.75 8.55005C5.33579 8.96426 5.33579 9.63583 5.75 10.05L11.2929 15.5929C11.6834 15.9835 12.3166 15.9835 12.7071 15.5929L18.25 10.05C18.6642 9.63584 18.6642 8.96426 18.25 8.55005C17.8358 8.13584 17.1642 8.13584 16.75 8.55005L12.5657 12.7344C12.2533 13.0468 11.7467 13.0468 11.4343 12.7344Z"
+                        fill="black"></path>
+                    </svg>
+                  </span>
+                </div>
+                <div
+                  class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-200px py-4"
+                  data-kt-menu="true">
+                  <div class="menu-item px-3 text-center" *ngFor="let tMenu of transactionMenu">
+                    <div class="menu-link px-3" (click)="clickMenuOpt(tMenu.key, activity._id)">{{ tMenu.key |
+                      translate}}</div>
+                  </div>
+                </div>
+              </span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="d-flex">
+      <h5 *ngIf='!activities?.length && !showLoader' style="text-align: center;"> {{ "NO_DATA_FOUND" | translate}} !
+      </h5>
+      <div *ngIf="showLoader" class="spinner-border mx-auto"></div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
+        <div class="dataTables_length" id="kt_ecommerce_sales_table_length">
+          <label>
+            <select class="form-select form-select-sm form-select-solid" [(ngModel)]="pageCount"
+              (change)="changeItemsPerPage(pageCount)">
+              <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{ pageNum }}</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-9 d-flex align-items-center justify-content-center justify-content-md-end">
+        <pagination-controls [hidden]="!activities?.length" (pageChange)="pageChanged($event)"
+          (pageBoundsCorrection)="pageChanged($event)" [maxSize]="setPaginateSize"
+          [previousLabel]="'PREVIOUS' | translate" [nextLabel]="'NEXT' | translate"
+          screenReaderPaginationLabel="Pagination" [screenReaderPageLabel]="'PAGE' | translate">
+        </pagination-controls>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- <pre>
+	<code>
+
+		# User stories for repairs
+		# Work in progress!
+
+
+		As a retailer, I want see all repairs
+
+		As a retailer, I want see all repairs that have been created on date X
+		As a retailer, I want see all repairs that have been created between date A and date B
+
+		As a retailer, I want see all repairs that are repaired by us
+		As a retailer, I want see all repairs that are repaired by a repairer
+
+		As a retailer, I want see all repairs that have status: new
+		As a retailer, I want see all repairs that have status: offer
+		As a retailer, I want see all repairs that have status: offer-accepted
+		As a retailer, I want see all repairs that have status: offer-rejected
+		As a retailer, I want see all repairs that have status: to-be-repaired
+		As a retailer, I want see all repairs that have status: parts-ordered
+		As a retailer, I want see all repairs that have status: processing
+		As a retailer, I want see all repairs that have status: sent-to-repairer
+		As a retailer, I want see all repairs that have status: inspection
+		As a retailer, I want see all repairs that have status: completed
+		As a retailer, I want see all repairs that have status: delivered
+
+
+		As a retailer, I want to search for a specific repair by transaction number
+		As a retailer, I want to search for a specific repair by repair bag number
+		As a retailer, I want to search for a specific repair by customer name
+		As a retailer, I want to search for a specific repair by public comment field
+		As a retailer, I want to search for a specific repair by internal comment field
+
+		As a retailer, I want to see all repairs that have been created today
+		As a retailer, I want to see all repairs that have been created on a specific date
+		As a retailer, I want to see all repairs that have been created within a specific date range
+
+		As a retailer, I want to see all repairs that have E-mail as contact method
+		As a retailer, I want to see all repairs that have Phone as contact method
+		As a retailer, I want to see all repairs that have WhatsApp as contact method
+
+		As a retailer, I want to see all repairs that should be finished today
+		As a retailer, I want to see all repairs that should be finished on a specific date
+		As a retailer, I want to see all repairs that should be finished within a specific date range
+
+		As a retailer, I want to see all repairs that are new
+		As a retailer, I want to see all repairs that are pending
+		As a retailer, I want to see all repairs that are in progress
+		As a retailer, I want to see all repairs that are finished
+
+		As a retailer, I want to see all repairs that are ready to be sent to a repairer
+		As a retailer, I want to see all repairs that should be sent to a repairer
+		As a retailer, I want to see all repairs that are currently sent to a repairer
+		As a retailer, I want to see all repairs that have returned from a repairer
+
+
+		As a retailer, I want to change the public comment of a repair
+		As a retailer, I want to change the private comment of a repair
+		As a retailer, I want to change the status of a repair
+		As a retailer, I want to change the end date of a repair
+		As a retailer, I want to change the estimated price of a repair
+		As a retailer, I want to change the actual price of a repair
+		As a retailer, I want to change the contact method of a repair
+
+		As a retailer, I want to add a payment to a repair
+
+		As a retailer, I want to print a receipt of the repair for the customer
+		As a retailer, I want to print a receipt of the repair payment for the customer
+		As a retailer, I want to print a receipt of the repair offer for the customer
+
+		As a retailer, I want to download a receipt of the repair for the customer
+		As a retailer, I want to download a receipt of the repair payment for the customer
+		As a retailer, I want to download a receipt of the repair offer for the customer
+
+		As a retailer, I want to create a repair offer
+
+		As a retailer, I want to manually add a log entry
+		As a retailer, I want to manually edit a log entry
+
+		As a retailer, I want to send an email to the customer to notify him of a status change
+		As a retailer, I want to send an email to the customer to let him know the repair is ready
+		As a retailer, I want to send an email to the customer to let him know the repair takes longer
+		As a retailer, I want to send an email to the repairer
+
+	</code>
+</pre> -->

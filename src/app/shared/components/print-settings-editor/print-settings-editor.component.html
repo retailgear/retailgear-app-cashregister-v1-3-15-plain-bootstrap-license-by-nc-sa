@@ -1,0 +1,95 @@
+<div class="card">
+    <div class="card-header" style="margin-top: 20px;">
+        <h4>{{ 'EDIT_SETTINGS_FOR : ' + format.name | translate}}</h4>
+        <div>
+            <button type="button" class="btn btn-sm btn-light" (click)="close(false)">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-5">
+        <app-pn-tabs class="tab-content" addClass="" addChildLinkClass="text-gray-600">
+            <div class="tab-gap"></div>
+
+            <app-pn-tab tabTitle="{{ 'PARAMETERS' | translate}}" #params>
+                <div class="row">
+                    <div class="col-12">
+                        <h3>{{oTemplate.sTitle}}</h3>
+                    </div>
+
+                    <div class="col-12 setting" *ngFor="let setting of oTemplate.aSettings">
+
+                        <div *ngIf="setting.eType==='switch'" class="row align-items-center mb-3">
+                            <label class="col-3">{{ setting.sTitle }}</label>
+                            <label class="form-check form-switch form-check-custom form-check-solid col-9">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="setting.bShow" />
+                                <span class="form-check-label fw-bolder">{{ "SHOW_BUSINESS_LOGO" | translate }}</span>
+                            </label>
+                        </div>
+
+                        <div *ngIf="setting.eType==='dropdown'" class="row align-items-center mb-3">
+
+                            <label class="col-3">{{ setting.sTitle }}</label>
+                            <ng-select [(ngModel)]="setting.value" [clearable]="false" class="col-3">
+                                <ng-option *ngFor="let option of setting.eOptions" [value]="option">{{ option }}
+                                </ng-option>
+                            </ng-select>
+
+                            <ng-container *ngIf="setting.value==='custom'">
+                                <div class="col-3">
+                                    <div class="d-flex align-items-center">
+                                        <label class="me-2">{{ 'WIDTH' | translate }}</label>
+                                        <input type="number" class="form-control" [(ngModel)]="setting.nWidth">
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="d-flex align-items-center">
+                                        <label class="me-2">{{ 'HEIGHT' | translate }}</label>
+                                        <input type="number" class="form-control" [(ngModel)]="setting.nHeight">
+                                    </div>
+                                </div>
+                            </ng-container>
+
+                        </div>
+
+                        <div *ngIf="setting.eType==='textArray'" class="row mb-3 align-items-center">
+
+                            <label class="col-3">{{ setting.sTitle | translate}}</label>
+                            <div class="col-9">
+                                <div class="row">
+                                    <div *ngFor="let text of setting.eOptions;let i = index" class="col-3">
+
+                                        <div class="d-flex align-items-center">
+                                            <label class="me-2">{{ text | translate }}</label>
+                                            <input type="number" class="form-control" [(ngModel)]="setting.aValues[i]">
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div *ngIf="setting.eType==='text'" class="row mb-3 align-items-center">
+                            <label class="col-3">{{ setting.sTitle | translate}}</label>
+                            <div class="col-3">
+                                <input type="number" class="form-control" [(ngModel)]="setting.value">
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </app-pn-tab>
+            <app-pn-tab tabTitle="{{ 'CONTENT' | translate}}" #content>
+                <div class="json-editor">
+                    <app-json-editor [initialData]="oTemplate.layout" #jsonEditor></app-json-editor>
+                </div>
+            </app-pn-tab>
+
+        </app-pn-tabs>
+    </div>
+    <div class="card-footer">
+        <button class="btn btn-primary" (click)="saveSettings()">{{ 'SAVE' | translate}}</button>
+    </div>
+</div>

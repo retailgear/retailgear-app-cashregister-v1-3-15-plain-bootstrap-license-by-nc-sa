@@ -1,0 +1,128 @@
+<div class="card">
+    <div class="card-header row" style="margin-top: 20px;">
+        <div class="col-md-10">
+            <h4 *ngIf="mode === 'create'">{{ 'CREATE_FAVOURITE' | translate}}</h4>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input type="text" class="form-control me-3" [placeholder]="'SEARCH' | translate"
+                    [(ngModel)]="searchKeyword"
+                    (ngModelChange)="searchKeyword? shopProducts = shopProducts: shopProducts = []"
+                    (keyup.enter)="search()">
+            </div>
+            <div class="col-md-12">
+                <div *ngIf="searching" class="spinner-border mx-auto"></div>
+            </div>
+        </div>
+        <div>
+            <div class="row" *ngIf="shopProducts && shopProducts.length > 0">
+                <!-- <h5>{{'BUSINESS_PRODUCTS'}}</h5> -->
+                <div class="col-md-6 cursor-pointer" *ngFor="let product of shopProducts"
+                    (mouseenter)="product['showOption'] = true" (mouseleave)="product['showOption'] = false">
+                    <div class="card m-1 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <div class="w-50 p-2">
+                                    <img src="{{product.aImage[0]? product.aImage[0]: '../assets/images/no-photo-available.jpg' }}"
+                                        class="w-auto h-xxl-100px">
+                                </div>
+                                <div class="w-50 px-2">
+                                    <label class="business-bg-color rounded-full px-2 py-1 text-white text-sm"> {{
+                                        "BUSINESS_PRODUCT" | translate}}</label>
+                                    <p class="block mt-2">{{ product.oName? product.oName['en'] : 'No name' }}</p>
+                                    <p class="mt-2">{{ product.sEan }}</p>
+                                    <p class="mt-2">{{ product.sProductNumber }}</p>
+                                </div>
+                            </div>
+                            <div class="absolute hover-product-option mt-n6" *ngIf="product['showOption']">
+                                <div class="d-flex">
+                                    <button class="btn btn-secondary w-50 mr-2 p-0"
+                                        (click)="onSelectProduct(product, 'business', 'same-article')">
+                                        {{ "SELECT" | translate}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <hr *ngIf="commonProducts && commonProducts.length > 0"> -->
+            <!-- <div class="row" *ngIf="commonProducts && commonProducts.length > 0">
+                <div class="col-12">
+                    <h5>{{'SUPPLIER_PRODUCTS'}}</h5>
+                </div>
+                <div class="col-md-6 cursor-pointer" *ngFor="let product of commonProducts"
+                    (mouseenter)="product['showOption'] = true" (mouseleave)="product['showOption'] = false">
+                    <div class="card m-1 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <div class="w-50 p-2">
+                                    <img src="{{product.aImage[0]? product.aImage[0]: '../assets/images/no-photo-available.jpg' }}"
+                                        class="w-auto h-xxl-100px">
+                                </div>
+                                <div class="w-50 px-2">
+                                    <label class="business-bg-color rounded-full px-2 py-1 text-white text-sm">Business
+                                        product</label>
+                                    <span>
+                                        <fa-icon icon="copy" aria-label="copy-article-number" class="ml-4"></fa-icon>
+                                    </span>
+                                    <p class="block mt-2">{{ product.oName? product.oName['en'] : 'No name' }}</p>
+                                    <p class="mt-2">{{ product.sEan }}</p>
+                                    <p class="mt-2">{{ product.sProductNumber }}</p>
+                                </div>
+                            </div>
+                            <div class="absolute hover-product-option mt-n6" *ngIf="product['showOption']">
+                                <div class="d-flex">
+                                    <button class="btn btn-secondary w-50 mr-2 p-0"
+                                        (click)="onSelectProduct(product, 'business', 'same-article')">
+                                        Add this article
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+        <div class="row my-5" *ngIf="newSelectedProduct">
+            <div class="col-md-6">
+                <div class="d-flex flex-column">
+                    <h4> {{ "IMAGE" | translate}}</h4>
+                    <img src="{{ newSelectedProduct.aImage && newSelectedProduct?.aImage[0] ? newSelectedProduct?.aImage[0] : '../../../../../../assets/images/no-photo-available.jpg' }}"
+                        class="w-50">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row mb-5">
+                    <label> {{ "PRODUCT_NAME" | translate}}</label>
+                    <input type="text" class="form-control" [placeholder]="'ENTER_NAME(ALIAS)' | translate"
+                        [(ngModel)]="newSelectedProduct.sName" (ngModelChange)="validate()">
+                    <span class="err-msg" *ngIf="newSelectedProduct.sName?.length > limit">
+                        {{ 'MAX_LIMIT_REACHED' | translate }} : {{ limit }} {{ 'CHARACTERS' | translate }}
+                    </span>
+                </div>
+                <div class="row mb-5">
+                    <label> {{ "PRICE" | translate}}</label>
+                    <input type="text" class="form-control" [placeholder]="'ENTER_PRICE' |translate"
+                        [(ngModel)]="newSelectedProduct.nPrice">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer p-5 justify-content-end align-items-center d-flex">
+        <div *ngIf="creating" class="me-2 spinner-border mx-auto"></div>
+        <button class="btn btn-primary me-2" (click)="create($event)" [disabled]="!bValid">
+            <span *ngIf="mode === 'create'">{{'CREATE' | translate}}</span>
+            <span *ngIf="mode === 'edit'">{{'SAVE' | translate}}</span>
+        </button>
+
+        <button *ngIf="mode == 'assign'" class="btn btn-primary" (click)="assignProduct()">
+            {{'ASSIGN' | translate}}
+        </button>
+
+        <button class="btn btn-secondary" (click)="close(false)">{{ 'CLOSE' | translate}}</button>
+    </div>
+</div>

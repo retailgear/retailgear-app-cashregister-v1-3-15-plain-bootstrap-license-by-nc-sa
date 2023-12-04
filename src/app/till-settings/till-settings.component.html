@@ -1,0 +1,227 @@
+<div class="card mb-5 mb-xl-10 d-flex" data-kt-scroll-section="cash-settings">
+  <div class="card-header row">
+    <div class="card-title">
+      <div class="col-md-9">
+        <span>{{ 'CASH_REGISTER' | translate}}</span>
+      </div>
+    </div>
+  </div>
+  <div class="card-body border-bottom">
+    <div class="row">
+      <div class="col-md-2">
+        <label class="form-check form-switch form-check-custom form-check-solid">{{ 'BOOK_KEEPING_MODE' |
+          translate}}</label>
+      </div>
+      <div class="col-md-1">
+        <label class="form-check form-switch form-check-custom form-check-solid">
+          <input type="checkbox" class="form-check-input" [(ngModel)]="bookKeepingMode"
+            (click)="bookKeepingMode = !bookKeepingMode; updateBookkeepingSetting(bookKeepingMode)">
+        </label>
+      </div>
+    </div>
+    <div class="mt-3">
+      <form name="thermalPrinterForm">
+        <div class="row mb-5">
+          <div class="col-6">
+            <label for="line_n">{{"LAST_RECEIPT_NUMBER" | translate}}</label>
+            <input type="number" id="line_n" name="line_n" class="form-control"
+              [(ngModel)]="settings.nLastReceiptNumber"
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');">
+          </div>
+          <div class="col-6">
+            <label for="line_l">{{"LAST_INVOICE_NUMBER" | translate}}</label>
+            <input type="number" id="line_l" name="line_l" class="form-control"
+              [(ngModel)]="settings.nLastInvoiceNumber"
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');">
+          </div>
+        </div>
+
+        <div class="row mb-5">
+          <p>{{"I_WANT_TO_CLOSE_MY_CASHR_BY" | translate}}</p>
+          <div class="col-3">
+            <label class="btn btn-outline btn-outline-dashed btn-outline-default active d-flex text-start p-3"
+              data-kt-button="true" [ngClass]="{'active': settings.sDayClosurePeriod == 'week'}">
+              <!--begin::Radio button-->
+              <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
+                <input class="form-check-input" type="radio" name="sDayClosurePeriod" value="week"
+                  [(ngModel)]="settings.sDayClosurePeriod" />
+              </span>
+              <!--end::Radio button-->
+              <span class="ms-5">
+                <span class="fs-6 fw-bolder mb-1 d-block">{{"WEEK" | translate}}</span>
+                <!-- <span class="fw-bold fs-7 text-gray-600"></span> -->
+              </span>
+            </label>
+          </div>
+
+          <div class="col-3">
+            <label class="btn btn-outline btn-outline-dashed btn-outline-default active d-flex text-start p-3"
+              data-kt-button="true" [ngClass]="{'active': settings.sDayClosurePeriod == 'day'}">
+              <!--begin::Radio button-->
+              <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
+                <input class="form-check-input" type="radio" name="sDayClosurePeriod" value="day"
+                  [(ngModel)]="settings.sDayClosurePeriod" />
+              </span>
+              <!--end::Radio button-->
+              <span class="ms-5">
+                <span class="fs-6 fw-bolder mb-1 d-block">{{"DAY" | translate}}</span>
+                <!-- <span class="fw-bold fs-7 text-gray-600"></span> -->
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end align-items-center">
+          <div *ngIf="updatingSettings" class="spinner-border mx-2"></div>
+          <button type="submit" class="btn btn-primary mt-4 float-end" (click)="updateSettings($event)">
+            {{"SAVE" | translate}}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card-body p-9 border-bottom" data-kt-scroll-section="payment-methods">
+    <div class="card-title fw-bold row">
+      <div class="col-md-10">
+        <span class="fw-bold">
+          <h3>{{ 'PAYMENT_METHODS' | translate}}</h3>
+        </span>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-primary float-end" (click)="createPaymentMethod()">{{ 'NEW' | translate}}</button>
+      </div>
+    </div>
+    <div *ngIf="payMethods.length" class="dataTables_wrapper dt-bootstrap4 no-footer">
+      <div class="table-responsive">
+        <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
+          <thead class="fw-bold">
+            <tr>
+              <div class="row">
+                <div class="col-md-8 fw-bold">
+                  <span>{{ 'NAME' | translate}}</span>
+                </div>
+                <div class="col-md-3">
+                  <span *ngIf="bookKeepingMode">{{ 'LEDGER_NUMBER' | translate}}</span>
+                </div>
+                <div class="col-md-1">
+                  <span>{{ 'DELETE' | translate}}</span>
+                </div>
+              </div>
+            </tr>
+          </thead>
+          <tbody class="fw-bold">
+            <tr *ngFor="let method of payMethods" class="bg-hover-secondary">
+              <div class="row">
+                <div class="col-md-8" (click)="viewDetails(method)">
+                  <label>{{method.sName}}</label>
+                </div>
+                <div class="col-md-3">
+                  <input type="number" *ngIf="bookKeepingMode" class="form-control form-control-solid"
+                    [(ngModel)]="method.sLedgerNumber" (focusout)="updateLedgerNumber(method)" />
+                </div>
+                <div class="col-md-1 text-gray-500" (click)="deleteMethod(method)">
+                  <fa-icon icon="trash"></fa-icon>
+                </div>
+              </div>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="d-flex">
+      <h5 *ngIf='!payMethods.length && !payMethodsLoading'>{{ 'NO_DATA_FOUND' | translate}}</h5>
+      <div *ngIf="payMethodsLoading" class="spinner-border mx-auto"></div>
+    </div>
+  </div>
+  <div class="card-body" data-kt-scroll-section="quick-buttons">
+    <div class="card-title fw-bold row">
+      <div class="col-md-8">
+        <span class="fw-bold">
+          <h3>{{ 'QUICK_BUTTONS' | translate}}</h3>
+        </span>
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-primary float-end" (click)="saveFavourites($event)">{{ 'SAVE_SEQUENCE' |
+          translate}}</button>
+      </div>
+      <div class="col-md-1">
+        <button class="btn btn-primary float-end" (click)="createFavourite()">{{ 'NEW' | translate}}</button>
+      </div>
+    </div>
+    <div class="">
+      <div *ngIf="quickButtonsLoading" class="spinner-border mx-auto"></div>
+      <h5 *ngIf='!quickButtons.length && !quickButtonsLoading'>{{ 'NO_DATA_FOUND' | translate}}</h5>
+      <ul *ngIf="quickButtons.length && !quickButtonsLoading" class="list-group">
+        <li class="list-group-item" *ngFor="let button of quickButtons; let i = index">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="d-flex justify-content-start align-items-center my-3">
+                <h4 class="text-gray-800 fw-bold fs-6 lh-1 text-center mb-0">{{button.sName}}</h4>
+                <span class="text-gray-600 mx-3"> ({{button.nPrice | currency: '€'}})</span>
+                <!-- todo: color per quick button <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span> -->
+              </span>
+            </div>
+            <div>
+              <button class="btn p-3 hover" (click)="shiftQuickButton('up', i)">
+                <i class="fa fa-arrow-up"></i>
+              </button>
+              <button class="btn p-3 hover" (click)="shiftQuickButton('down', i)">
+                <i class="fa fa-arrow-down"></i>
+              </button>
+              <button class="btn p-3 hover" (click)="editQuickButton(button)">
+                <i class="fa fa-edit"></i>
+              </button>
+              <button class="btn p-3 hover" (click)="removeQuickButton(button)">
+                <i class="fa fa-trash" style="color:red"></i>
+              </button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+<div class="card" *ngIf="bookKeepingMode">
+  <div class="card-header row mt-4">
+    <div class="col-md-4">
+      <div class="d-flex align-items-center position-relative my-2">
+        <span class="svg-icon svg-icon-4 position-absolute ms-4">
+          <fa-icon icon="search"></fa-icon>
+        </span>
+        <input type="text" class="form-control form-control-solid w-250px ps-14" (value)="searchValue"
+          [(ngModel)]="searchValue" (change)="getGeneralLedgerNumber()" placeholder="SEARCH">
+        <button class="btn btn-primary ms-xl-1" title="{{'RELOAD_THIS_PAGE' | translate}}">
+          <fa-icon icon="sync"></fa-icon>
+        </button>
+      </div>
+    </div>
+    <div class="col-md-8"></div>
+  </div>
+  <div class="card-body pt-0">
+    <table class="table-fixed w-100">
+      <thead>
+        <tr>
+          <th class="border border-green-100 p-4" *ngFor="let column of overviewColumns">
+            <span *ngIf="column.name !== 'action'">{{ column.name | translate }}</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let column of bookKeepings; let i = index" class="fw-bold border border-green-100 p-4">
+          <td class="border border-green-100 p-4">
+            <span>{{column.sDescription | translate }}</span>
+          </td>
+          <td class="border border-green-100 p-4">
+            <input type="number" *ngIf="bookKeepingMode" class="form-control form-control-solid"
+              [(ngModel)]="column.nNumber" (focusout)="updateGeneralLedgerNumber(column)" />
+          </td>
+      </tbody>
+    </table>
+  </div>
+  <div class="d-flex">
+    <h5 *ngIf='!bookKeepings.length && !loading'>{{ 'NO_DATA_FOUND' | translate}}</h5>
+    <div *ngIf="loading" class="spinner-border mx-auto"></div>
+  </div>
+</div>

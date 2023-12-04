@@ -1,0 +1,55 @@
+<div class="card shadow-sm">
+    <div class="card-header" style="margin-top: 20px;">
+        <h4>{{ "COUPON" | translate}}</h4>
+        <div>
+            <button type="button" class="btn btn-sm btn-light" (click)="close({ action: false })">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div class="card-body row">
+        <div class="col-md-12">
+            <input name="coupon_code" id="coupon_code" type="text" class="form-control w-100" placeholder="{{ '
+                COUPON_CODE' | translate}}" required="true">
+        </div>
+        <div class="col-md-3">
+            <label> {{"DISCOUNT_TYPE" | translate}}</label>
+        </div>
+        <div class="col-md-9">
+            <input name="coupon_code" id="coupon_code" type="text" class="form-control w-100" required="true">
+        </div>
+        <div class="col-md-3">
+            <label> {{"COUPON_AMOUNT" | translate}}</label>
+        </div>
+        <div class="col-md-9">
+            <input name="coupon_code" id="coupon_code" type="text" class="form-control w-100" required="true">
+        </div>
+        <div class="col-md-3">
+            <label> {{"COUPON_MIN_SPEND" | translate}}</label>
+        </div>
+        <div class="col-md-9">
+            <input name="coupon_code" id="coupon_code" type="text" class="form-control w-100" required="true">
+        </div>
+        <div class="col-md-3">
+            <label> {{"COUPON_EXPIRY_DATE" | translate}}</label>
+        </div>
+        <div class="col-md-9">
+            <input name="coupon_code" id="coupon_code" type="text" class="form-control w-100" required="true">
+        </div>
+        <div class="col-md-3">
+            <label> {{"USAGE_LIMIT_PER_COUPON" | translate}}</label>
+        </div>
+        <div class="col-md-9">
+            <input name="coupon_code" id="coupon_code" type="text" class="form-control w-100" required="true">
+        </div>
+    </div>
+    <div class="card-footer row">
+        <div class="col-md-11">
+            <button type="button" class="btn btn-secondary" (click)="save()">{{ "SAVE" | translate}}</button>
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-secondary" (click)="close({ action: false })">{{ "CLOSE" |
+                translate}}</button>
+        </div>
+    </div>
+</div>

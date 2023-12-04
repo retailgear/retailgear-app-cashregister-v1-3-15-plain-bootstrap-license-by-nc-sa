@@ -1,0 +1,52 @@
+image: node:16
+
+options:
+  size: 2x
+
+definitions:
+  services:
+    docker:
+      memory: 3096
+
+pipelines:
+  branches:
+    master:
+      - step:
+          name: Build app
+          caches:
+            - node
+          script:
+            - yarn install
+            - npm install -g @angular/cli@12.0.5
+            - ng build --configuration production
+          artifacts:
+            - cash-register/dist/cash-register/**
+      - step:
+          name: Deploy to S3
+          script:
+          - echo $(pwd)
+          - pipe: atlassian/aws-s3-deploy:1.1.0
+            variables:
+              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID # Optional if already defined in the context or OIDC used.
+              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY # Optional if already defined in the context or OIDC used.
+              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION # Optional if already defined in the context or OIDC used.
+              S3_BUCKET: $S3_BUCKET
+              LOCAL_PATH: 'cash-register/dist/cash-register'
+              ACL: 'public-read'
+              DELETE_FLAG: 'true'
+      - step:
+          name: Compressing
+          script:
+          - apt-get update -y
+          - apt-get install zip -y
+          - rm -rf cash-register/dist
+          - mkdir compress
+          - zip -r compress/prismanote-app-cash-register.zip cash-register
+          - echo $(ls)
+          - pipe: atlassian/aws-s3-deploy:1.1.0
+            variables:
+              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID # Optional if already defined in the context or OIDC used.
+              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY # Optional if already defined in the context or OIDC used.
+              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION # Optional if already defined in the context or OIDC used.
+              S3_BUCKET: $SHARED_S3_BUCKET
+              LOCAL_PATH: 'compress'

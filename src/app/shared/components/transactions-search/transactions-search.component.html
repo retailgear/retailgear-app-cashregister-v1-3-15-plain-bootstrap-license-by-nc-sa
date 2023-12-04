@@ -1,0 +1,118 @@
+<div class="card shadow-sm">
+    <div class="card-header" style="margin-top: 20px;">
+        <h4>{{"FIND_TRANSACTIONS" | translate}}</h4>
+        <div>
+            <button type="button" class="btn btn-sm btn-light" (click)="close({ action: false })">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div class="card-body d-flex">
+        <div class="position-relative w-md-400px me-md-2">
+            <fa-icon [icon]="faSearch" class="text-gray-500 position-absolute top-50 translate-middle ms-6">
+            </fa-icon>
+            <input type="text" class="form-control form-control-solid ps-10" #inputElement
+                [(ngModel)]="requestParams.searchValue" name="search" value="" [placeholder]="'SEARCH' | translate"
+                (keyup.enter)="findTransactions()" />
+        </div>
+        <button type="submit" (click)="findTransactions()" class="btn btn-primary me-5"> {{ "SEARCH" |
+            translate}}</button>
+    </div>
+    <div class="card-body pt-0">
+        <app-pn-tabs class="tab-content">
+            <app-pn-tab tabTitle="{{ 'TRANSACTIONS' | translate}}">
+                <div class="dataTables_wrapper dt-bootstrap4 no-footer">
+                    <div class="table-responsive">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
+                            <thead>
+                                <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                                    <th class="min-w-100px sorting" tabindex="0">{{ "TRANSACTION_NUMBER" | translate}}
+                                    </th>
+                                    <th class="min-w-100px sorting" tabindex="0">{{"DATE" | translate}}</th>
+                                    <th class="min-w-100px sorting" tabindex="0">{{"ACTION" | translate}} </th>
+                                </tr>
+                            </thead>
+                            <tbody class="fw-bold text-gray-600">
+                                <tr *ngFor='let transaction of transactions'>
+                                    <td class="">{{transaction.sNumber}}</td>
+                                    <td class="">{{ transaction.dCreatedDate | date: 'short'}}</td>
+                                    <td>
+                                        <button class="btn btn-primary"
+                                            (click)="openTransaction(transaction, 'transaction')">{{ "OPEN" |
+                                            translate}}</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex">
+                        <h5 *ngIf='!transactions.length && !showLoader'> {{"NO_DATA_FOUND" | translate}}!</h5>
+                        <div *ngIf="showLoader" class="spinner-border mx-auto"></div>
+                    </div>
+                </div>
+            </app-pn-tab>
+            <app-pn-tab tabTitle="{{ 'ACTIVITIES' | translate}}">
+                <div class="dataTables_wrapper dt-bootstrap4 no-footer">
+                    <div class="table-responsive">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
+                            <thead>
+                                <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                                    <th class="min-w-100px sorting" tabindex="0"> {{"ACTIVITY_NUMBER" | translate}}</th>
+                                    <th class="min-w-100px sorting" tabindex="0"> {{"DATE" |translate}}</th>
+                                    <th class="min-w-100px sorting" tabindex="0">{{ "ACTION" | translate}}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="fw-bold text-gray-600">
+                                <tr *ngFor='let transaction of activities'>
+                                    <td class="">{{transaction.sNumber}}</td>
+                                    <td class="">{{ transaction.dCreatedDate | date: 'short'}}</td>
+                                    <td>
+                                        <button class="btn btn-primary"
+                                            (click)="openTransaction(transaction, 'activity')">{{ "OPEN" |
+                                            translate}}</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex">
+                        <h5 *ngIf='!transactions.length && !showLoader'> {{"NO_DATA_FOUND" | translate}}!</h5>
+                        <div *ngIf="showLoader" class="spinner-border mx-auto"></div>
+                    </div>
+                </div>
+            </app-pn-tab>
+
+            <div class="row">
+                <div
+                    class="col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start">
+                    <div class="dataTables_length" id="kt_ecommerce_sales_table_length">
+                        <label>
+                            <select name="kt_ecommerce_sales_table_length" aria-controls="kt_ecommerce_sales_table"
+                                class="form-select form-select-sm form-select-solid" [(ngModel)]="requestParams.limit">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end">
+                    <div class="dataTables_paginate paging_simple_numbers" id="kt_ecommerce_sales_table_paginate">
+                        <ul class="pagination">
+                            <li class="paginate_button page-item previous disabled"><a href="#" data-dt-idx="0"
+                                    tabindex="0" class="page-link"> <i class="previous"></i></a></li>
+                            <!-- <li class="paginate_button page-item active"
+                                *ngFor="let in of counter(totalTransactions) ;let i = index"><a href="#"
+                                    class="page-link">{{i+1}}</a>
+                            </li> -->
+                            <li class="paginate_button page-item next"><a href="#" class="page-link"><i
+                                        class="next"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </app-pn-tabs>
+    </div>
+</div>

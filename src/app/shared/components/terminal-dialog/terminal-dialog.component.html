@@ -1,0 +1,93 @@
+<div class="card shadow-sm">
+    <div class="card-header" style="margin-top: 20px;">
+        <h4>{{"CHECKOUT" | translate}}</h4>
+        <div *ngIf="!ifCardSuccess">
+            <button type="button" class="btn btn-sm btn-light" (click)="close(false)"
+                [disabled]="restartPaymentTimer > 0 && 46 > restartPaymentTimer">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div class="card-body row">
+        <table>
+            <thead>
+                <th>{{"PAYMENT_METHOD" | translate}}</th>
+                <th>{{"AMOUNT" | translate}}</th>
+                <th>{{"ACTIONS" | translate}}</th>
+                <th>{{"REMARK" | translate}}</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let paymethod of cardPayments; index as i">
+                    <td>{{paymethod.sCardName? paymethod.sName +"("+paymethod.sCardName+")":
+                        paymethod.sName}}</td>
+                    <td>{{paymethod.amount | currency: '€'}}</td>
+                    <td>
+                        <button class="btn btn-primary w-80"
+                            (click)="restartPaymentTimer = 45; startTerminal(paymethod, i)"
+                            [disabled]="(restartPaymentTimer > 0 && 46 > restartPaymentTimer) || paymethod.status === 'SUCCESS'">
+                            <span *ngIf="paymethod.status !== 'PROGRESS'">
+                                {{ paymethod.status | translate}}
+                            </span>
+                            <span class="d-flex" *ngIf="paymethod.status === 'PROGRESS'">
+                                <fa-icon [icon]="faSpinner" class="fa-spin"></fa-icon>
+                                {{"RETRY_IN:("+restartPaymentTimer+")" | translate}}
+                            </span>
+                            <span *ngIf="paymethod.status === 'RETRY'">
+                                <fa-icon [icon]="faRefresh"></fa-icon>
+                            </span>
+                            <span *ngIf="paymethod.status === 'SUCCESS'">
+                                <fa-icon [icon]="faCheck"></fa-icon>
+                            </span>
+                        </button>
+                    </td>
+                    <td> <span>
+                            {{ paymethod.remark | translate}}
+                        </span></td>
+                    <td>
+                        {{paymethod.paymentReference}}
+                    </td>
+                </tr>
+                <tr *ngFor="let paymethod of otherPayments">
+                    <td>{{paymethod.sName}}</td>
+                    <td>{{paymethod.amount | currency: '€'}}</td>
+                    <td>
+                        <button class="btn btn-primary"> {{ "DONE" | translate}}</button>
+                    </td>
+                    <td>NA</td>
+                    <td>NA</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td> {{"CHANGE(CASH)" | translate}}</td>
+                    <td> {{ -changeAmount | currency: '€' }}</td>
+                </tr>
+                <tr>
+                    <td> {{"TOTAL" | translate}}</td>
+                    <td> {{ totalAmount - changeAmount | currency: '€' }}</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="mt-2">
+            <mat-progress-bar mode="determinate" [value]="progressValue" [ngClass]="progressClass"></mat-progress-bar>
+            <div *ngIf="restartPaymentTimer > 0 && 46 > restartPaymentTimer">
+                <span class="mt-1 text-info">{{"CANCEL_THE_DEBIT_CARD_TRANSACTION"| translate}}</span>
+                <br>
+                <span class="text-danger"> *{{"DO_NOT_CLOSE_THIS_WINDOW"| translate}}.</span>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card-footer">
+        <div class="btn-holder">
+            <button type="button" class="btn btn-secondary" *ngIf="!ifCardSuccess"
+                [disabled]="restartPaymentTimer > 0 && 46 > restartPaymentTimer" (click)="close(false)">{{"CANCEL" |
+                translate}}</button>
+            <button type="button" class="btn btn-primary" (click)="continue()"
+                [disabled]="restartPaymentTimer > 0 && 46 > restartPaymentTimer">{{"PROCEED" | translate}}</button>
+        </div>
+    </div>
+</div>

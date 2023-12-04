@@ -1,0 +1,42 @@
+<div class="card shadow-sm">
+    <div class="card-header" style="margin-top: 20px;">
+        <h4>{{"NEW_DEVICE" | translate}}</h4>
+        <div>
+            <button type="button" class="btn btn-sm btn-light" (click)="close(false)">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-9">
+        <div class="row mb-6">
+            <label class="col-lg-4 col-form-label required fw-bold fs-6">{{ 'NAME' | translate}}</label>
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-lg-12 fv-row">
+                        <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 w-100"
+                            required="true" [(ngModel)]="device.sName" placeholder="{{'NAME' | translate}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-6">
+            <label class="col-lg-4 col-form-label fw-bold fs-6">{{"DESCRIPTION" | translate}}</label>
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-lg-12 fv-row">
+                        <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 w-100"
+                            [(ngModel)]="device.sDescription" placeholder="{{'DESCRIPTION' | translate}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-6">
+            <div class="col-lg-2">
+                <button *ngIf="mode === 'create'" class="btn btn-primary" (click)="addNewDevice()">{{ 'CREATE' |
+                    translate}}</button>
+                <button *ngIf="mode === 'edit'" class="btn btn-primary" (click)="editDevice()">{{ 'UPDATE' |
+                    translate}}</button>
+            </div>
+        </div>
+    </div>
+</div>

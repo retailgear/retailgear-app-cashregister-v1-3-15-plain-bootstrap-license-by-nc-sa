@@ -1,0 +1,57 @@
+.counting-list td {
+    overflow: hidden;
+}
+
+.counting-list td:hover {
+    overflow: auto;
+}
+
+.counting-list tr {
+    display: flex;
+    margin-bottom: 0.5rem;
+}
+
+.currency,
+.countingTotal label {
+    font-size: 1.1rem;
+}
+
+.countingTotal input,
+.w-30 {
+    width: 30%;
+}
+
+.earnings-section div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    line-height: 2rem;
+}
+
+.earnings-section .bold {
+    font-weight: bold;
+}
+
+.spinner-box {
+    background-color: transparent;
+}
+
+.table th {
+    font-weight: bold;
+}
+
+span.invalid {
+    color: red;
+}
+
+span.valid {
+    color: green;
+}
+
+.text-overflow-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

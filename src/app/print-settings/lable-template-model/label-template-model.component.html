@@ -1,0 +1,35 @@
+<div class="card">
+  <div class="card-header" style="margin-top: 20px;">
+    <h4>{{ mode==='create'?'CREATE_NEW_LABEL_TEMPLATE':'EDIT_LABEL_TEMPLATE' | translate}}</h4>
+    <div>
+      <button type="button" class="btn btn-sm btn-light" (click)="close(false)">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
+    </div>
+  </div>
+  <div class="card-body py-3">
+    <div class="row">
+      <div class="col-12">
+        <ng-container *ngIf="image">
+
+          <img [src]="image" alt="" />
+        </ng-container>
+      </div>
+      <div class="col-12">
+
+        <div class="json-editor">
+          <app-json-editor [initialData]="jsonData" #jsonEditor></app-json-editor>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="card-footer d-flex justify-content-end">
+    <button class="btn btn-primary" type="submit" (click)="preview()">{{ 'PREVIEW' |
+      translate}}</button>
+  </div>
+  <div class="card-footer d-flex justify-content-end">
+    <button class="btn btn-primary" type="submit" (click)="saveLabelTemplate()">{{ 'SAVE' | translate}}</button>
+  </div>
+</div>

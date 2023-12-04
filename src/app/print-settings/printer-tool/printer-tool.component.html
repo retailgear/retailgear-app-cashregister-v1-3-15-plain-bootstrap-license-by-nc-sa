@@ -1,0 +1,93 @@
+<div class="card">
+  <div class="card-header" style="margin-top: 20px;">
+    <h4>{{ "SEND_MANUAL_COMMAND"| translate}}</h4>
+    <div>
+      <button type="button" class="btn btn-sm btn-light" (click)="close(false)">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
+    </div>
+  </div>
+  <div class="card-body py-3">
+    <div class="d-flex justify-content-between ">
+      <div class="row mb-3">
+        <div class="col-12 ">
+        </div>
+        <span class="fw-bolder">
+          {{ "FAX" | translate}}
+        </span>
+        <div class="col-12">op DESKTOP-GS49AV2</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-12  text-end">
+          <span class="fw-bolder">
+            {{ "PRINTER" | translate}} :{{labelPrintSettings?.nPrinterId}}
+          </span>
+        </div>
+        <div class="col-12  text-end">
+          <span class="fw-bolder">
+            {{"DEVICE" | translate}} :{{labelPrintSettings?.nComputerId}}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-7 px-3">
+        <div class="card text-start border">
+          <h4 class="card-title bg-gray-100 p-4"> {{ "TITLE" | translate}}</h4>
+          <div class="card-body p-4">
+            <div class="d-flex w-70 justify-content-start flex-wrap">
+
+              <button type="button" (click)="prefillCommand(commands.Start)"
+                class="btn btn-secondary m-2 ">{{"START"|translate}}</button>
+
+              <button type="button" (click)="prefillCommand(commands.Stop)"
+                class="btn btn-secondary m-2">{{"STOP"|translate}}</button>
+
+              <button type="button" (click)="prefillCommand(commands.Calibrate)"
+                class="btn btn-secondary m-2">{{"CALIBRATE"|translate}}</button>
+
+              <button type="button" (click)="prefillCommand(commands.BlancLabel)"
+                class="btn btn-secondary m-2">{{"BLANCE_LABEL"|translate}}</button>
+
+              <button type="button" (click)="prefillCommand(commands.QuePrinterCleanUp)"
+                class="btn btn-secondary m-2">{{"QUE_PRINTER_CLEAN_UP"|translate}}</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="col-5 px-3">
+        <div class="card text-start border">
+          <h4 class="card-title bg-gray-100 p-4">{{ "TITLE" | translate}}</h4>
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-start flex-wrap">
+              <button type="button" (click)="prefillCommand(commands.MediaDarkness)"
+                class="btn btn-secondary m-2 ">{{"MEDIA_DARKNESS"|translate}}</button>
+
+              <button type="button" (click)="prefillCommand(commands.AlignmentFixGK420t)"
+                class="btn btn-secondary m-2">{{"ALIGNMENT_FIX_GK420T"|translate}}</button>
+
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="mb-3">
+          <input disabled="" [(ngModel)]="zplCode" type="text" class="form-control"
+            placeholder="{{'ZPL_CODE'|translate}}">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card-footer d-flex justify-content-end p-5">
+    <button class="btn btn-primary" type="submit" [disabled]="!this.zplCode" (click)="save()">{{ 'SEND' |
+      translate}}</button>
+
+    <button class="btn btn-secondary ms-4" type="submit" (click)="clear()">{{ 'CLEAR' | translate}}</button>
+  </div>

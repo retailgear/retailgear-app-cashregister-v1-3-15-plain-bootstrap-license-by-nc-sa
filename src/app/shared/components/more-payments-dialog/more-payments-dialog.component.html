@@ -1,0 +1,28 @@
+<div class="card shadow-sm">
+    <div class="card-header" style="margin-top: 20px;">
+        <h4>{{ 'ALL_PAYMENT_METHODS' | translate}}</h4>
+        <div mat-dialog-actions>
+            <button mat-dialog-close type="button" class="btn btn-sm btn-light" (click)="close(false)">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="bg-white py-3">
+            <ul id="quick-buttons" class="nav nav-pills nav-pills-custom mb-3">
+                <li class="nav-item mb-3 me-3" *ngFor="let method of allPaymentMethods">
+                    <button
+                        class="nav-link d-flex justify-content-center flex-column flex-center overflow-hidden active w-85px h-85px py-4"
+                        (click)="close(method)">
+                        <h4 class="nav-text text-gray-800 fw-bold fs-6 lh-1 text-center mb-0">{{method.sName |
+                            translate}}</h4>
+                        <!-- <span class="text-gray-600">{{button.price | currency: '€'}}</span> -->
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- <div class="card-footer">
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </div> -->
+</div>

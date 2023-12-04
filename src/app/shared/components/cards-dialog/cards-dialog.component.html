@@ -1,0 +1,147 @@
+<div class="card shadow-sm">
+    <div class="card-header" style="margin-top: 20px;">
+        <h4>{{ 'CARD_PAYMENTS' | translate}}</h4>
+        <div mat-dialog-actions>
+            <button mat-dialog-close type="button" class="btn btn-sm btn-light" (click)="close(false)">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <app-pn-tabs class="tab-content" [activeTabIndex]="activeTabIndex">
+            <app-pn-tab tabTitle="{{ 'EXTERNAL_GIFTCARDS' | translate}}" (click)="nAmount = 0" #externalGiftcards>
+                <div class="dataTables_wrapper dt-bootstrap4 no-footer">
+                    <!-- <img *ngIf="externalGiftCardDetails?.profileIconUrl" style="height: 35px; width: 35px;"
+                        [src]="externalGiftCardDetails?.profileIconUrl" alt=""> -->
+                    <div class="row">
+                        <div class="col-6">
+                            <!-- <div class="col-6"> -->
+                            {{"GIFTCARD_NUMBER" | translate}}:
+                            <!-- </div> -->
+                            <!-- <div class="col-6"> -->
+                            <!-- <img style="height: 30px; width: 55px;"
+                                src="https://static.pay.nl/payment_profiles/100x100/815.png" alt=""> -->
+                            <!-- </div> -->
+                        </div>
+                        <div class="col-4">
+                            <input name="sGiftCardNumber" class="form-control" type="text" [(ngModel)]="sGiftCardNumber"
+                                #searchExternalGift (keyup.enter)="fetchExternalGiftCard(sGiftCardNumber)">
+                            <label for="sGiftCardNumber">{{"USE_YOUR_BARCODE_SCANNER_TO_SCAN_THIS" | translate}}</label>
+                            <div class="row" *ngIf="externalGiftCardDetails?.type === 'fashioncheque'">
+                                <div class="col-3">
+                                    <label for="pincode">
+                                        {{"PINCODE" | translate}}
+                                    </label>
+                                </div>
+                                <div class="col-9">
+                                    <input name="pincode" class="form-control" type="text" [(ngModel)]="pincode"
+                                        (keyup.enter)="fetchExternalGiftCard(sGiftCardNumber)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <img *ngIf="externalGiftCardDetails?.profileIconUrl" style="height: 35px; width: 35px;"
+                                [src]="externalGiftCardDetails?.profileIconUrl" alt="">
+                            <!-- <button class="btn btn-primary w-100" (click)="fetchExternalGiftCard(sGiftCardNumber)"
+                                [disabled]="fetchInProgress">
+                                <span>
+                                    {{ "FETCH" | translate}}
+                                </span>
+                            </button> -->
+                        </div>
+                        <span
+                            *ngIf="externalGiftCardDetails && !(externalGiftCardDetails.type === 'fashioncheque' && externalGiftCardDetails.balance === '-1')">{{"BALANCE_GIFTCARDS"
+                            | translate}}:
+                            {{externalGiftCardDetails?.balance / 100 | currency: '€'}}</span>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            {{"AMOUNT_TO_USE" | translate}}
+                        </div>
+                        <div class="col-6">
+                            <input name="" class="form-control" type="number"
+                                [disabled]="!externalGiftCardDetails?.balance || 1 > externalGiftCardDetails?.balance"
+                                [(ngModel)]="nAmount">
+                            <span *ngIf="nAmount > externalGiftCardDetails?.balance"
+                                class="text-danger">{{"AMOUNT_ENTERED_IS_HIGHER_THAN_AVAILABLE_BALANCE" |
+                                translate}}.</span>
+                        </div>
+                    </div>
+                    <!-- <div class="row">
+                        <div class="col-6">
+                            {{ "AMOUNT_TO_USE" | translate}}
+                        </div>
+                        <div class="col-6">
+                            <input name="" class="form-control" type="text">
+                        </div>
+                    </div> -->
+                </div>
+            </app-pn-tab>
+            <app-pn-tab tabTitle="{{ 'CUSTOM_GIFTCARDS' | translate}}">
+                <div class="dataTables_wrapper dt-bootstrap4 no-footer">
+                    <div class="row">
+                        <div class="col-6">
+                            {{"CARDNUMBER"| translate}}:
+                        </div>
+                        <div class="col-4">
+                            <input name="sGiftCardNumber" class="form-control" type="text" [(ngModel)]="sGiftCardNumber"
+                                #searchgift>
+                            <label for="sGiftCardNumber">{{"USE_YOUR_BARCODE_SCANNER_TO_SCAN_THIS" | translate}}</label>
+                        </div>
+                        <div class="col-2">
+                            <button class="btn btn-primary w-100" (click)="fetchGiftCard(sGiftCardNumber)"
+                                [disabled]="fetchInProgress">
+                                <span class="d-flex" *ngIf="fetchInProgress">
+                                    <fa-icon [icon]="faSpinner" class="fa-spin"></fa-icon>
+                                </span>
+                                <span *ngIf="!fetchInProgress">
+                                    {{ "FETCH" | translate}}
+                                </span></button>
+                        </div>
+                        <span *ngIf="giftCardDetails">{{"BALANCE_GIFTCARDS" | translate}}:
+                            {{giftCardDetails?.nPaidAmount}}</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            {{"AMOUNT_TO_USE" | translate}}
+                        </div>
+                        <div class="col-6">
+                            <input name="" class="form-control" type="number"
+                                [disabled]="!giftCardDetails || 1 > giftCardDetails?.nPaidAmount" [(ngModel)]="nAmount">
+                            <span *ngIf="nAmount > giftCardDetails?.nPaidAmount"
+                                class="text-danger">{{"AMOUNT_ENTERED_IS_HIGHER_THAN_AVAILABLE_BALANCE" |
+                                translate}}.</span>
+                        </div>
+                    </div>
+                </div>
+            </app-pn-tab>
+            <app-pn-tab tabTitle="{{ 'LOYALTY_POINTS' | translate}}" (click)="nAmount = 0" #loyaltyPointElem>
+                <div class="dataTables_wrapper dt-bootstrap4 no-footer">
+                    <div class="row" *ngIf="!customer">
+                        {{"COUNTER_CUSTOMER_SELECTED" | translate}}
+                    </div>
+                    <div class="row" *ngIf="customer">
+                        <div class="col-6">
+                            <span>{{"POINTS_SPENDABLE"| translate}}: {{loyaltyPoints}}</span>
+                        </div>
+                        <div class="col-6">
+                            <input name="" class="form-control" type="number" [(ngModel)]="redeemedLoyaltyPoints">
+                        </div>
+                        <!-- <div class="col-2">
+                            <button class="btn btn-primary" type="submit">{{"REDEEM" | translate}}</button>
+                        </div>
+                        <div class="col-2">
+                            <button class="btn btn-primary" type="submit">{{"ALL_POINTS" | translate}}</button>
+                        </div> -->
+                    </div>
+                </div>
+            </app-pn-tab>
+        </app-pn-tabs>
+    </div>
+    <div class="card-footer">
+        <button class="btn btn-warning" type="button">{{"CANCEL" | translate }}</button>
+        <button class="btn btn-primary" type="submit" (click)="submit()">{{"USE" | translate}}</button>
+    </div>
+</div>

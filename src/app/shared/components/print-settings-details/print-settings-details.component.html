@@ -1,0 +1,51 @@
+<div class="card">
+    <div class="card-header" style="margin-top: 20px;">
+        <h4>{{ 'CREATE_NEW_PRINT_SETTING' | translate}}</h4>
+        <div>
+            <button type="button" class="btn btn-sm btn-light" (click)="close(false)">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+            </div>
+    </div>
+    <div class="card-body p-9">
+        <div class="row">
+            <label class="col-md-2 col-form-label required fw-bold">{{ 'SELECT_METHOD' | translate}}</label>
+            <div class="col-md-4">
+                <select class="form-select form-control form-select-solid" [(ngModel)]="method" (click)="selectMethod(method)" >
+                    <option *ngFor="let method of methods" [value]="method" >{{method}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 20px;">
+            <label class="col-md-2 col-form-label required fw-bold">{{ 'TYPE' | translate}}</label>
+            <div class="col-md-4">
+                <select class="form-select form-control form-select-solid" [(ngModel)]="type" >
+                    <option *ngFor="let type of types" [value]="type">{{type}}</option>
+                </select>
+            </div>
+            <label *ngIf="method !== 'labelDefinition'" class="col-md-2 col-form-label required fw-bold">{{ 'USER' | translate}}</label>
+            <div *ngIf="method !== 'labelDefinition'" class="col-md-4">
+                <select class="form-select form-control form-select-solid" [(ngModel)]="user" >
+                    <option *ngFor="let user of users" [value]="user">{{user}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 20px;">
+            <label class="col-md-2 col-form-label required fw-bold">{{ 'COMPUTER' | translate}}</label>
+            <div class="col-md-4">
+                <select class="form-select form-control form-select-solid" [(ngModel)]="computerId" (click)="getPrinters()">
+                    <option *ngFor="let computer of computers" [value]="computer.id" (click)="getPrinters()">{{computer.name}}</option>
+                </select>
+            </div>
+            <label *ngIf="method !== 'labelDefinition'" class="col-md-2 col-form-label required fw-bold">{{ 'PRINTER' | translate}}</label>
+            <div *ngIf="method !== 'labelDefinition'" class="col-md-4">
+                <select class="form-select form-control form-select-solid" [(ngModel)]="printerId" >
+                    <option *ngFor="let printer of printers" [value]="printer.id">{{printer.name}}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <button class="btn btn-primary" type="submit" (click)="createPrintSetting()">{{ 'CREATE' | translate}}</button>
+    </div>
+</div>

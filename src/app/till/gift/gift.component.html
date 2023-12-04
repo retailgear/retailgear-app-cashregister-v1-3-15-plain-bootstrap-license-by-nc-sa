@@ -1,0 +1,97 @@
+<div class="accordion-item">
+  <h2 class="accordion-header">
+    <button class="accordion-button fs-4 fw-bold pe-0 ps-4" type="button" data-bs-toggle="collapse"
+      data-bs-target="#kt_accordion_1_body_1" aria-expanded="true" aria-controls="kt_accordion_1_body_1">
+      <section class="row  product-row mb-3 align-items-center w-100">
+        <div class="col-12">
+          <div class="row">
+            <div class="col-1">{{item.quantity}}</div>
+            <div class="col-4 text-truncate">{{item.name}} - {{item.sGiftCardNumber}}</div>
+            <div class="col">{{item.price | currency: tillService.currency}}</div>
+            <div class="col"></div>
+            <div class="col">{{item.tax}}%</div>
+            <div class="col">{{item.price | currency: tillService.currency}}</div>
+            <div class="col"></div>
+          </div>
+        </div>
+      </section>
+    </button>
+  </h2>
+  <div id="kt_accordion_1_body_1" class="accordion-collapse collapse show" aria-labelledby="kt_accordion_1_header_1"
+    data-bs-parent="#kt_accordion_1">
+    <div class="accordion-body px-3 py-4">
+      <section class="row product-row ">
+        <div class="col-3">
+          <div class="row">
+            <div class="col-12">
+              <button class="btn btn-bg-light btn-active-color-primary mb-2 w-100" (click)="create()"
+                [disabled]="!item.nonEditable && numberIcon === faBan">
+                {{ "PRINT" | translate}} <fa-icon [icon]="faPrint"></fa-icon>
+              </button>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-bg-light btn-active-color-primary mb-2 w-100" (click)="duplicate()">{{ "DUPLICATE"
+                | translate}}
+                <fa-icon [icon]="faClone">
+                </fa-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-3">
+          <div class="input-group b-5">
+            <input type="text" class="form-control" name="number" id="number" [(ngModel)]="item.sGiftCardNumber"
+              (blur)="checkNumber()" [disabled]="item.nonEditable">
+            <span class="input-group-text">
+              <fa-icon [icon]="numberIcon" [ngClass]="checkingNumber ? 'fa-spin': ''"></fa-icon>
+            </span>
+            <span class="text-danger" *ngIf="!item.nonEditable && numberIcon === faBan">
+              {{"ENTER_VALID_GIFTCARD_NUMBER" | translate}}
+            </span>
+          </div>
+        </div>
+
+        <div class="col-3">
+          <div class="form-floating mb-7">
+            <input type="number" class="form-control" name="number" id="value" [(ngModel)]="item.price"
+              [disabled]="item.nonEditable" (change)="changeInPrice()">
+            <label for="number">{{ "VALUE" | translate}}</label>
+          </div>
+          <p>{{ "VAT_HANDLING" | translate}}</p>
+          <div class="form-check form-check-custom form-check-solid">
+            <input class="form-check-input" type="radio" [(ngModel)]="item.bGiftcardTaxHandling" value="true"
+              id="vatPaid1" />
+            <label class="form-check-label" for="vatPaid1">
+              {{ "PAY_TAXES_WHEN_CREATE" | translate}}
+            </label>
+          </div>
+          <div class="form-check form-check-custom form-check-solid">
+            <input class="form-check-input" type="radio" [(ngModel)]="item.bGiftcardTaxHandling" value="false"
+              id="vatPaid2" />
+            <label class="form-check-label" for="vatPaid2">
+              {{ "PAY_TAXES_WHEN_REDEEM" | translate}}
+            </label>
+          </div>
+        </div>
+
+        <div class="col-3">
+          <div class="form-floating till-padding">
+            <ng-select name="taxRate" id="taxRate" class="form-select" [(ngModel)]="item.tax">
+              <ng-option *ngFor="let rate of taxes" [value]="rate.nRate">{{rate.sName}}</ng-option>
+            </ng-select>
+            <label for="taxRate">{{"TAX" | translate}}</label>
+          </div>
+        </div>
+        <div class="col-1">
+          <!-- <button class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px" (click)="create()"
+            [disabled]="!item.nonEditable && numberIcon === faBan">
+            <span class="svg-icon svg-icon-1qx me-0">
+              <fa-icon [icon]="faPrint"></fa-icon>
+            </span>
+          </button> -->
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

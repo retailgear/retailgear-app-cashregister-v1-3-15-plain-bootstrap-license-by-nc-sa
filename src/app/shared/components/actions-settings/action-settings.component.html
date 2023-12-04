@@ -1,0 +1,66 @@
+<div class="card">
+    <div class="card-header" style="margin-top: 20px;">
+        <h4>{{ 'ADD_ACTION_SETTINGS' | translate}}</h4>
+        <div>
+            <button type="button" class="btn btn-sm btn-light" (click)="close(false)">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-5">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-6">
+                    <span>{{ 'TYPE' | translate}}</span>
+                </div>
+                <div class="col-6">
+                    <ng-container *ngIf="mode==='create'; else staticType">
+                        <ng-select [(ngModel)]="eType" [clearable]="false">
+                            <ng-option *ngFor="let option of aTypeOptions" [value]="option.key">
+                                {{ option.key | translate}}
+                            </ng-option>
+                        </ng-select>
+                    </ng-container>
+                    <ng-template #staticType>
+                        <span>{{ eType }}</span>
+                    </ng-template>
+                </div>
+            </div>
+            <div class="row mb-5">
+                <div class="col-6">
+                    <span>{{ 'SITUATION' | translate}}</span>
+                </div>
+                <div class="col-6">
+                    <ng-container *ngIf="mode==='create'; else staticSituation">
+                        <ng-select [(ngModel)]="eSituation" [clearable]="false">
+                            <ng-option *ngFor="let option of aTypeOptions | filter: eType" [value]="option">
+                                {{ option | translate}}
+                            </ng-option>
+                        </ng-select>
+                    </ng-container>
+                    <ng-template #staticSituation>
+                        <span>{{ eSituation | translate }}</span>
+                    </ng-template>
+                </div>
+            </div>
+            <div class="row mb-5">
+                <div class="col-6">
+                    <span>{{ 'ACTION_TO_PERFORM' | translate}}</span>
+                </div>
+                <div class="col-6">
+                    <ng-select [(ngModel)]="aActions" (ngModelChange)="checkActionToPerform()" [clearable]="false"
+                        [multiple]="true">
+                        <ng-option *ngFor="let option of aActionToPerform" [value]="option">
+                            {{ option | translate}}
+                        </ng-option>
+                    </ng-select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-end">
+        <button class="btn btn-primary mx-2" (click)="saveSettings()" [disabled]="bDisableSubmit">{{ 'SAVE' |
+            translate}}</button>
+        <button class="btn btn-secondary" (click)="close(false)">{{ 'CANCEL' | translate}}</button>
+    </div>
+</div>

@@ -1,0 +1,100 @@
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-check form-check-solid form-switch fv-row lh-xxl">
+            <input name="input0" id="input0" type="checkbox" class="form-check-input w-45px h-30px"
+                [(ngModel)]="service.bGiftWrap" />
+            <span class="form-check-label fw-bold text-muted">{{ 'GIFTWRAP' | translate }} </span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-check form-check-solid form-switch fv-row lh-xxl">
+            <input name="input0" id="input0" type="checkbox" class="form-check-input w-45px h-30px"
+                [(ngModel)]="service.bEngraving" />
+            <span class="form-check-label fw-bold text-muted">{{ 'ENGRAVING' | translate }} </span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="row mt-2" *ngIf="service.bGiftWrap">
+            <div class="col-md-6"> <label>{{ "TYPES" | translate}}</label></div>
+            <div class="col-md-6"> <label> {{ "PRICE" | translate}}</label></div>
+            <div class="col-md-6 mt-2">
+                <div class="form-check form-check-solid">
+                    <input name="input0" id="input0" type="checkbox" class="form-check-input"
+                        [(ngModel)]="service.oGiftWrapDetails.oBasic.bEnabled" />
+                    <span class="form-check-label fw-bold text-muted">{{ 'BASIC' | translate }} </span>
+                </div>
+            </div>
+            <div class="col-md-6 mt-2">
+                <input name="input14" id="input14" type="number" [(ngModel)]="service.oGiftWrapDetails.oBasic.nPrice"
+                    class="form-control" fullWidth required="true">
+            </div>
+            <div class="col-md-6 mt-2">
+                <div class="form-check form-check-solid">
+                    <input name="input0" id="input0" type="checkbox" class="form-check-input"
+                        [(ngModel)]="service.oGiftWrapDetails.oPremium.bEnabled" />
+                    <span class="form-check-label fw-bold text-muted">{{ 'PREMIUM' | translate }} </span>
+                </div>
+            </div>
+            <div class="col-md-6 mt-2">
+                <input name="input14" id="input14" type="number" [(ngModel)]="service.oGiftWrapDetails.oPremium.nPrice"
+                    class="form-control" fullWidth required="true">
+            </div>
+            <div class="col-md-6 mt-2">
+                <div class="form-check form-check-solid">
+                    <input name="input0" id="input0" type="checkbox" class="form-check-input"
+                        [(ngModel)]="service.oGiftWrapDetails.oLuxury.bEnabled" />
+                    <span class="form-check-label fw-bold text-muted">{{ 'LUXURY' | translate }} </span>
+                </div>
+            </div>
+            <div class="col-md-6 mt-2">
+                <input name="input14" id="input14" type="number" [(ngModel)]="service.oGiftWrapDetails.oLuxury.nPrice"
+                    class="form-control" fullWidth required="true">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="row mt-2" *ngIf="service.bEngraving">
+            <div class="col-md-6"> <label> {{ "TYPES" | translate}}</label></div>
+            <div class="col-md-6"> <label> {{ "PRICE" | translate}}</label></div>
+            <div class="col-md-6 mt-2">
+                <div class="form-check form-check-solid">
+                    <input name="input0" id="input0" type="checkbox" class="form-check-input"
+                        [(ngModel)]="service.oEngravingDetails.oFontDetails.bEnabled" />
+                    <span class="form-check-label fw-bold text-muted">{{ 'SELECTED_FONTS' | translate }} </span>
+                </div>
+            </div>
+            <div class="col-md-6 mt-2">
+                <input name="input14" id="input14" type="number"
+                    [(ngModel)]="service.oEngravingDetails.oFontDetails.nPrice" class="form-control" fullWidth
+                    required="true">
+            </div>
+            <div class="col-md-6 mt-2" *ngIf="service.oEngravingDetails.oFontDetails.bEnabled">
+                <label> {{"SELECT_FONT" | translate}} </label>
+            </div>
+            <div class="col-md-6 mt-2" *ngIf="service.oEngravingDetails.oFontDetails.bEnabled">
+                <span *ngFor="let font of fontList" class="d-none">
+                    <link [attr.href]="getSanitizedURL(font)" rel="stylesheet">
+                </span>
+                <ng-select id="formFieldIp" name="propertyField"
+                    [(ngModel)]="service.oEngravingDetails.oFontDetails.aFontList" [clearable]="false"
+                    [multiple]="true">
+                    <ng-option *ngFor="let opt of fontList" [value]="opt">
+                        <label [ngStyle]="{'font-family' :opt}">{{ opt }}</label>
+                    </ng-option>
+                </ng-select>
+            </div>
+            <div class="col-md-6 mt-2">
+                <div class="form-check form-check-solid">
+                    <input name="input0" id="input0" type="checkbox" class="form-check-input"
+                        [(ngModel)]="service.oEngravingDetails.oImageDetails.bEnabled" />
+                    <span class="form-check-label fw-bold text-muted">{{ 'GIVEN_IMAGE' | translate }} </span>
+                </div>
+            </div>
+            <div class="col-md-6 mt-2">
+                <input name="input14" id="input14" type="number"
+                    [(ngModel)]="service.oEngravingDetails.oImageDetails.nPrice" class="form-control" fullWidth
+                    required="true">
+            </div>
+        </div>
+    </div>
+</div>

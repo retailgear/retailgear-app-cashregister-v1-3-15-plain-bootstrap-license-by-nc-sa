@@ -1,0 +1,163 @@
+<h2 class="accordion-header">
+  <button class="accordion-button fs-4 fw-bold pe-0 ps-4" type="button" data-bs-toggle="collapse"
+    data-bs-target="#kt_accordion_1_body_1" aria-expanded="true" aria-controls="kt_accordion_1_body_1">
+    <section class="row product-row align-items-center w-100">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-1">
+            <svg width="15" height="15" class="m-1">
+              <rect width="15" height="15" [ngStyle]="{fill:getColorCode(item)}"
+                style="stroke-width:1;stroke:rgb(0,0,0)" />
+              {{ "YOUR_BROWSER_DOES_NOT_SUPPORT_INLINE_SVG" | translate }}
+            </svg>
+            {{item.quantity}}
+          </div>
+          <div class="col-4 text-truncate">{{item.name}}</div>
+          <div class="col">{{item.price | currency: tillService.currency }}</div>
+          <div class="col">{{totalDiscount}}</div>
+          <div class="col">{{item.tax}}%</div>
+          <div class="col">{{ item.amountToBePaid | currency: tillService.currency }}
+          </div>
+          <div class="col">{{item.paymentAmount | currency: tillService.currency }}</div>
+        </div>
+      </div>
+    </section>
+  </button>
+</h2>
+
+<div id="kt_accordion_1_body_1" class="accordion-collapse collapse show rounded-0"
+  aria-labelledby="kt_accordion_1_header_1" data-bs-parent="#kt_accordion_1">
+  <div class="accordion-body px-3 py-4">
+    <section class="row product-row">
+      <div class="col-4">
+        <div class="row">
+
+          <div class="col-12">
+            <app-dialer [(quantity)]="item.quantity" (quantityChange)="quantityChangeHandler($event)"></app-dialer>
+          </div>
+
+          <div class="col-12">
+            <div class="form-group mb-4">
+              <select class="form-control " [(ngModel)]="item.oType.bRefund" (ngModelChange)="changeTypeArray()">
+                <option *ngFor="let type of typeArray" [ngValue]="type.value">{{type.title | translate}}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-12" *ngIf="item.eTransactionItemType === 'return'">
+            <div class="form-group mb-4">
+              <label class="form-control-label mb-3">{{ "BROKEN" | translate}}</label>:
+              <input class="form-control  mb-3 mb-lg-0" type="text" name="activityName"
+                [(ngModel)]="item.nBrokenProduct" class="form-control" (change)="changeInbrokenAmount(item)">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-4">
+        <div class="row">
+          <!-- NAME  -->
+          <div class="col-12">
+            <div class="form-group mb-4">
+              <label class="form-control-label mb-3">{{ "NAME" | translate}}</label>:
+              <input class="form-control  mb-3 mb-lg-0" type="text" name="name" [(ngModel)]="item.name">
+            </div>
+          </div>
+          <!-- ARTICLE_NUMBER -->
+
+          <div class="col-12">
+            <div class="form-group mb-4">
+              <label class="form-control-label mb-3">{{ "ARTICLE_NUMBER" | translate}}</label>:
+              <span class="fs-7 w-100 d-block text-gray-600 mb-1">{{item.sArticleNumber}}</span>
+            </div>
+          </div>
+        </div>
+        <!-- DESCRIPTION -->
+        <div class="col-12">
+          <div class="form-group mb-4">
+            <label class="form-control-label mb-3">{{ "DESCRIPTION" | translate}}</label>:
+            <textarea class="form-control  mb-3 mb-lg-0" type="text" name="description" lines="10"
+              [(ngModel)]="item.description"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-4">
+        <div class="row">
+          <!-- PRICE -->
+          <div class="col-9">
+            <div class="form-group mb-4">
+              <label class="form-control-label mb-3">{{ "PRICE" | translate}}</label>:
+              <input class="form-control  mb-3 mb-lg-0" type="text" name="price" (change)="updatePayments()"
+                placeholder="{{ 'PRICE' | translate}}" id="price" [(ngModel)]="item.price">
+            </div>
+          </div>
+          <!-- PERCENTAGE -->
+          <div class="col-3">
+            <div class="form-group mb-4">
+              <label class="form-control-label mb-3"></label>
+              <button class="btn btn-icon btn-secondary my-2" (click)="openDiscountDialog()"
+                [disabled]="item.oType?.bRefund || item.tType === 'pay'">
+                <span class="svg-icon svg-icon-1qx me-0">
+                  <i class="fas fa-percent"></i>
+                </span>
+              </button>
+            </div>
+          </div>
+          <div class="col-9">
+            <div class="form-group mb-4">
+              <label class="form-control-label mb-3">{{ "TAX" | translate}}</label>:
+              <ng-select name="taxRate" id="taxRate" class="form-control  mb-3 mb-lg-0" [(ngModel)]="item.tax">
+                <ng-option *ngFor="let rate of taxes" [value]="rate.nRate">{{rate.sName}}</ng-option>
+              </ng-select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <!-- MORE -->
+          <div class="col-12 mb-7">
+            <button class="btn btn-bg-light btn-active-color-primary mt-2" type="button" data-bs-toggle="collapse"
+              (click)="collapsedBtn = !collapsedBtn" [ngClass]="{'collapsed': collapsedBtn }"
+              data-bs-target="#kt_accordion_123" aria-expanded="true" aria-controls="kt_accordion_123">
+              {{ "MORE" | translate}}
+              <fa-icon *ngIf="!collapsedBtn" [icon]="faArrowDown"></fa-icon>
+              <fa-icon *ngIf="collapsedBtn" [icon]="faArrowUp"></fa-icon>
+            </button>
+          </div>
+          <div class="col-12">
+            <div id="kt_accordion_123" [ngClass]="{'show': collapsedBtn }" class="accordion-collapse collapse">
+              <!-- PREPAYMENT -->
+              <div class="row">
+                <div class="form-group mb-4">
+                  <label class="form-control-label mb-3">
+                    <span *ngIf="item.oType.bPrepayment===true">{{ "PREPAYMENT" | translate}}</span>
+                    <span *ngIf="item.oType.bPrepayment===false">{{ "FULL_PAYMENT" | translate}}</span>
+                  </label>: 
+                  <span style="color:red;font-weight:bolder">Don't touch this field untill you filled in the payments on the right side</span>
+                  <input class="form-control  mb-3 mb-lg-0" type="number"
+                    [(ngModel)]="item.paymentAmount" (ngModelChange)="changePrePayment(item)">
+                </div>
+              </div>
+              <div class="row" *ngIf="item.nDiscount > 0">
+                <div class="form-group mb-4">
+                  <label class="form-control-label mb-3">{{ "DISCOUNT" | translate}} <span
+                      *ngIf="item.bDiscountOnPercentage"> {{"IN" | translate}} % </span></label>:
+                  <input class="form-control  mb-3 mb-lg-0" type="number" name="discount"
+                    placeholder="{{ 'DISCOUNT' | translate}}"
+                    [value]="item.nDiscount - (item.nRedeemedLoyaltyPoints || 0)" disabled>
+                </div>
+              </div>
+              <div class="row" *ngIf="item.oType.bRefund">
+                <div class="form-group mb-4">
+                  <label class="form-control-label mb-3">{{ "LOYALTY_POINTS" | translate}}</label>:
+                  <span class="fs-7 w-100 d-block text-gray-600 mb-1">{{item.nRedeemedLoyaltyPoints}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

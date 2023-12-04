@@ -1,0 +1,42 @@
+<div class="container">
+    <div class="card card-flush">
+        <div class="card-header align-items-center">
+            <div class="card-body">
+                <div class="row" *ngIf="bIsDayStateOpenLoading">
+                    <div class="spinner-border mx-auto">
+                    </div>
+                </div>
+                <div class="row" *ngIf="!bIsDayStateOpenLoading">
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-primary" routerLink="./list">
+                            <span class="indicator-label">{{ "DAY_CLOSURE_LIST" | translate}}</span>
+                        </button>
+                    </div>
+                    <!-- <div class="col-md-3">
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-primary mx-2" (click)="closeDayState($event)">{{ "CLOSE_DAYSTATE" |
+                                translate}}</button>
+                            <div *ngIf="closingDayState" class="spinner-border mx-auto"></div>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-flush">
+        <div class="card-header align-items-center">
+            <div class="card-body">
+                <div class="row">
+                    <strong> {{ "NO_OPEN_DAY_STATE_FOUND" | translate}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div>
+        <iframe #adminFrame src="http://localhost:4002/" class="w-full" height="90%"></iframe>
+    </div>
+</div>

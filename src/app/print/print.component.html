@@ -1,0 +1,27 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <h1>{{ "TEMPLATE" | translate}}</h1>
+      <p>{{"TO_CHANGE_TEMPLATE_YOU_NEED_TO_UPDATE_COMPONENT_CODE" | translate}}</p>
+      <json-editor [options]="editorOptions" [data]="templateString"></json-editor>
+      <!-- <textarea [(ngModel)]="templateString" class="form-control" rows="20"></textarea>-->
+    </div>
+    <div class="col-md-6">
+      <h1>{{ "DATA" | translate}}</h1>
+      <p>{{"TO_CHANGE_DATA_YOU_NEED_TO_UPDATE_COMPONENT_CODE" | translate}}</p>
+      <json-editor [options]="editorOptions" [data]="dataString"></json-editor>
+      <!--<textarea [(ngModel)]="dataString" class="form-control" rows="20"></textarea>-->
+    </div>
+    <div class="col-md-12">
+      <p>{{ "COMPUTER_ID" | translate}}: {{computerId}} | {{"PRINTER_ID" |translate}}: {{printerId}}</p>
+      <div class="alert alert-danger" *ngIf="!computerId || !printerId">{{ "COPY_LOCAL_STORAGE_KEY" | translate}}
+        <strong>authorization</strong>, <strong>currentBusiness</strong> {{ "AND" | translate}} <strong>org</strong> {{
+        "TO_THE_LOCAL_STORAGE_OF_THIS_PAGE" | translate}}!
+      </div>
+      <button class="btn btn-primary" type="button" (click)="generatePDF(false)"> {{ "DOWNLOAD" | translate}} <span
+          class="spinner-border spinner-border-sm align-middle ms-2" *ngIf="pdfGenerating"></span></button>
+      <button class="btn btn-primary" type="button" (click)="generatePDF(true)"> {{ "PRINT" | translate}}<span
+          class="spinner-border spinner-border-sm align-middle ms-2" *ngIf="pdfGenerating"></span></button>
+    </div>
+  </div>
+</div>

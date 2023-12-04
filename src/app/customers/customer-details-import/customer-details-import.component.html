@@ -1,0 +1,55 @@
+<div class="row step-container mb-6" *ngIf="customerDetailsForm">
+    <p class="mb-4"> {{
+        "FILL_IN_CUSTOMER_DETAILS_WITH_CORRESPONDING_COLUMNS_FROM_SELECTED_FIL_IF_FIELD_EMPTY_IT_IS_NOT_USED" |
+        translate}}</p>
+
+    <div class="flex">
+        <button class="btn btn-secondary" (click)="gotoStep('previous')">
+            {{"BACK" | translate}}
+        </button>
+        <button class="btn btn-primary ml-2" (click)="gotoStep('import')" [disabled]="validateCustomerHeaderLink()">
+            {{"NEXT_STEP" | translate}}
+        </button>
+        <button class="btn btn-primary ml-auto pull-right" (click)="getDynamicFields(true)">
+            <fa-icon [icon]="faSync"></fa-icon> &nbsp;
+            {{ "RELOAD_DEFAULT_ATTRIBUTES" | translate}}
+        </button>
+    </div>
+    <h4>{{ 'CUSTOMER_DETAILS' | translate}}</h4>
+    <div class="row mb-4">
+        <div class="col-md-2 no-padding-left">
+            <h5>{{"FOUND_COLUMN(CSV_HEADERS)"}}</h5>
+        </div>
+        <div class="col-md-3 no-padding-left">
+            <h5>{{ "ATTRIBUTE_TO_SET" | translate}}</h5>
+        </div>
+        <div class="col-md-7 no-padding-right">
+            <h5>{{ "UPDATE_TEMPLATE" | translate}}</h5>
+        </div>
+    </div>
+    <div class="row mb-4" *ngFor="let option of headerOptions">
+        <div class="col-md-2 no-padding-left">
+            {{option}}
+        </div>
+        <div class="col-md-3 no-padding-left">
+            <select class="form-select" id="customer-attributes" [(ngModel)]="customerDetailsForm[option]">
+                <option *ngFor="let option of allFields.all" [value]="option.sKey">{{ option.value | translate}}
+                </option>
+            </select>
+        </div>
+        <div class="col-md-7 no-padding-left flex">
+            <select class="form-select w-75" id="customer-update-template" [(ngModel)]="updateTemplateForm[option]">
+                <option value="do-nothing">{{ "DO_NOTHING" | translate }}</option>
+                <option value="overwrite">{{ "OVERWRITE" | translate }}</option>
+                <option value="add-if-undefined">{{ "ADD_IF_UNDEFINED" | translate }}</option>
+                <option value="append">{{ "APPEND" | translate }}</option>
+            </select>
+            <!-- <nb-radio-group class="flex" [(ngModel)]="updateTemplateForm[option]">
+                <nb-radio class="mr-4" value="do-nothing">{{ "DO_NOTHING" | translate }}</nb-radio>
+                <nb-radio class="mr-4" value="overwrite">{{ "OVERWRITE" | translate }}</nb-radio>
+                <nb-radio class="mr-4" value="add-if-undefined">{{ "ADD_IF_UNDEFINED" | translate }}</nb-radio>
+                <nb-radio class="mr-4" value="append">{{ "APPEND" | translate }}</nb-radio>
+            </nb-radio-group> -->
+        </div>
+    </div>
+</div>

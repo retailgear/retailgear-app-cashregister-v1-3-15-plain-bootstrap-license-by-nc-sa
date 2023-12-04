@@ -1,0 +1,56 @@
+<div class="card mb-5 mb-xl-10 d-flex">
+    <div class="card-header row">
+        <div class="card-title">
+            <span>{{'FISKALY_SETTINGS' | translate}}</span>
+            <!-- <span>{{'LOYALITY_POINTS_PROGRAM' | translate}}</span> -->
+        </div>
+    </div>
+
+    <div class="card-body">
+        <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
+            <thead class="fw-bold">
+                <tr>
+                    <div class="row">
+                        <div class="col-3 fw-bold">
+                            <span>{{ 'LOCATION' | translate}}</span>
+                        </div>
+                        <div class="col-3">
+                            <span>{{ 'TSS_ID' | translate}}</span>
+                        </div>
+                        <div class="col-3">
+                            <span>{{ 'TSS_STATE' | translate}}</span>
+                        </div>
+                        <div class="col-3">
+                            <span>{{ 'ACTIONS' | translate}}</span>
+                        </div>
+                    </div>
+                </tr>
+            </thead>
+            <tbody class="fw-bold">
+                <tr class="bg-hover-secondary">
+                    <div class="row" *ngFor="let location of businessDetails.aLocation; index as i">
+                        <div class="col-3">
+                            <label>{{location.sName}}</label>
+                        </div>
+                        <div class="col-3">
+                            <label>{{location.tssInfo ?location.tssInfo._id: 'NA'}}</label>
+                        </div>
+                        <div class="col-3">
+                            <label>{{location.tssInfo ? location.tssInfo.state: 'NA'}}</label>
+                        </div>
+                        <div class="col-3">
+                            <button *ngIf="!location.tssInfo" class="btn btn-primary"
+                                (click)="createTSS(location._id, i)">{{ "CREATE_TSS" |translate}}</button>
+                            <label *ngIf="location.tssInfo"
+                                class="form-check form-switch form-check-custom form-check-solid">
+                                <input type="checkbox" [(ngModel)]="location.tssEnabled" name="loyaltyProgram"
+                                    (ngModelChange)="changeState(location, location.tssEnabled, i)"
+                                    class="form-check-input">
+                            </label>
+                        </div>
+                    </div>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+<div class="card shadow-sm">
+  <div class="card-header" style="margin-top: 20px;">
+    <h4>{{ 'IMAGE_UPDATE' | translate}}</h4>
+    <div mat-dialog-actions>
+      <button mat-dialog-close type="button" class="btn btn-sm btn-light" (click)="close(false)">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
+    </div>
+  </div>
+  <div class="card-body pt-0 row">
+    <div>
+      <button class="btn btn-secondary" (click)="webcamImage = null; useCamera()"> {{ "USE_CAMERA_OR_WEBCAM" |
+        translate}}</button>
+      <label for="file1" class="btn btn-secondary" (click)="webcamImage = null; useUpload()">{{ "UPLOAD_FILE" |
+        translate}}</label>
+      <input id="file1" type="file" class="form-control" (change)="onFileChange($event)" #fileHandler hidden>
+    </div>
+    <div class="col-md-12">
+      <!-- <div style="text-align:center"> -->
+      <webcam *ngIf="!webcamImage" [height]="340" [width]="430" (click)="triggerSnapshot()"
+        [trigger]="triggerObservable" (imageCapture)="handleImage($event)" [allowCameraSwitch]="allowCameraSwitch"
+        [switchCamera]="nextWebcamObservable" [videoOptions]="videoOptions" [imageQuality]="1"
+        (cameraSwitched)="cameraWasSwitched($event)" (initError)="handleInitError($event)">
+      </webcam>
+      <!-- </div> -->
+
+      <div class="snapshot" *ngIf="webcamImage">
+        <img class="img-thumbnail" height="241" width="430"
+          [src]="webcamImage.imageAsDataUrl || sanitizeImageUrl(webcamImage)" />
+        <!-- <img class="img-thumbnail" height="241" width="430" [src]="webcamImage.imageAsDataUrl" /> -->
+      </div>
+
+      <button class="btn btn-primary" (click)="submit()" type="submit"> {{ "SUBMIT" | translate}}</button>
+    </div>
+  </div>
+</div>

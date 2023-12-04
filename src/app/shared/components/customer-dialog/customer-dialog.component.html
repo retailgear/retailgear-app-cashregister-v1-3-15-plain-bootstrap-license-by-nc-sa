@@ -1,0 +1,90 @@
+<div class="card shadow-sm">
+    <div class="card-header" style="margin-top: 20px;">
+        <h4>{{"FIND_CUSTOMER" | translate}}</h4>
+        <div>
+            <button type="button" class="btn btn-sm btn-light" (click)="close({ action: false })">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div class="card-body row">
+        <div class="d-flex align-items-center">
+            <div class="position-relative w-md-400px me-md-2" style="margin-bottom: 10px;">
+                <fa-icon [icon]="faSearch" class="text-gray-500 position-absolute top-50 translate-middle ms-6">
+                </fa-icon>
+                <input type="text" class="form-control form-control-solid ps-10" #inputElement
+                    [(ngModel)]="requestParams.searchValue" (change)="getCustomers()" name="search" value=""
+                    [placeholder]="'SEARCH' | translate" />
+            </div>
+            <div class="d-flex align-items-center">
+                <button type="submit" (click)="getCustomers()" class="btn btn-primary me-5"> {{ "SEARCH" |
+                    translate}}</button>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="customers.length" class="card-body pt-0">
+        <div class="dataTables_wrapper dt-bootstrap4 no-footer">
+            <div class="table-responsive">
+                <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
+                    <thead>
+                        <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                            <th *ngFor="let column of allColumns" class="min-w-100px sorting" tabindex="0">{{column |
+                                translate}}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="fw-bold text-gray-600">
+                        <tr *ngFor='let customer of customers'>
+                            <td *ngFor="let column of allColumns" class="">{{customer[column]}}</td>
+                            <td>
+                                <button class="btn btn-primary" (click)="setCustomer(customer)"> {{"SELECT" |
+                                    translate}}</button>
+                            </td>
+                            <td>
+                                <button class="btn btn-primary" (click)="editCustomer(customer)"> {{"OPEN" |
+                                    translate}}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        
+        </div>
+        <!-- <div class="row">
+        <div class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
+            <div class="dataTables_length" id="kt_ecommerce_sales_table_length">
+                <label>
+                    <select name="kt_ecommerce_sales_table_length" aria-controls="kt_ecommerce_sales_table" class="form-select form-select-sm form-select-solid"  [(ngModel)]="requestParams.limit" (change)="changeItemsPerPage(requestParams.limit)">
+                        <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{ pageNum }}</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-9 d-flex align-items-center justify-content-center justify-content-md-end">
+            <pagination-controls
+                [hidden] = "customers.length == 0"
+                (pageChange)="pageChanged($event)"
+                (pageBoundsCorrection)="pageChanged($event)"
+                [maxSize]="setPaginateSize"
+                [previousLabel]="'PREVIOUS' | translate"
+                [nextLabel]="'NEXT' | translate"
+                screenReaderPaginationLabel="Pagination"
+                [screenReaderPageLabel]="'PAGE' | translate">
+            </pagination-controls>
+        </div>
+    </div> -->
+    </div>
+    <div class="d-flex card-body pt-0">
+        <h5 *ngIf='!customers.length && !showLoader'> {{"NO_DATA_FOUND" |translate}}!</h5>
+        <div *ngIf="showLoader" class="spinner-border mx-auto"></div>
+    </div>
+    <div class="card-footer row">
+        <div class="col-md-11">
+            <button type="button" class="btn btn-secondary" (click)="AddCustomer()"> {{ "ADD_CUSTOMER" |
+                translate}}</button>
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-secondary" (click)="close({ action: false })"> {{ "CLOSE" |
+                translate}}</button>
+        </div>
+    </div>
+</div>
