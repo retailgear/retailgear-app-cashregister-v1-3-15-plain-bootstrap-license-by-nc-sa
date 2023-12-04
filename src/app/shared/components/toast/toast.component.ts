@@ -91,8 +91,15 @@ export class ToastComponent implements OnInit, OnDestroy {
   }
 
   fetchStatus() {
-    if (this.data.apiUrl)
-      this.apiService.getNew('cashregistry', this.data.apiUrl).subscribe((response: any) => {
+    if (this.data.apiUrl){
+     
+      const oBody = {
+        id: this.data?.templateContext?.id,
+        APIKEY: this.data?.templateContext?.apiKey
+      }
+      console.log('fetch status', oBody)
+
+      this.apiService.postNew('cashregistry', this.data.apiUrl, oBody).subscribe((response: any) => {
         if (response?.state) {
           this.states.printJob = 'Print job status : ' + response?.state;
           this.states.computer = 'Computer status : ' + response?.printer?.computer?.state;
@@ -101,6 +108,7 @@ export class ToastComponent implements OnInit, OnDestroy {
           this.states.message = 'PRINTJOB_NOT_FOUND';
         }
       })
+    }
   }
   closeToast(){
     this.intervalId = setTimeout(() => this.animationState = 'closing', 1000);

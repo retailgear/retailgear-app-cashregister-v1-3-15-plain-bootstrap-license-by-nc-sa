@@ -6,7 +6,7 @@ import { DialogComponent } from '../../service/dialog';
 @Component({
   selector: 'app-add-edit-workstation',
   templateUrl: './add-edit-workstation.component.html',
-  styleUrls: ['./add-edit-workstation.component.sass']
+  styleUrls: ['./add-edit-workstation.component.scss']
 })
 export class AddEditWorkstationComponent implements OnInit {
 

@@ -1,0 +1,27 @@
+.nav-link,
+.btn-link {
+    color: #464646;
+    font-size: 1.2rem;
+    font-weight: 600;
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+}
+
+.nav-link.active,
+.btn-link.active {
+    font-weight: 700;
+    color: var(--bs-primary) !important;
+}
+
+ul.dropdown-menu {
+    li {
+        a.dropdown-item.active {
+            color: #fff;
+            text-decoration: none;
+            background-color: var(--bs-primary);
+        }
+    }
+}

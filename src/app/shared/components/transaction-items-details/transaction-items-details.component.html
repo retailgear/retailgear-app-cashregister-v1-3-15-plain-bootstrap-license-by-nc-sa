@@ -1,117 +1,223 @@
 <div class="card shadow-sm">
-    <div class="card-header" style="margin-top: 20px;">
-        <h4>{{itemType === 'transaction'? "TRANSACTION_ITEMS" : "ACTIVITY_ITEMS" | translate}}</h4>
+    <div class="card-header p-4 d-flex justify-content-between align-items-center">
+        <h4 class="m-0">{{(itemType === 'transaction'? "TRANSACTION_ITEMS" : "ACTIVITY_ITEMS") | translate}}</h4>
         <div>
-            <button type="button" class="btn btn-sm btn-light" (click)="close(null, 'close')">
-                <fa-icon [icon]="faTimes"></fa-icon>
-            </button>
+            <a class="cancel my-auto fs-4" (click)="close(false,'close')">
+                <i class="fa fa-times fabutton"></i>
+            </a>
         </div>
     </div>
-    <div class="card-body pt-0">
+    <div class="card-body p-4">
         <div class="dataTables_wrapper dt-bootstrap4 no-footer" *ngIf="transactionItems.length">
             <div class="table-responsive">
                 <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
                     <thead>
-                        <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0"
-                            *ngIf="itemType === 'transaction'">
+                        <tr class="text-start text-gray-400 fw-bolder fs-7 gs-0" *ngIf="itemType === 'transaction'">
                             <th>
                                 <label class="form-check form-check-custom form-check-solid me-9">
-                                    <input class="form-check-input" type="checkbox" value="" id="kt_roles_select_all"
-                                        (change)="selectAll($event.target)" />
-                                    <!-- <span class="form-check-label" for="kt_roles_select_all">Select all</span> -->
+                                    <input class="form-check-input checkbox-hw" type="checkbox" value=""
+                                        id="kt_roles_select_all" (change)="selectAll($event.target)" />
                                 </label>
                             </th>
                             <th *ngFor="let column of transactionColumns" class="min-w-100px sorting" tabindex="0">
                                 {{column}}
                             </th>
                         </tr>
-                        <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0"
-                            *ngIf="itemType === 'activity'">
+                        <tr class="text-start text-gray-400 fw-bolder gs-0" *ngIf="itemType === 'activity'">
                             <th>
-                                <label class="form-check form-check-custom form-check-solid me-9">
-                                    <input class="form-check-input" type="checkbox" id="kt_roles_select_all1"
-                                        (change)="selectAll($event.target)" />
-                                    <!-- <span class="form-check-label" for="kt_roles_select_all1">Select all</span> -->
+                                <label class="form-check form-check-custom form-check-solid me-2">
+                                    <input class="form-check-input checkbox-hw" type="checkbox" [checked]="bAllSelected"
+                                        id="kt_roles_select_all1" (change)="selectAll($event.target)" />
                                 </label>
                             </th>
-                            <th *ngFor="let column of activityColumns" class="min-w-100px sorting" tabindex="0">
-                                {{column}}
+                            <th *ngFor="let column of activityColumns" class="sorting" tabindex="0">
+                                <!-- min-w-100px -->
+                                {{column | translate}}
                             </th>
                         </tr>
                     </thead>
                     <tbody class="fw-bold text-gray-600" *ngIf="itemType === 'transaction'">
-                        <tr *ngFor='let transactionItem of transactionItems'>
+                        <tr *ngFor='let transactionItem of transactionItems ;let i=index'>
                             <td>
-                                <label class="form-check form-check-custom form-check-solid me-9">
-                                    <input class="form-check-input" type="checkbox" id="kt_roles_select_all"
-                                        [(ngModel)]="transactionItem.isSelected"
-                                        [disabled]="transactionItem.bIsRefunded" />
-                                    <!-- <span class="form-check-label" for="kt_roles_select_all"></span> -->
+                                <label class="form-check form-check-custom form-check-solid me-2">
+                                    <input class="form-check-input checkbox-hw" type="checkbox" id="kt_roles_select_all"
+                                        [(ngModel)]="transactionItem.isSelected" (ngModelChange)="checkSelectedItem(i)"
+                                        [disabled]="transactionItem.bIsRefunded || transactionItem?.oType?.bRefund" />
                                 </label>
                             </td>
-                            <td class="">{{transactionItem.sProductName}}</td>
-                            <td class="">{{transactionItem.nTotalAmount}}</td>
+                            <td class="w-200px fs-6">{{transactionItem.sProductName}}</td>
+                            <td class="">{{transactionItem.nTotalAmount | currency: tillService.currency}}</td>
                             <td class="">{{transactionItem.nQuantity}}</td>
-                            <td class="">{{transactionItem.nPaidAmount}}</td>
-                            <td class="">{{transactionItem.nTotalAmount > transactionItem.nPaidAmount ? 'True' :
-                                'False'}}</td>
-                            <td class="">{{ transactionItem.dCreatedDate | date: 'short'}}</td>
+                            <td class="">{{transactionItem.nPaidAmount | currency: tillService.currency}}</td>
+                            <td class="">{{(transactionItem.nTotalAmount > transactionItem.nPaidAmount ? 'YES' :
+                                'NO') | translate }}</td>
+                            <td class="">{{ transactionItem.dCreatedDate | date:'dd-MM-YYYY HH:mm'}}</td>
                             <td>
-                                <div class="btn-group btn-toggle"
+                                <div class="form-check-custom"
                                     [ngClass]="{'cursor-not-allowed': transactionItem.bIsRefunded }">
-                                    <!-- <button class="btn btn-lg btn-default"
-                                        *ngIf="transactionItem.nPaidAmount < transactionItem.nPriceIncVat * transactionItem.nQuantity"
-                                        (click)="transactionItem.tType = 'pay'"
-                                        [ngClass]="transactionItem.tType === 'pay'? 'btn-primary active': ''"
-                                        [disabled]="transactionItem.bIsRefunded">{{ 'RESET_PAYMENT' |
-                                        translate}}</button> -->
-                                    <button class="btn btn-lg btn-default btn-primary active"
-                                        *ngIf="transactionItem.nPaidAmount === transactionItem.nPriceIncVat * transactionItem.nQuantity"
-                                        [disabled]="transactionItem.bIsRefunded">{{ "REFUND" | translate}}</button>
-                                    <button class="btn btn-lg"
-                                        *ngIf="transactionItem.nPaidAmount < transactionItem.nPriceIncVat * transactionItem.nQuantity"
-                                        (click)="transactionItem.tType = 'refund'"
-                                        [ngClass]="transactionItem.tType === 'refund'? 'btn-primary active': ''"
-                                        [disabled]="transactionItem.bIsRefunded">{{ "REFUND" | translate}}</button>
+
+                                    <div class="form-check form-check-solid"
+                                        *ngIf="transactionItem.nPaidAmount === transactionItem.nPriceIncVat * transactionItem.nQuantity">
+                                        <input class="form-check-input" id="ref1_tr_{{transactionItem._id}}"
+                                            type="radio" name="tr_{{transactionItem._id}}"
+                                            [checked]="transactionItem.tType === 'refund'? true : false"
+                                            [disabled]="transactionItem.bIsRefunded || transactionItem?.oType?.bRefund" />
+                                        <label class="form-check-label" for="ref1_tr_{{transactionItem._id}}">
+                                            {{ "REFUND" | translate}}
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-solid"
+                                        *ngIf="transactionItem.nPaidAmount < transactionItem.nPriceIncVat * transactionItem.nQuantity">
+                                        <input class="form-check-input" id="ref2_tr_{{transactionItem._id}}"
+                                            type="radio" name="tr_{{transactionItem._id}}"
+                                            [checked]="transactionItem.tType === 'refund'? true : false"
+                                            (click)="transactionItem.tType = 'refund'"
+                                            [disabled]="transactionItem.bIsRefunded || transactionItem?.oType?.bRefund" />
+                                        <label class="form-check-label" for="ref2_tr_{{transactionItem._id}}">
+                                            {{ "REFUND" | translate}}
+                                        </label>
+                                    </div>
+
+                                    <!--<div class="btn-group btn-toggle"
+                                    [ngClass]="{'cursor-not-allowed': transactionItem.bIsRefunded }">-->
+
+                                    <!--THIS ONE WAS COMMENTED, LEAVE THIS ONE-->
+                                    <!--<button class="btn btn-lg btn-default"
+                                            *ngIf="transactionItem.nPaidAmount < transactionItem.nPriceIncVat * transactionItem.nQuantity"
+                                            (click)="transactionItem.tType = 'pay'"
+                                            [ngClass]="transactionItem.tType === 'pay'? 'btn-primary active': ''"
+                                            [disabled]="transactionItem.bIsRefunded">{{ 'RESET_PAYMENT' |
+                                            translate}}</button> -->
+
+                                    <!--<button class="btn btn-lg btn-default btn-primary active"
+                                            *ngIf="transactionItem.nPaidAmount === transactionItem.nPriceIncVat * transactionItem.nQuantity"
+                                            [disabled]="transactionItem.bIsRefunded">{{ "REFUND" | translate}}</button>
+                                        <button class="btn btn-lg"
+                                            *ngIf="transactionItem.nPaidAmount < transactionItem.nPriceIncVat * transactionItem.nQuantity"
+                                            (click)="transactionItem.tType = 'refund'"
+                                            [ngClass]="transactionItem.tType === 'refund'? 'btn-primary active': ''"
+                                            [disabled]="transactionItem.bIsRefunded">{{ "REFUND" | translate}}</button>-->
                                 </div>
                             </td>
                         </tr>
                     </tbody>
                     <tbody class="fw-bold text-gray-600" *ngIf="itemType === 'activity'">
-                        <tr *ngFor='let transactionItem of transactionItems'>
-                            <td>
-                                <label class="form-check form-check-custom form-check-solid me-9">
-                                    <input class="form-check-input" type="checkbox" id="kt_roles_select_all"
-                                        [(ngModel)]="transactionItem.isSelected"
-                                        [disabled]="transactionItem.bIsRefunded" />
-                                    <!-- <span class="form-check-label" for="kt_roles_select_all">Select all</span> -->
-                                </label>
-                            </td>
-                            <td class="">{{transactionItem.sNumber}}</td>
-                            <td class="">{{transactionItem.nTotalAmount}}</td>
-                            <td class="">{{transactionItem.nPaidAmount}}</td>
-                            <td class="">{{transactionItem.nTotalAmount > transactionItem.nPaidAmount ? 'True' :
-                                'False'}}</td>
-                            <td class="">{{ transactionItem.dCreatedDate | date: 'short'}}</td>
-                            <td>
-                                <div class="btn-group btn-toggle"
-                                    [ngClass]="{'cursor-not-allowed': transactionItem.bIsRefunded }">
-                                    <button class="btn btn-lg btn-default"
-                                        *ngIf="transactionItem.nPaidAmount < transactionItem.nPriceIncVat * transactionItem.nQuantity"
-                                        (click)="transactionItem.tType = 'pay'"
-                                        [ngClass]="transactionItem.tType === 'pay'? 'btn-primary active': ''"
-                                        [disabled]="transactionItem.bIsRefunded">{{ 'RESET_PAYMENT' |
-                                        translate}}</button>
-                                    <button class="btn btn-lg btn-default btn-primary active"
-                                        *ngIf="transactionItem.nPaidAmount === transactionItem.nPriceIncVat * transactionItem.nQuantity"
-                                        [disabled]="transactionItem.bIsRefunded">{{ "REFUND" | translate}}</button>
-                                    <button class="btn btn-lg"
-                                        *ngIf="transactionItem.nPaidAmount < transactionItem.nPriceIncVat * transactionItem.nQuantity"
-                                        (click)="transactionItem.tType = 'refund'"
-                                        [ngClass]="transactionItem.tType === 'refund'? 'btn-primary active': ''"
-                                        [disabled]="transactionItem.bIsRefunded">{{ "REFUND" | translate}}</button>
-                                </div>
-                            </td>
+                        <tr *ngFor='let transactionItem of transactionItems ; let i=index'>
+                            <ng-container *ngIf="transactionItem.bUpdating">
+                                <td colspan="9" class="text-center">
+                                    <div class="spinner-border mx-auto"></div>
+                                </td>
+                            </ng-container>
+                            <ng-container *ngIf="!transactionItem?.bUpdating">
+                                <td>
+                                    <label class="form-check form-check-custom form-check-solid me-2">
+                                        <input class="form-check-input checkbox-hw" type="checkbox"
+                                            id="kt_roles_select_all" [(ngModel)]="transactionItem.isSelected"
+                                            (ngModelChange)="checkSelectedItem(i)"
+                                            [disabled]="transactionItem.bIsRefunded || transactionItem?.oType?.bRefund" />
+                                        <!-- <span class="form-check-label" for="kt_roles_select_all">Select all</span> -->
+                                    </label>
+                                </td>
+                                <td class="w-125px">{{transactionItem.sNumber}}</td>
+                                <td class="w-200px fs-6">{{transactionItem.sProductName}}</td>
+                                <td class="">{{transactionItem?.sBagNumber || '-'}}</td>
+                                <td class="">
+                                    <div *ngIf="!bPriceEditMode"
+                                        class="d-flex align-items-center justify-content-center">
+                                        <span class="me-2">{{transactionItem.nPriceIncVat | currency:
+                                            tillService.currency}}
+                                            <ng-container *ngIf="transactionItem.nQuantity > 1">
+                                                x {{ transactionItem.nQuantity }} Q.
+                                            </ng-container>
+                                        </span>
+                                        <span *ngIf="transactionItem.bIsRefunded || transactionItem.oType?.bRefund">
+                                            <i class="fa fa-info-circle" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" title="not allowed, item is refunded">
+                                                <button class="btn" (click)="bPriceEditMode = true"
+                                                    [disabled]="transactionItem.bIsRefunded || transactionItem.oType?.bRefund">
+                                                    <i class="fa fa-edit"></i>
+                                                </button>
+                                            </i>
+                                        </span>
+                                        <span
+                                            *ngIf="!(transactionItem.bIsRefunded) && !(transactionItem.oType?.bRefund)">
+                                            <button class="btn p-1" (click)="bPriceEditMode = true">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div *ngIf="bPriceEditMode" class="d-flex align-items-center">
+                                        <input class="form-control w-90px p-1 me-2"
+                                            [(ngModel)]="transactionItem.nPriceIncVat">
+                                        <div class="d-flex">
+                                            <button class="btn me-1 p-1" (click)="saveEditedPrice(transactionItem)">
+                                                <i class="fa fa-save fa-lg"></i>
+                                            </button>
+                                            <button class="btn p-1" (click)="bPriceEditMode = false">
+                                                <i class="fa fa-times fa-lg"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{transactionItem.nDiscountToShow | currency: tillService.currency}}</td>
+                                <td>{{transactionItem.nPaidAmount | currency: tillService.currency}}</td>
+                                <td>{{(transactionItem.nTotalAmount > transactionItem.nPaidAmount ? 'YES' :'NO') |
+                                    translate }}</td>
+                                <td>{{ transactionItem.dCreatedDate | date:'dd-MM-YYYY HH:mm'}}</td>
+                                <td>
+                                    <div class="form-check-custom d-flex flex-column"
+                                        [ngClass]="{'cursor-not-allowed': transactionItem.bIsRefunded }">
+                                        <div class="form-check form-check-solid mb-4">
+                                            <input class="form-check-input" id="prep_tr_{{transactionItem.sNumber}}"
+                                                type="radio" (click)="transactionItem.tType = 'pay'"
+                                                [checked]="transactionItem.tType == 'pay'"
+                                                [disabled]="transactionItem.bIsRefunded || transactionItem.oType?.bRefund" />
+
+                                            <label class="form-check-label" for="prep_tr_{{transactionItem.sNumber}}">
+                                                {{ 'RESET_PAYMENT' | translate}}
+                                            </label>
+                                        </div>
+                                        <!-- *ngIf="transactionItem.nPaidAmount === (transactionItem.nPriceIncVat * transactionItem.nQuantity)" -->
+                                        <div class="form-check form-check-solid">
+                                            <input class="form-check-input" id="ref1_tr_{{transactionItem.sNumber}}"
+                                                type="radio" (click)="transactionItem.tType = 'refund'"
+                                                [checked]="transactionItem.tType == 'refund'"
+                                                [disabled]="transactionItem.bIsRefunded || transactionItem?.oType?.bRefund" />
+                                            <!-- condition for checked :(transactionItem.nPaidAmount === (transactionItem.nPriceIncVat * transactionItem.nQuantity)) && transactionItem.nTotalAmount != 0 -->
+                                            <label class="form-check-label" for="ref1_tr_{{transactionItem.sNumber}}">
+                                                {{ "REFUND" | translate}}
+                                            </label>
+                                        </div>
+                                        <!-- <div class="form-check form-check-solid"
+                                            *ngIf="transactionItem.nPaidAmount < (transactionItem.nPriceIncVat * transactionItem.nQuantity)">
+                                            <input class="form-check-input" id="ref2_tr_{{transactionItem.sNumber}}" type="radio"
+                                                name="tr_{{transactionItem.sNumber}}" (click)="transactionItem.tType = 'refund'"
+                                                [checked]="transactionItem.tType == 'refund'"
+                                                [disabled]="transactionItem.bIsRefunded || transactionItem?.oType?.bRefund" />
+                                            <label class="form-check-label" for="ref2_tr_{{transactionItem.sNumber}}">
+                                                {{ "REFUND" | translate}}
+                                            </label>
+                                        </div> -->
+
+                                        <!--<div class= "btn-group btn-toggle"
+                                                                [ngClass]="{'cursor-not-allowed': transactionItem.bIsRefunded }">
+                                                                <button class="btn btn-lg btn-default"
+                                                                    *ngIf="transactionItem.nPaidAmount < transactionItem.nPriceIncVat * transactionItem.nQuantity"
+                                                                    (click)="transactionItem.tType = 'pay'"
+                                                                    [ngClass]="transactionItem.tType === 'pay'? 'btn-primary active': ''"
+                                                                    [disabled]="transactionItem.bIsRefunded">{{ 'RESET_PAYMENT' |
+                                                                    translate}}</button>
+                                                                <button class="btn btn-lg btn-default btn-primary active"
+                                                                    *ngIf="transactionItem.nPaidAmount === transactionItem.nPriceIncVat * transactionItem.nQuantity"
+                                                                    [disabled]="transactionItem.bIsRefunded">{{ "REFUND" | translate}}</button>
+                                                                <button class="btn btn-lg"
+                                                                    *ngIf="transactionItem.nPaidAmount < transactionItem.nPriceIncVat * transactionItem.nQuantity"
+                                                                    (click)="transactionItem.tType = 'refund'"
+                                                                    [ngClass]="transactionItem.tType === 'refund'? 'btn-primary active': ''"
+                                                                    [disabled]="transactionItem.bIsRefunded">{{ "REFUND" | translate}}</button> -->
+                                    </div>
+                                </td>
+                            </ng-container>
                         </tr>
 
                         <!-- WARNING ABOUT GIFT-CARD-DISCOUNT -->
@@ -123,7 +229,7 @@
                 </table>
             </div>
             <div class="d-flex" *ngIf="oShowWarning.bIsMoreTransaction">
-                <h5> {{ oShowWarning.sMessage }}</h5>
+                <h5> {{ oShowWarning.sMessage | translate }}</h5>
 
             </div>
             <div class="d-flex">
@@ -133,8 +239,9 @@
         </div>
     </div>
 
-    <div class="card-footer">
-        <button type="button" (click)="close({transactionItems: transactionItems, transaction: transaction})"
+    <div class="card-footer p-4">
+        <button type="button" [disabled]="!bIsDisable"
+            (click)="close({action:true, transactionItems: transactionItems, transaction: transaction})"
             class="btn btn-primary float-end"> {{ "OPEN" |translate }}</button>
     </div>
 </div>

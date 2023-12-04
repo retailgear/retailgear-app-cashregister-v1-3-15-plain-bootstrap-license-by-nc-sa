@@ -24,13 +24,13 @@ $info-light:    									if(isDarkMode(), #2F264F, #F8F5FF);
 $info-inverse:  									#FFFFFF;
 
 // Danger
-$danger:       									    if(isDarkMode(), #F64E60, #F1416C);
+$danger:       									    if(isDarkMode(), #F64E60, #D9214E);
 $danger-active:    									if(isDarkMode(), #EE2D41, #D9214E);
 $danger-light:    									if(isDarkMode(), #3A2434, #FFF5F8);
 $danger-inverse:  									#FFFFFF;
 
 // Warning
-$warning:       									if(isDarkMode(), #FFA800, #FFC700);
+$warning:       									if(isDarkMode(), #FFA800, #FFFFFF);
 $warning-active:    								if(isDarkMode(), #EE9D01, #F1BC00);
 $warning-light:    									if(isDarkMode(), #392F28, #FFF8DD);
 $warning-inverse:  									#FFFFFF;

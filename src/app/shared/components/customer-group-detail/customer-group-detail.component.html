@@ -1,0 +1,37 @@
+<div class="card shadow-sm">
+    <div class="card-header align-items-center py-5">
+      <h4>{{'NEW GROUP'}} </h4>
+      <a class="cancel ml-auto mt-3" (click)="close(false)">
+        <i class="fa fa-times fabutton"></i>
+      </a>
+    </div>
+    <div class="card-body main">
+        <div class="row">
+         <div class="col-12">
+            <form #form="ngForm">
+                <div class="mb-3 row">
+                  <label for="groupName" class="col-sm-3 col-form-label">{{'GROUP_NAME' | translate}}</label>
+                 <div class="col-sm-8">
+                  <input type="text"name="groupName" [(ngModel)]="customerGroup.sName" class="form-control" placeholder="{{'GROUP_NAME' | translate}}">
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="groupName" class="col-sm-3 col-form-label">{{'GROUP_DESCRIPTION' | translate}}</label>
+                   <div class="col-sm-8">
+                    <input type="text" class="form-control" name="description" [(ngModel)]="customerGroup.sDescription" placeholder="{{'GROUP_DESCRIPTION' | translate}}">
+                    </div>
+                  </div>
+            </form>
+        </div>
+        </div>
+  </div>
+  <div class="card-footer">
+    <div class="row">
+        <div class="d-flex justify-content-right">
+            <button *ngIf="mode == 'create'" class="btn btn-primary mx-2" (click)="createGroup()" [disabled]="bDisabled" >{{'CREATE' | translate}}</button>
+            <button *ngIf="mode == 'update'" class="btn btn-primary mx-2" (click)="updateGroup()" [disabled]="bDisabled">{{'UPDATE' | translate}}</button>
+            <button class="btn btn-secondary" (click)="close(true)">{{"CANCEL" | translate}}</button>
+        </div>
+    </div>
+</div>
+</div>

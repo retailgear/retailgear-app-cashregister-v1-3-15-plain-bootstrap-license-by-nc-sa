@@ -24,7 +24,11 @@ module.exports = {
     publicPath: "auto"
   },
   optimization: {
-    runtimeChunk: false
+    runtimeChunk: false,
+    splitChunks: {
+      chunks: 'async'
+    },
+    emitOnErrors: true,
   },
   resolve: {
     alias: {
@@ -74,10 +78,29 @@ module.exports = {
     }),
     new ModuleFederationPlugin({
       // For remotes (please adjust)
+      name: "paymentIntegration",
+      filename: "payment-integration.js",
+      exposes: {
+        './PaymentIntegrationModule': './src/app/payment-integration/payment-integration.module.ts'
+      },
+
+      shared: share(sharedLibrary)
+    }),
+    new ModuleFederationPlugin({
+      // For remotes (please adjust)
       name: "savingPoints",
       filename: "saving-points.js",
       exposes: {
         './SavingPointsModule': './src/app/saving-points/saving-points.module.ts',
+      },
+      shared: share(sharedLibrary)
+    }),
+    new ModuleFederationPlugin({
+      // For remotes (please adjust)
+      name: "statisticsSettings",
+      filename: "statistics-settings.js",
+      exposes: {
+        './StatisticsSettingsModule': './src/app/statistics-settings/statistics-settings.module.ts',
       },
       shared: share(sharedLibrary)
     }),
@@ -155,12 +178,28 @@ module.exports = {
     }),
     new ModuleFederationPlugin({
       // For remotes (please adjust)
+      name: "testfilter",
+      filename: "testfilter.js",
+      exposes: {
+        './TestFilterModule': './src/app/testfilter/testfilter.module.ts',
+      },
+      shared: share(sharedLibrary)
+    }),
+    new ModuleFederationPlugin({
+      // For remotes (please adjust)
       name: "customer",
       filename: "customer.js",
       exposes: {
         './CustomerModule': './src/app/customers/customers.module.ts',
       },
       shared: share(sharedLibrary)
+    }),
+    new ModuleFederationPlugin({
+      name: 'customerGroup',
+      filename: 'customerGroup.js',
+      exposes: {
+        './customerGroupModule': './src/app/customers-group/customers-group.module.ts',
+      }
     }),
     new ModuleFederationPlugin({
       // For remotes (please adjust)
@@ -199,12 +238,33 @@ module.exports = {
       shared: share(sharedLibrary)
     }),
     // new ModuleFederationPlugin({
-    //   // For remotes (please adjust)
     //   remotes: {
-    //     "supplierSlider": "supplierSlider@http://localhost:4202/supplierSlider.js",
+    //     "supplierProductSlider": "supplierProductSlider@http://localhost:3001/api/v1/webpack/directive/supplier-product-slider.js",
     //   },
     //   shared: share(sharedLibrary)
     // }),
+    // new ModuleFederationPlugin({
+    //   remotes: {
+    //     "customersDocsImagesUpload": "customersDocsImagesUpload@http://localhost:3001/api/v1/webpack/jewels-and-watches/customers-docs-images-upload.js",
+    //   },
+    //   shared: share(sharedLibrary)
+    // }),
+    new ModuleFederationPlugin({
+      name: "ImportGiftCardModule",
+      filename: "import-gift-card.js",
+      exposes: {
+        './ImportGiftCardModule': './src/app/import-gift-card/import-gift-card.module.ts',
+      },
+      shared: share(sharedLibrary)
+    }),
+    new ModuleFederationPlugin({
+      name: "ImportRepairOrderModule",
+      filename: "import-repair-order.js",
+      exposes: {
+        './ImportRepairOrderModule': './src/app/import-repair-order/import-repair-order.module.ts',
+      },
+      shared: share(sharedLibrary)
+    }),
     sharedMappings.getPlugin()
   ],
 };

@@ -1,0 +1,297 @@
+<div class="container">
+  <div class="my-4 px-7 py-7 card card-flush">
+    <div class="d-flex align-items-center my-3">
+      <div class="position-relative w-md-400px me-md-2">
+        <fa-icon [icon]="faSearch" class="text-gray-500 position-absolute top-50 translate-middle ms-6"></fa-icon>
+        <!--end::Svg Icon-->
+        <input type="text" class="form-control form-control-solid ps-10" [(ngModel)]='sSearchValue' name="search"
+          value="" (keyup.enter)="loadTransaction()"  placeholder="Search" />
+      </div>
+      <div class="d-flex align-items-center">
+        <button type="submit" class="btn btn-primary mx-3" (click)="loadTransaction()">{{ 'SEARCH' | translate
+          }}</button>
+          <div class="d-flex align-items-center">
+            <button class="btn btn-secondary" (click)="resetFilters()">
+              <i class='fas fa-sync-alt'></i>
+            </button>
+          </div>
+          <div class="d-flex align-items-center ads_search">
+            <button type="button" (click)="showAdvanceSearch = !showAdvanceSearch" class="btn btn-info me-5">
+              <i class="fa fa-filter"></i>
+            </button>
+          </div>
+      </div>
+      
+      <div class="d-flex align-items-right ms-auto">
+        <button class="btn btn-light-primary mx-2" [disabled]="!isDownloadEnable" (click)="openExportModel()">{{'DOWNLOAD' |
+          translate}}</button>
+        <!-- <button class="btn btn-primary" (click)="goToCashRegister()">{{ 'NEW' | translate }}</button> -->
+      </div>
+    </div>
+
+    
+
+    <div class="collapse row" id="kt_advanced_search_form" data-kt-search-minimize="on"
+      [ngClass]="{'show' : showAdvanceSearch}">
+
+      <div class="col-12">
+        <div class="row g-4 mb-2">
+          <div class="col-lg-2">
+            <label class="fs-6 form-label fw-bolder text-dark">{{ "CREATE_MIN_DATE" | translate}}</label>
+            <input type="date" class="form-control form-control form-control-solid" name="createMinDate"
+              [ngModel]="requestParams.create.minDate | date:'yyyy-MM-dd'"
+              (ngModelChange)="requestParams.create.minDate = $event" />
+          </div>
+
+          <div class="col-lg-2">
+            <label class="fs-6 form-label fw-bolder text-dark">{{ "CREATE_MAX_DATE" | translate}}</label>
+            <input type="date" class="form-control form-control form-control-solid" name="createMaxDate"
+              [ngModel]="requestParams.create.maxDate | date:'yyyy-MM-dd'"
+              (ngModelChange)="requestParams.create.maxDate = $event" />
+          </div>
+
+          <div class="col-lg-2">
+            <label class="fs-6 form-label fw-bolder text-dark">{{ "ESTIMATE_MIN_DATE" | translate}}</label>
+            <input type="date" class="form-control form-control form-control-solid" name="estimateMinDate"
+              [ngModel]="requestParams.estimate.minDate | date:'yyyy-MM-dd'"
+              (ngModelChange)="requestParams.estimate.minDate = $event" />
+          </div>
+
+          <div class="col-lg-2">
+            <label class="fs-6 form-label fw-bolder text-dark">{{ "ESTIMATE_MAX_DATE" | translate}}</label>
+            <input type="date" class="form-control form-control form-control-solid" name="estimateMaxDate"
+              [ngModel]="requestParams.estimate.maxDate | date:'yyyy-MM-dd'"
+              (ngModelChange)="requestParams.estimate.maxDate = $event" />
+          </div>
+
+          <div class="col-lg-3">
+            <label class="fs-6 form-label fw-bolder text-dark">{{ 'REPAIR_STATUS' | translate }}</label>
+            <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+              [(ngModel)]="requestParams.selectedRepairStatuses" [clearable]="false">
+              <ng-option *ngFor="let repairStatus of repairStatuses" [value]="repairStatus.value">{{repairStatus.key |
+                translate}}
+              </ng-option>
+            </ng-select>
+          </div>
+
+          <div class="col-lg-3">
+            <label class="fs-6 form-label fw-bolder text-dark">{{ 'EMPLOYEES' | translate }}</label>
+            <ng-select class="form-control form-control-solid p-0" [clearable]="false"
+              [(ngModel)]="requestParams.employee">
+              <ng-option *ngFor="let employeeObj of employees" [value]="employeeObj">{{employeeObj.sFirstName}}
+                {{employeeObj.sLastName || ''}}</ng-option>>
+            </ng-select>
+          </div>
+
+          <div class="col-lg-3">
+            <label class="fs-6 form-label fw-bolder text-dark">{{ "ASSIGNEE" | translate}}</label>
+            <ng-select class="form-control form-control-solid p-0" [clearable]="false"
+              [(ngModel)]="requestParams.iAssigneeId">
+              <ng-option *ngFor="let employeeObj of employees" [value]="employeeObj._id">{{employeeObj.sFirstName}}
+                {{employeeObj.sLastName || ''}}</ng-option>>
+            </ng-select>
+          </div>
+
+          <div class="col-lg-3">
+            <label class="fs-6 form-label fw-bolder text-dark">{{ 'WORKSTATION' | translate }}</label>
+            <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+              [(ngModel)]="requestParams.selectedWorkstations" [clearable]="false">
+              <ng-option *ngFor="let workstation of workstations" [value]="workstation._id">{{workstation.sName}}
+              </ng-option>
+            </ng-select>
+          </div>
+
+          <div class="col-lg-3">
+            <label class="fs-6 form-label fw-bolder text-dark">{{ 'LOCATION' | translate }}</label>
+            <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+              [(ngModel)]="requestParams.selectedLocations" [clearable]="false">
+              <ng-option *ngFor="let location of requestParams.locations" [value]="location._id">{{location.sName}}
+              </ng-option>
+            </ng-select>
+          </div>
+
+          <div class="col-lg-2">
+            <label class="fs-6 form-label fw-bolder text-dark">{{ 'E_KIND' | translate }}</label>
+            <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+              [(ngModel)]="requestParams.selectedKind" [clearable]="false">
+              <ng-option *ngFor="let eKind of aKind" [value]="eKind.value">{{eKind.key | translate}}</ng-option>
+            </ng-select>
+          </div>
+
+          <div class="col-lg-2">
+            <label class="fs-6 form-label fw-bolder text-dark">{{ 'BUSINESS_PARTNER' | translate }}</label>
+            <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+              [(ngModel)]="requestParams.aSelectedBusinessPartner" [clearable]="false">
+              <ng-option *ngFor="let oBusinessPartner of aFilterBusinessPartner"
+                [value]="oBusinessPartner.iBusinessPartnerId">
+                {{oBusinessPartner.sBusinessPartnerName}}
+              </ng-option>
+            </ng-select>
+          </div>
+
+          <div class="col-lg-3">
+            <label class="fs-6 form-label fw-bolder text-dark">{{"IMPORT_STATUS" | translate}}</label>
+            <div class="nav-group nav-group-fluid">
+              <label>
+                <input type="radio" class="btn-check" name="import" value="all" [(ngModel)]="importStatus"
+                  checked="checked" />
+                <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bolder px-4">{{ "ALL" |
+                  translate}}</span>
+              </label>
+              <label>
+                <input type="radio" class="btn-check" name="import" value="true" [(ngModel)]="importStatus" />
+                <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bolder px-4">{{ "IMPORTED"
+                  | translate}}</span>
+              </label>
+              <label>
+                <input type="radio" class="btn-check" name="import" value="false" [(ngModel)]="importStatus" />
+                <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bolder px-4">{{"UNIMPORTED"
+                  | translate}}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Property Filter -->
+          <div class="col-lg-5">
+            <ng-container>
+              <div class="col-md-12">
+                <label class="fs-6 form-label fw-bolder text-dark">{{ "PROPERTIES" |
+                  translate}}</label>
+                <div class="overflow-scroll py-1 h-200px">
+                  <div *ngFor="let property of aProperty; let pIndex = index">
+                    <div class="row align-items-center">
+                      <div class="col-md-4">
+                        <div>{{property?.sPropertyName}}</div>
+                      </div>
+                      <div class="col-md-8">
+                        <div *ngIf="propertyOptions[property.iPropertyId]?.length">
+                          <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+                            [(ngModel)]="selectedProperties[property.iPropertyId]" (click)="onProperties(property.iPropertyId)"
+                            [clearable]="false">
+                            <ng-option *ngFor="let oProperty of propertyOptions[property.iPropertyId]"
+                              [value]="oProperty.sName">{{oProperty.sName}}</ng-option>
+                          </ng-select>
+                        </div>
+                      </div>
+                    </div>
+                    <br>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+          <!-- Property Filter -->
+
+        </div>
+
+      </div>
+
+    </div>
+
+    
+    <div class="table-responsive">
+      <table class="table table-hover table-rounded table-striped gy-7 gs-7">
+        <thead>
+          <tr class="fw-bold fs-6 text-gray-400 border-gray-200 text-uppercase">
+            <th>{{"ACTIVITY_NO" | translate}}</th>
+            <th *ngIf="type !== 'repair'">{{"TYPE" | translate}}</th>
+            <th *ngIf="type == 'order' || type == 'repair'">{{"REPAIR_NUMBER" | translate}}</th>
+            <th *ngIf="type == 'repair' || type == 'gold-purchase'">{{"AINAME" | translate}}</th>
+            <th><div *ngIf="type == 'giftcard'">{{"ISSUE_DATE" | translate}}</div>
+                <div *ngIf="type != 'giftcard'">{{"INTAKE_DATE" | translate}}</div>
+            </th>
+            <th *ngIf="type !== 'giftcard' && type !== 'gold-purchase' && type !== 'order'">{{"ESTIMATED_DATE" | translate}}</th>
+            <th *ngIf="type !== 'giftcard' && type !== 'gold-purchase' && type == 'order'">{{"ORDERED_DATE" | translate}}</th>
+            <th>{{"STATUS" | translate}}</th>
+            <th *ngIf="type == 'gold-purchase'">{{"TOTAL_PRICE" | translate}}</th>
+            <th *ngIf="type == 'giftcard'">{{"AIAMOUNT" | translate}}</th>
+            <th *ngIf="type == 'giftcard'">{{ "REM_AMOUNT" | translate}}</th>
+            <th *ngIf="type !== 'giftcard' && type !== 'gold-purchase'">{{"SUPPLIER_REPAIRER" | translate}}</th>
+            <th>{{"CUSTOMER" | translate}}</th>
+            <th>{{"ACTION" | translate}}</th>
+    
+            <!-- <th scope="col" *ngFor="let th of tableHeaders"
+                [ngClass]="{'fw-bolder': th.selected, 'cursor-pointer': !th.disabled, 'pe-none': th.disabled}"
+                (click)="setSortOption(th)">
+                {{ th.key | translate}}
+                <fa-icon *ngIf="th.selected" [icon]=" th.sort ==='asc' ? faArrowDown : faArrowUp"></fa-icon>
+              </th> -->
+          </tr>
+        </thead>
+        <tbody class="fw-bold text-gray-600">
+          <ng-container *ngFor="let activity of activityItems | paginate: paginationConfig, let i = index;">
+            <tr *ngIf="activity.eActivityItemStatus !== 'cancelled'">
+              <td style="min-width: 170px;">{{activity?.sNumber}}</td>
+              <td *ngIf="type !== 'repair'" style="text-transform: capitalize;">{{activity?.oType.eKind}}</td>
+              <td *ngIf="type == 'order' || type == 'repair'" style="width: 120px;">{{activity?.sBagNumber || '-'}}</td>
+              <td *ngIf="type == 'repair' || type == 'gold-purchase'" class="custom-overflow">{{activity?.sProductName ||
+                '-'}}</td>
+              <td style="width: 130px;" scope="row">{{activity?.dCreatedDate | date: 'yyyy-MM-dd HH:mm'}}</td>
+              <td *ngIf="type !== 'giftcard' && type !== 'gold-purchase' && type !== 'order'" style="width: 130px;" scope="row">
+                {{activity?.dEstimatedDate | date:
+                'yyyy-MM-dd HH:mm'}}</td>
+              <td *ngIf="type !== 'giftcard' && type !== 'gold-purchase' && type == 'order'" style="width: 130px;" scope="row">
+                {{activity?.dCreatedDate | date:
+                'yyyy-MM-dd HH:mm'}}</td>
+              <td>
+                <div *ngFor="let status of repairStatuses">
+                  <div *ngIf="activity.eActivityItemStatus == status.value">
+                    {{status.key | translate}}
+                  </div>
+                </div>
+              </td>
+              <td *ngIf="type == 'gold-purchase'">{{activity?.nTotalAmount}}</td>
+              <td *ngIf="type == 'giftcard'">{{(activity?.nPriceIncVat || '0') | currency: tillService.currency}}</td>
+              <td *ngIf="type == 'giftcard'">
+                {{(activity?.nGiftcardRemainingAmount || '0') | currency: tillService.currency}}
+              </td>
+              <td *ngIf="type !== 'giftcard' && type !== 'gold-purchase'" class="custom-overflow">{{activity?.sBusinessPartnerName
+                || '-'}}</td>
+              <td class="custom-overflow">
+                <span *ngIf="!activity?.oCustomer?.bIsCompany">{{activity?.oCustomer?.sFirstName}}
+                  {{activity?.oCustomer?.sLastName || '-'}} </span>
+                <span *ngIf="activity?.oCustomer?.bIsCompany"> {{activity?.oCustomer?.sCompanyName || "-"}}</span>
+              </td>
+              <td>
+                <div class="btn-group w-100">
+                  <div class="btn btn-secondary fs-bold px-6" (click)="openActivities(activity)"
+                    [class.disabled]="!businessDetails?._id">
+                    <span class="indicator-label">
+                      {{ "VIEW" | translate }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex">
+      <h5 *ngIf='!activityItems.length && !showLoader' style="text-align: center;"> {{ 'NO_DATA_FOUND' | translate }}
+      </h5>
+      <div *ngIf="showLoader" class="spinner-border mx-auto"></div>
+    </div>
+    <div class="row" *ngIf='activityItems.length'>
+      <div class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
+        <div class="dataTables_length" id="kt_ecommerce_sales_table_length">
+          <label>
+            <select name="kt_ecommerce_sales_table_length" aria-controls="kt_ecommerce_sales_table"
+              class="form-select form-select-sm form-select-solid" [(ngModel)]="paginationConfig.itemsPerPage"
+              (change)="changeItemsPerPage()">
+              <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{ pageNum }}</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-9 d-flex align-items-center justify-content-center justify-content-md-end">
+        <pagination-controls [hidden]="activityItems.length === 0" (pageChange)="pageChanged($event)"
+          (pageBoundsCorrection)="pageChanged($event)" [maxSize]="setPaginateSize"
+          [previousLabel]="'PREVIOUS' | translate" [nextLabel]="'NEXT' | translate"
+          screenReaderPaginationLabel="Pagination" [screenReaderPageLabel]="'PAGE' | translate">
+        </pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>

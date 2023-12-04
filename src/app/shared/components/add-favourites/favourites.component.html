@@ -1,52 +1,76 @@
 <div class="card">
-    <div class="card-header row" style="margin-top: 20px;">
+    <div class="card-header d-flex justify-content-between align-items-center">
         <div class="col-md-10">
-            <h4 *ngIf="mode === 'create'">{{ 'CREATE_FAVOURITE' | translate}}</h4>
-        </div>
-        <div class="col-md-2"></div>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-12">
-                <input type="text" class="form-control me-3" [placeholder]="'SEARCH' | translate"
-                    [(ngModel)]="searchKeyword"
-                    (ngModelChange)="searchKeyword? shopProducts = shopProducts: shopProducts = []"
-                    (keyup.enter)="search()">
-            </div>
-            <div class="col-md-12">
-                <div *ngIf="searching" class="spinner-border mx-auto"></div>
-            </div>
+            <h4 class="m-0" *ngIf="mode === 'edit'">{{'EDIT_QUICK_BUTTON' | translate}}</h4>
+            <h4 class="m-0" *ngIf="mode === 'assign'">{{'ASSIGN_PRODUCT' | translate}}</h4>
         </div>
         <div>
-            <div class="row" *ngIf="shopProducts && shopProducts.length > 0">
+            <a class="cancel my-auto" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row" *ngIf="mode === 'assign'">
+            <div class="col-md-12 d-flex align-items-center mb-3">
+                <input type="text" class="form-control w-75"  placeholder="{{'SEARCH_PRODUCT' | translate}}" [(ngModel)]="searchKeyword" name="searchKeyword"
+                    (ngModelChange)="searchKeyword ? shopProducts = shopProducts : shopProducts = []"
+                    (ngModelChange)="search()" #searchField>
+                <button class="btn btn-primary ms-3" (click)="search()" [disabled]="searchKeyword?.length <= 2">
+                    {{"SEARCH" | translate}}
+                </button>
+            </div>
+            <div class="col-md-12 d-flex justify-content-center mb-3" *ngIf="searching">
+                <div class="spinner-border mx-auto"></div>
+            </div>
+        </div>
+        <div *ngIf="mode === 'assign' && !searching">
+            <div class="alert alert-danger" role="alert" *ngIf="shopProducts?.length == 0">
+                <p class="m-0 text-uppercase fw-bolder">
+                    {{"NO_DATA_FOUND" | translate}}! 
+                </p>
+            </div>
+            <div class="row my-3" *ngIf="shopProducts && shopProducts.length > 0">
                 <!-- <h5>{{'BUSINESS_PRODUCTS'}}</h5> -->
-                <div class="col-md-6 cursor-pointer" *ngFor="let product of shopProducts"
-                    (mouseenter)="product['showOption'] = true" (mouseleave)="product['showOption'] = false">
-                    <div class="card m-1 shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex">
-                                <div class="w-50 p-2">
-                                    <img src="{{product.aImage[0]? product.aImage[0]: '../assets/images/no-photo-available.jpg' }}"
-                                        class="w-auto h-xxl-100px">
-                                </div>
-                                <div class="w-50 px-2">
-                                    <label class="business-bg-color rounded-full px-2 py-1 text-white text-sm"> {{
-                                        "BUSINESS_PRODUCT" | translate}}</label>
-                                    <p class="block mt-2">{{ product.oName? product.oName['en'] : 'No name' }}</p>
-                                    <p class="mt-2">{{ product.sEan }}</p>
-                                    <p class="mt-2">{{ product.sProductNumber }}</p>
-                                </div>
+                <pagination-controls
+                    id="paginate_shop_products"
+                    (pageChange)="pageChanged($event, 'shopProducts', searchKeyword)"
+                    (pageBoundsCorrection)="pageChanged($event, 'shopProducts', searchKeyword)"
+                    [previousLabel]="'PREVIOUS' | translate"
+                    [nextLabel]="'NEXT' | translate"
+                    screenReaderPaginationLabel="Pagination"
+                    [screenReaderPageLabel]="'PAGE' | translate"
+                    *ngIf="shopProducts?.length > 0">
+                </pagination-controls>
+                <div class="col-xl-6 col-sm-12 cursor-pointer p-2" *ngFor="let product of shopProducts | paginate: oShopProductsPaginationConfig"
+                (mouseenter)="product['showOption'] = true" (mouseleave)="product['showOption'] = false">
+                    <a (click)="onSelectProduct(product, 'business', 'same-article')">
+                        <div class="card custom-card m-2 shadow-sm" style="height: 145px !important;">
+                        <div class="card-body d-flex align-items-center p-3">
+                            <div class="image-container">
+                            <img src="{{product.aImage[0]? product.aImage[0] : '../assets/images/no-photo-available.jpg' }}" class="rounded">
                             </div>
-                            <div class="absolute hover-product-option mt-n6" *ngIf="product['showOption']">
-                                <div class="d-flex">
-                                    <button class="btn btn-secondary w-50 mr-2 p-0"
-                                        (click)="onSelectProduct(product, 'business', 'same-article')">
-                                        {{ "SELECT" | translate}}
-                                    </button>
-                                </div>
+                            <div class="w-100 mx-4">
+                            <p class="d-block m-0 mb-2 fs-7 text-uppercase text-primary fw-bolder">{{ product.oName['en'] || ('NO_NAME'|
+                                translate) }}</p>
+                            <div class="d-flex align-items-start justify-content-between flex-wrap">
+                                <p class="col-xl-6 col-sm-4 m-0 text-gray-800">
+                                <small><strong>{{ product.sProductNumber || ("NO_PROUCT_NUMBER" | translate)}}</strong></small><br>
+                                <small><strong>{{"EAN" | translate}}</strong>: {{ product.sEan || ('NO_EAN' | translate)}}</small><br>
+                                </p>
+                                <p class="col-xl-5 col-sm-4 m-xl-0 mx-sm-2 text-gray-800">
+                                    <span class="small">
+                                        <strong>{{"ARTICLE_NUMBER" | translate}}</strong>: <br>
+                                        {{product?.sNewArticleNumber ? product?.sNewArticleNumber : (product?.sArticleNumber || '-') }}
+                                        <i class="fa fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="{{product.sArticleNumber}}"></i>
+                                    </span>
+                                </p>
+                            </div>
                             </div>
                         </div>
-                    </div>
+                        </div>
+                    </a>
                 </div>
             </div>
             <!-- <hr *ngIf="commonProducts && commonProducts.length > 0"> -->
@@ -87,42 +111,138 @@
                 </div>
             </div> -->
         </div>
-        <div class="row my-5" *ngIf="newSelectedProduct">
-            <div class="col-md-6">
+        <div class="row p-5 bg-light" *ngIf="newSelectedProduct && mode === 'assign'">
+            <div class="col-md-5 p-0">
                 <div class="d-flex flex-column">
-                    <h4> {{ "IMAGE" | translate}}</h4>
+                    <label class="m-0 fw-bolder"> {{ "IMAGE" | translate}}</label>
                     <img src="{{ newSelectedProduct.aImage && newSelectedProduct?.aImage[0] ? newSelectedProduct?.aImage[0] : '../../../../../../assets/images/no-photo-available.jpg' }}"
-                        class="w-50">
+                        class="w-100" style="max-width: 270px; object-fit: contain;">
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="row mb-5">
-                    <label> {{ "PRODUCT_NAME" | translate}}</label>
-                    <input type="text" class="form-control" [placeholder]="'ENTER_NAME(ALIAS)' | translate"
+            <div class="col-md-6 p-0 ms-auto">
+                <div class="mb-5">
+                    <label class="fw-bolder"> {{ "PRODUCT_NAME" | translate}}</label>
+                    <input type="text" class="form-control"
                         [(ngModel)]="newSelectedProduct.sName" (ngModelChange)="validate()">
-                    <span class="err-msg" *ngIf="newSelectedProduct.sName?.length > limit">
+                    <!-- <span class="err-msg" *ngIf="newSelectedProduct.sName?.length > limit && mode != 'assign'">
                         {{ 'MAX_LIMIT_REACHED' | translate }} : {{ limit }} {{ 'CHARACTERS' | translate }}
-                    </span>
+                    </span> -->
                 </div>
-                <div class="row mb-5">
-                    <label> {{ "PRICE" | translate}}</label>
-                    <input type="text" class="form-control" [placeholder]="'ENTER_PRICE' |translate"
+                <div class="mb-5">
+                    <label class="fw-bolder"> {{ "PRICE" | translate}}</label>
+                    <input type="text" class="form-control" disabled
                         [(ngModel)]="newSelectedProduct.nPrice">
+                </div>
+                <!-- <div class="row mb-5" *ngIf="mode != 'assign'">
+                    <label> {{ "SHORTCUT_KEY" | translate}}</label>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div class="w-100">
+                            <ng-select [(ngModel)]="newSelectedProduct.oKeyboardShortcut.sKey1" [items]="aFunctionKeys" bindLabel="title" bindValue="title"
+                                [clearable]="false" placeholder="{{'SELECT_FUNCTION_KEY' | translate }}"></ng-select>
+                        </div>
+                        <div class="w-100 mx-2" *ngIf="!newSelectedProduct.oKeyboardShortcut.sKey1.startsWith('F')">
+                            <input type="text" class="form-control" placeholder="{{'SELECT_NUMBER' | translate}}"
+                                [(ngModel)]="newSelectedProduct.oKeyboardShortcut.sKey2">
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+        <div class="col-12 d-flex bg-light p-5 flex-wrap" *ngIf="mode === 'edit'">
+            <div class="col-md-12">
+                <div class="mb-3 border-bottom border-dark pb-3 d-flex">
+                    <div class="w-50">
+                        <p class="fw-bolder text-uppercase text-primary mb-1">{{"PRODUCT_DETAILS" | translate}}</p>
+                        <p class="mb-1">
+                            {{"ARTICLE_NUMBER" | translate}}:
+                            <span class="text-muted">
+                                {{newSelectedProduct?.sNewArticleNumber ? newSelectedProduct?.sNewArticleNumber : (newSelectedProduct?.sArticleNumber || '-') }}
+                            </span>
+                            <i class="fa fa-info-circle text-normal" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="{{newSelectedProduct.sArticleNumber}}"></i>
+                        </p>
+                        <p class="mb-1">
+                            {{"NAME" | translate}}: <span class="text-muted">{{newSelectedProduct.sNameOriginal}}</span>
+                        </p>
+                        <p class="m-0">
+                            {{"PRODUCT_NUMBER" | translate}}: <span class="text-muted">{{newSelectedProduct.sProductNumber}}</span>
+                        </p>
+                    </div>
+                    <div class="w-50 ms-2">
+                        <div class="alert alert-info mt-2" role="alert">
+                            <p class="m-0">
+                                {{ 'SEARCH_PRODUCT_IN_ASSORTMENT_PAGE_TO_MAKE_CHANGES' | translate }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class="col-2 me-auto bg-white d-flex justify-content-center align-items-center flex-column">
+                        <p class="fw-bolder mb-2">{{"PREVIEW" | translate}}</p>
+                        <ul id="quick-buttons" class="nav nav-pills nav-pills-custom align-items-center">
+                            <li class="nav-item">
+                              <div>
+                                <button
+                                  class="pe-none nav-link d-flex justify-content-center flex-column flex-center overflow-hidden w-85px h-85px py-4 position-relative">
+                                  <h4 class="nav-text text-gray-800 fw-bold fs-6 lh-1 text-center mb-2">{{newSelectedProduct.sName}}</h4>
+                                  <span class="text-gray-600">{{newSelectedProduct.nPrice | currency: tillService.currency}}</span>
+                                </button>
+                              </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-9">
+                        <div class="mb-5 d-flex flex-wrap">
+                            <div class="col-12 alert alert-danger mt-2" role="alert" *ngIf="newSelectedProduct.sName?.length > limit" >
+                                <p class="m-0 text-danger">
+                                    {{ 'MAX_LIMIT_REACHED' | translate }} : {{ limit }} {{ 'CHARACTERS' | translate }}
+                                </p>
+                            </div>
+                            <div class="col-5">
+                                <label> {{ "QUICK_BUTTON_NAME" | translate}}</label>
+                                <input type="text" class="form-control" [placeholder]="'ENTER_NAME(ALIAS)' | translate"
+                                    [(ngModel)]="newSelectedProduct.sName" name="quickbutton_name">
+                            </div>
+                            <div class="col-3 mx-auto">
+                                <label> {{ "PRICE" | translate}}</label>
+                                <input type="number" class="form-control" placeholder="{{'ENTER_PRICE' |translate}}" [(ngModel)]=" newSelectedProduct.nPrice" name="quickbutton_price">
+                            </div>
+                            <div class="col-3">
+                                <label> {{ "TYPE" | translate}}</label>
+                                <ng-select class="form-control p-0" [(ngModel)]="newSelectedProduct.oType.bRefund" [clearable]="false" name="type">
+                                    <ng-option *ngFor="let item of aTypes" [value]="item.value">{{item.key | translate}}</ng-option>
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="">
+                            <label> {{ "SHORTCUT_KEY" | translate}}</label>
+                            <div class="d-flex align-items-center">
+                                <div class="col-5">
+                                    <ng-select [(ngModel)]="newSelectedProduct.oKeyboardShortcut.sKey1" [items]="aFunctionKeys" bindLabel="title" bindValue="title"
+                                        [clearable]="false" placeholder="{{'SELECT_FUNCTION_KEY' | translate }}" name="quickbutton_sKey1"></ng-select>
+                                </div>
+                                <div class="col-6 ms-auto" *ngIf="newSelectedProduct.oKeyboardShortcut.sKey1 && !newSelectedProduct.oKeyboardShortcut.sKey1.startsWith('F')">
+                                    <input type="text" class="form-control" placeholder="{{'SELECT_NUMBER' | translate}}"
+                                        [(ngModel)]="newSelectedProduct.oKeyboardShortcut.sKey2"  name="quickbutton_sKey2">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="card-footer p-5 justify-content-end align-items-center d-flex">
         <div *ngIf="creating" class="me-2 spinner-border mx-auto"></div>
-        <button class="btn btn-primary me-2" (click)="create($event)" [disabled]="!bValid">
-            <span *ngIf="mode === 'create'">{{'CREATE' | translate}}</span>
+        <button *ngIf="mode != 'assign'" class="btn btn-primary me-2" (click)="create($event)" [disabled]="!bValid">
+            <!-- <span *ngIf="mode === 'create'">{{'UPDATE' | translate}}</span> -->
             <span *ngIf="mode === 'edit'">{{'SAVE' | translate}}</span>
         </button>
 
-        <button *ngIf="mode == 'assign'" class="btn btn-primary" (click)="assignProduct()">
-            {{'ASSIGN' | translate}}
+        <button *ngIf="mode == 'assign'" class="btn btn-primary" (click)="assignProduct()" [disabled]="!bValid">
+            {{'ASSIGN' | translate}} 
         </button>
 
-        <button class="btn btn-secondary" (click)="close(false)">{{ 'CLOSE' | translate}}</button>
+        <!-- <button class="btn btn-secondary" (click)="close(false)">{{ 'CLOSE' | translate}}</button> -->
     </div>
 </div>

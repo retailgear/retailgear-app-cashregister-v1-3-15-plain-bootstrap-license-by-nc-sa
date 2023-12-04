@@ -6,7 +6,7 @@ export class EdiProduct {
     public sPurchasePrice: string,
     public sSupplierDescription: string,
     public sSellingPrice: string,
-    public sEAN: string,
+    public sEan: string,
     public sProductNumber: string,
     public sPDK1: string,
     public sPDK2: string,

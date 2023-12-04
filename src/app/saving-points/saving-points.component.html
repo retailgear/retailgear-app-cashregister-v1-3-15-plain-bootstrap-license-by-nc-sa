@@ -1,12 +1,201 @@
-<div class="card mb-5 mb-xl-10 d-flex">
-    <div class="card-header row">
-        <div class="card-title">
-            <span>{{'LOYALITY_POINTS_PROGRAM' | translate}}</span>
+<div class="container p-4">
+    <div class="card py-2">
+        <div class="card-header bg-white py-3 px-4">
+            <h3 class="card-title">{{'LOYALITY_POINTS_PROGRAM' | translate}}</h3>
+        </div>
+        <div class="card-body px-5">
+            <div class="row">
+                <div class="col-6">
+                    <div class="row mb-3">
+                        <div class="col-md-9">
+                            <label>{{ "USE_THE_LOYALITY_PROGRAM" | translate}}</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-check form-switch form-check-custom form-check-solid">
+                                <input type="checkbox" name="loyaltyProgram" class="form-check-input"
+                                    [(ngModel)]="savingPointsSettings.bEnabled">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-9">
+                            <label>{{"SHOW_ON_PDF_RECEIPTS"| translate}}</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-check form-switch form-check-custom form-check-solid">
+                                <input type="checkbox" name="showOnPDF" class="form-check-input"
+                                    [(ngModel)]="savingPointsSettings.bShowOnPdf">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-9">
+                            <label>{{ "GIVE_POINTS_WITH_DISCOUNT" | translate}}</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-check form-switch form-check-custom form-check-solid">
+                                <input type="checkbox" name="bNoEndDate" class="form-check-input"
+                                    [(ngModel)]="savingPointsSettings.bDiscountPoints">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-9">
+                            <label>{{ "GIVE_POINTS_ON_REPAIRS" | translate}}</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-check form-switch form-check-custom form-check-solid">
+                                <input type="checkbox" name="bNoEndDate" class="form-check-input"
+                                    [(ngModel)]="savingPointsSettings.bRepairPoints">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-9">
+                            <label>{{ "USE_ON_WEBSHOP" | translate}}</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-check form-switch form-check-custom form-check-solid">
+                                <input type="checkbox" name="bNoEndDate" class="form-check-input"
+                                    [(ngModel)]="savingPointsSettings.bPointsOnWebshop">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="bg-gray-100 p-5">
+                        <h4 class="mb-5">{{ "USER_CAN_SPEND_POINTS_ONLINE_IN_COMBINATION_WITH:" | translate}}</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-9">
+                                <label>{{ "COUPON_CODE" | translate}}</label>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-check form-switch form-check-custom form-check-solid">
+                                    <input type="checkbox" name="bNoEndDate" class="form-check-input"
+                                        [(ngModel)]="savingPointsSettings.bUsePointWithCoupon">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-9">
+                                <label>{{"PRODUCTS_IN_SALE"| translate}}</label>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-check form-switch form-check-custom form-check-solid">
+                                    <input type="checkbox" name="bNoEndDate" class="form-check-input"
+                                        [(ngModel)]="savingPointsSettings.bUsePointWithSale">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row border-top border-secondary">
+                <div class="col-6 mt-5 pe-5 mb-3">
+                    <div class="row d-flex align-items-center mb-3">
+            
+                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 mb-3">
+                            <div class="col">
+                                <label class="mb-2">{{ "FOR_EVERY" | translate}} €</label>
+                                <input type="number" class="form-control w-75px d-inline"
+                                    [(ngModel)]="savingPointsSettings.nPerEuro">
+                            </div>
+                            <div class="col">
+                                <label class="mb-2">{{"EARNS_THE_CUSTOMERS" | translate}}</label>
+                                <input type="number" class="form-control w-60px d-inline"
+                                    [(ngModel)]="savingPointsSettings.nPerEuro1">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label class="mb-2" style="text-transform: lowercase;">{{"POINTS" | translate}}.</label>
+                                <p class="alert alert-info">
+                                    <span>{{"POINTS_ARE_CALCULATED_BACK_TO_POINTS_PER_EURO" | translate}}.</span>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        </div>
+                            
+                            <div class="row mt-3 d-flex align-items-center mb-3">
+                                <div class="col-md-6">
+                                    <label>{{ "POINTS_PER_EURO" | translate}}</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" class="form-control" [(ngModel)]="savingPointsSettings.nPerEuro2">
+                                </div>
+                                <div class="col-12">
+                                    <p><strong>{{'EXAMPLE' | translate }}</strong></p>
+                            <p class="mt-2">{{ 'IF_CUSTOMER_REDEEMS' | translate }}: <strong>10 {{"POINTS" |
+                                    translate}}</strong>, {{ 'AN_ACTUAL_VALUE_REDUCED_WOULD_BE' | translate }}
+                                <strong>{{
+                                    (10/savingPointsSettings.nPerEuro2 || 1) | currency: tillService.currency}}</strong>
+                            </p>
+                            </div>
+                            </div>
+
+                </div>
+                <div class="col-6 mt-5 px-4 mb-3">
+                    <h4 class="mb-3"> {{ "POINTS_VALIDITY" | translate}} </h4>
+                
+                    <div class="col-12 d-flex align-items-center">
+                        <div class="w-50 me-3">
+                            <input type="number" class="form-control form-control-solid">
+                        </div>
+                        <div class="w-50">
+                            <select class="form-select" id="expiry" required="true" name="expiry">
+                                <option *ngFor="let p of expiry" [value]="p">{{ p }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <!-- <input type="date" class="form-control datetimepicker-input" placeholder="Start date" [ngModel]="filterDates.startDate | date:'yyyy-MM-dd'" (ngModelChange)="filterDates.startDate = $event"/> -->
+                        <label for="endDate"> {{"ENDDATE"| translate}}</label>
+                        <input type="date" name="endDate" class="form-control datetimepicker-input" placeholder="End date"
+                            [ngModel]="savingPointsSettings.dEndDate | date:'yyyy-MM-dd'"
+                            (ngModelChange)="savingPointsSettings.dEndDate = $event" />
+                        <div class="d-flex mt-3">
+                            <input class="form-check" type="checkbox" [(ngModel)]="savingPointsSettings.bNoEndDate">
+                            <label class="mx-2" for="bbNoEndDate">{{ "THERE_IS_NO_ENDDATE" | translate}}</label>
+                            </div>
+                            </div>
+
+                </div>
+                </div>
+
+        </div>
+        <div class="card-header bg-white py-3 px-4 flex-column">
+            <h3 class="card-title">{{'LOYALITY_POINTS_EXCLUSIONS' | translate}}</h3>
+            <p>{{'BELOW_ITEMS_WILL_BE_EXCLUDED_FROM_LOYALTY_POINTS_CALCULATIONS' | translate }}</p>
+        </div>
+        <div class="card-body px-5">
+            <div class="row mb-5">
+                <div class="col-4">
+                    <p>{{ 'ARTICLE_GROUP' | translate }}</p>
+                </div>
+                <div class="col-8">
+                    <ng-select [multiple]="true" [(ngModel)]="savingPointsSettings.aExcludedArticleGroups" [items]="aArticleGroups"
+                        bindLabel="sName" bindValue="_id"></ng-select>
+                    </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-4">
+                            <p>{{ 'PAYMENT_METHOD' | translate }}</p>
+                        </div>
+                        <div class="col-8">
+                    <ng-select [multiple]="true" [(ngModel)]="savingPointsSettings.aExcludedPaymentMethods" [items]="aPaymentMethods"
+                        bindLabel="sName" bindValue="_id"></ng-select>
+                    </div>
+                    </div>
+                    </div>
+        <div class="card-footer px-5 d-flex justify-content-end">
+            <button class="btn btn-primary" (click)="updateSettings()"> {{ "SAVE" | translate}}</button>
         </div>
     </div>
 </div>
 
-<div class="row">
+<!-- <div class="row">
     <div class="col-6 card mb-5 mb-xl-10 d-flex">
         <div class="card-body">
             <div class="row">
@@ -104,9 +293,9 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
-<div class="row">
+<!-- <div class="row">
     <div class="col-6 card mb-5 mb-xl-10 d-flex">
         <div class="card-body">
 
@@ -127,18 +316,18 @@
                     <input type="number" class="form-control" [(ngModel)]="savingPointsSettings.nPerEuro2">
                 </div>
             </div>
-            <div class="row">
+           <div class="row">
                 <div class="col-md-9">
                     <label>{{ "DISCOUNT_PER_POINT" | translate}}</label>
                 </div>
                 <div class="col-md-3">
                     <input type="number" class="form-control" [(ngModel)]="savingPointsSettings.nDiscountPerPoint">
                 </div>
-            </div>
+            </div> 
         </div>
-    </div>
+    </div>-->
 
-    <div class="col-6 card shadow-sm mb-5 mb-xl-10 d-flex">
+<!-- <div class="col-6 card shadow-sm mb-5 mb-xl-10 d-flex">
         <div class="card-header row">
             <div class="card-title">
                 <div class="col-md-10">
@@ -158,9 +347,9 @@
                         </select>
                     </div>
                 </div>
-                <div class="row">
-                    <!-- <input type="date" class="form-control datetimepicker-input" placeholder="Start date" [ngModel]="filterDates.startDate | date:'yyyy-MM-dd'" (ngModelChange)="filterDates.startDate = $event"/> -->
-                    <label for="endDate"> {{"ENDDATE"| translate}}</label>
+                <div class="row"> -->
+<!-- <input type="date" class="form-control datetimepicker-input" placeholder="Start date" [ngModel]="filterDates.startDate | date:'yyyy-MM-dd'" (ngModelChange)="filterDates.startDate = $event"/> -->
+<!-- <label for="endDate"> {{"ENDDATE"| translate}}</label>
                     <input type="date" name="endDate" class="form-control datetimepicker-input" placeholder="End date"
                         [ngModel]="savingPointsSettings.dEndDate | date:'yyyy-MM-dd'"
                         (ngModelChange)="savingPointsSettings.dEndDate = $event" />
@@ -172,10 +361,10 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
-<div class="card mb-5 mb-xl-10 d-flex">
+<!-- <div class="card mb-5 mb-xl-10 d-flex">
     <button class="btn btn-primary w-200px" (click)="updateSettings()"> {{ "SAVE" | translate}}</button>
-    <!-- <h5 *ngIf='!workstations.length && !loading' style="text-align: center;"> No data found!</h5>
-    <div *ngIf="loading" class="spinner-border mx-auto"></div> -->
-</div>
+    <h5 *ngIf='!workstations.length && !loading' style="text-align: center;"> No data found!</h5>
+    <div *ngIf="loading" class="spinner-border mx-auto"></div>
+</div> -->

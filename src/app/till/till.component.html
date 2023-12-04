@@ -17,489 +17,661 @@
 
 </div>
 <div class="container">
-  <div class="content">
-    
+  <div class="content p-0">
+
     <div class="row " [ngClass]="{'opacity-25': parkedTransactionLoading}">
       <div class="col-12">
-        <div class="row">
-          <div class="col-8">
-            <div class="alert alert-warning" *ngIf="!bIsPreviousDayStateClosed">
-              <p class="mb-0" style="font-size: 1.2rem;font-weight: bold;margin-left:1.3rem">
-                <span style="margin-right:1rem; font-weight:bolder">!</span>
-                {{ "THE_PREVIOUS" | translate }} {{ settings.sDayClosurePeriod }} {{"IS_NOT_CLOSED_YET" | translate }}
-                ({{ dOpenDate | date:'EEEE, dd-MM-YYYYhh:mm:ss aaa':'GMT'}})
-              </p>
-              <a class="btn btn-hover" routerLink="../day-closure">{{ "CLOSE_DAYSTATE" | translate}}</a>
-            </div>
-          </div>
+        <div class="alert alert-warning d-flex align-items-center w-100" *ngIf="!bIsPreviousDayStateClosed">
+          <p class="mb-0 me-3" style="font-size: 1.2rem;font-weight: bold;">
+            <span style="margin-right:1rem; font-weight:bolder">!</span>
+            {{ "THE_PREVIOUS" | translate }} {{ tillService.settings.sDayClosurePeriod}} {{"IS_NOT_CLOSED_YET" |
+            translate }}
+            ({{ dOpenDate | date:'EEEE, dd-MM-YYYY hh:mm:ss aaa':'GMT'}})
+          </p>
+          <a routerLink="../day-closure" class="badge btn btn-primary btn-sm btnclose m-0">
+            {{"CLOSE_DAYSTATE" | translate}}
+          </a>
         </div>
-
       </div>
     </div>
+
     <div class="row">
       <div class="col-12">
-        <div class="d-flex justify-content-between align-items-end">
+        <div class="row">
+          <div class="col-lg-9 col-md-8 col-7 col-xs-12 item-section">
+            <div class="d-flex justify-content-between align-items-end mb-3">
 
-          <div class="d-flex justify-content-start">
+              <div [ngClass]="sNumber && sNumber !== ''? 'col-xl-7 col-sm-7 d-flex justify-content-start' : 'col-12 d-flex justify-content-start'" style="overflow-x: auto;">
 
-            <button class="btn d-flex btn-white  rounded p-4 mb-3 me-3 text-hover-primary min-w-90px"
-              [ngClass]="{'btn-color-primary': eKind === 'regular' }" (click)="onSelectRegular()"
-              [disabled]="isGoldForPayments">
-              <div class="d-flex flex-column justify-center align-items-center flex-grow-1">
-                <div class="symbol symbol-40px mb-2">
-                  <span class="symbol-label">
-                    <span class="svg-icon svg-icon-1qx me-0">
-                      <fa-icon [icon]="faBoxesStacked"></fa-icon>
-                    </span>
-                  </span>
-                </div>
-                <div class="fs-6">
-                  <span [ngClass]="eKind === 'regular'?'text-primary': 'text-gray-800'" class=" fw-bold">{{"STOCK" |
-                    translate}}</span>
-                </div>
-              </div>
-            </button>
-
-            <button class="btn d-flex btn-white  rounded p-4 mb-3 me-3 text-hover-primary min-w-90px"
-              [ngClass]="{'btn-color-primary': eKind === 'order' }" (click)="onSelectOrder()">
-              <div class="d-flex flex-column justify-center align-items-center flex-grow-1">
-                <div class="symbol symbol-40px mb-2">
-                  <span class="symbol-label">
-                    <span class="svg-icon svg-icon-1qx me-0">
-                      <fa-icon [icon]="faTruck"></fa-icon>
-                    </span>
-                  </span>
-                </div>
-                <div class="fs-6">
-                  <span [ngClass]="eKind === 'order'?'text-primary': 'text-gray-800'" class="fw-bold">{{"ORDER" |
-                    translate}}</span>
-                </div>
-              </div>
-            </button>
-
-            <button class="btn d-flex btn-white  rounded p-4 mb-3 me-3 text-hover-primary min-w-90px"
-              [ngClass]="{'btn-color-primary': eKind === 'repair' }" (click)="eKind = 'repair'; addItem('repair')">
-              <div class="d-flex flex-column justify-center align-items-center flex-grow-1">
-                <div class="symbol symbol-40px mb-2">
-                  <span class="symbol-label">
-                    <span class="svg-icon svg-icon-1qx me-0">
-                      <fa-icon [icon]="faScrewdriverWrench"></fa-icon>
-                    </span>
-                  </span>
-                </div>
-                <div class="fs-6">
-                  <span [ngClass]="eKind === 'repair'?'text-primary': 'text-gray-800'" class="fw-bold">{{"REPAIR" |
-                    translate}}</span>
-                </div>
-              </div>
-            </button>
-
-            <button class="btn d-flex btn-white  rounded p-4 mb-3 me-3 text-hover-primary min-w-90px"
-              [ngClass]="{'btn-color-primary': eKind === 'giftcard' }"
-              (click)="eKind = 'giftcard'; addItem('giftcard')">
-              <div class="d-flex flex-column justify-center align-items-center flex-grow-1">
-                <div class="symbol symbol-40px mb-2">
-                  <span class="symbol-label">
-                    <span class="svg-icon svg-icon-1qx me-0">
-                      <fa-icon [icon]="faGifts"></fa-icon>
-                    </span>
-                  </span>
-                </div>
-                <div class="fs-6">
-                  <span [ngClass]="eKind === 'giftcard'?'text-primary': 'text-gray-800'" class="fw-bold">{{"GIFTCARD" |
-                    translate}}</span>
-                </div>
-              </div>
-            </button>
-
-            <button class="btn d-flex btn-white  rounded p-4 mb-3 me-3 text-hover-primary min-w-90px"
-              (click)="eKind = 'gold-purchase'; addItem('gold-purchase')">
-              <div class="d-flex flex-column justify-center align-items-center flex-grow-1">
-                <div class="symbol symbol-40px mb-2">
-                  <span class="symbol-label">
-                    <span class="svg-icon svg-icon-1qx me-0">
-                      <fa-icon [icon]="faRing"></fa-icon>
-                    </span>
-                  </span>
-                </div>
-                <div class="fs-6">
-                  <span [ngClass]="eKind === 'gold-purchase'?'text-primary': 'text-gray-800'"
-                    class="fw-bold">{{"GOLD_PURCHASE" |
-                    translate}}</span>
-                </div>
-              </div>
-            </button>
-
-            <button class="btn d-flex btn-white rounded p-4 mb-3 me-3 text-hover-primary min-w-90px"
-              (click)="openExpenses()">
-              <div class="d-flex flex-column justify-center align-items-center flex-grow-1">
-                <div class="symbol symbol-40px mb-2">
-                  <span class="symbol-label">
-                    <span class="svg-icon svg-icon-1qx me-0">
-                      <fa-icon [icon]="faMoneyBill"></fa-icon>
-                    </span>
-                  </span>
-                </div>
-                <div class="fs-6">
-                  <span class="fw-bold text-gray-800">{{"ADD_EXPENSES" | translate}}</span>
-                </div>
-              </div>
-            </button>
-          </div>
-
-          <div *ngIf="sNumber && sNumber != ''" class="d-flex justify-content-between align-items-center">
-            <p class="fw-bolder text-gray-600 m-0">You are modifying an existing item with: {{sNumber}}</p>
-            <button class="btn btn-secondary btn-sm ms-2" (click)="clearAll()">
-              <i class="fa fa-times"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-9 col-xs-12 column-auto till-body ps-0 pe-0">
-        <div class="card card-flush mb-4">
-          <div id="till-items-header" class="card-header p-3 lh-1 justify-content-start min-h-0">
-            <div class="row w-100 fw-bolder text-gray-600 align-items-center">
-              <span class="col-1">{{ "QUANTITY" | translate}}</span>
-              <span class="col-4">{{ "DESCRIPTION" | translate}}</span>
-              <span class="col">{{ "PRICE" | translate}}</span>
-              <span class="col">{{ "DISCOUNT" | translate}}</span>
-              <span class="col">{{ "TAX" | translate}}</span>
-              <span class="col">{{ "TOTAL" | translate}}</span>
-              <span class="col">{{ "PREPAYMENT" | translate}}</span>
-              <span class="col"></span>
-            </div>
-          </div>
-          <div class="card-body p-0">
-            <div class="accordion" id="till-items-accordion" [itemLength]="transactionItems.length">
-              <ng-container *ngFor="let item of transactionItems; let i = index">
-                <div style="display:inline-table;">
-                  <!-- regular -->
-                  <div class="accordion-item w-100 d-table-cell" till-product
-                    *ngIf="item.type === 'regular' || item.type === 'reservation'" [item]="item" [taxes]="taxes"
-                    (itemChanged)="itemChanged($event, i)"></div>
-                  <!-- order -->
-                  <div class="accordion-item w-100 d-table-cell" till-order *ngIf="item.type === 'order'" [item]="item"
-                    [taxes]="taxes" (itemChanged)="itemChanged($event, i)"></div>
-                  <!-- repair -->
-                  <div class="accordion-item w-100 d-table-cell" till-repair *ngIf="item.type === 'repair'"
-                    [item]="item" [taxes]="taxes" (itemChanged)="itemChanged($event, i)"></div>
-                  <!-- giftcard -->
-                  <div class="accordion-item w-100 d-table-cell w-100" till-gift *ngIf="item.type === 'giftcard'"
-                    [item]="item" [transactionItems]="transactionItems" [taxes]="taxes"
-                    (itemChanged)="itemChanged($event, i)" (createGiftCard)="createGiftCard($event, i)">
-                  </div>
-                  <!-- gold-purchase -->
-                  <div class="accordion-item w-100 d-table-cell w-100" till-goldpurchase
-                    *ngIf="item.type === 'gold-purchase'" [item]="item" (itemChanged)="itemChanged($event, i)"></div>
-                  <!-- empty-line -->
-                  <div class="accordion-item w-100 d-table-cell w-100" till-other *ngIf="item.type=== 'empty-line'"
-                    [item]="item" [taxes]="taxes" (itemChanged)="itemChanged($event, i)"></div>
-                  <!-- loyalty-points -->
-                  <div class="accordion-item w-100 d-table-cell w-100" till-loyalty-points-discount
-                    *ngIf="item.type=== 'loyalty-points'" [item]="item" [taxes]="taxes"
-                    (itemChanged)="itemChanged($event, i)"></div>
-
-                  <div class="d-table-cell">
-                    <button class="btn btn-sm  btn-icon  btn-active-color-danger mx-6 ms-4"
-                      (click)="itemChanged('delete', i)">
-                      <span class="svg-icon svg-icon-3qx me-0">
-                        <fa-icon [icon]="faTimes"></fa-icon>
+                <!-- <button class="btn btn-white rounded p-4 mb-3 me-3 text-hover-primary  w-100px">
+                    <div class="symbol symbol-40px mb-2">
+                      <span class="symbol-label">
+                        <span class="svg-icon svg-icon-1qx me-0">
+                          <fa-icon [icon]="faBoxesStacked"></fa-icon>
+                        </span>
                       </span>
-                    </button>
+                    </div>
+                    <span [ngClass]="eKind === 'regular'?'d-block text-truncate text-primary': 'd-block text-truncate text-gray-800'" class=" fw-bold">HEEEEREEEEEEE</span>
+                </button> -->
+
+                <button class="btn btn-white rounded px-3 mb-3 me-3 text-hover-primary  w-100px"
+                  [ngClass]="{'btn-color-primary': eKind === 'regular' }" (click)="onSelectRegular()"
+                  [disabled]="isGoldForPayments">
+                  <div class="symbol symbol-40px mb-2">
+                    <span class="symbol-label">
+                      <span class="svg-icon svg-icon-1qx me-0">
+                        <fa-icon [icon]="faBoxesStacked"></fa-icon>
+                      </span>
+                    </span>
                   </div>
+                  <span class="d-block text-truncate fs-7 fw-bolder" [ngClass]="eKind === 'regular' ? 'text-primary' : 'text-gray-800'">
+                    {{"STOCK" | translate}}
+                  </span>
+                </button>
+
+                <button *ngIf="tillService.settings?.bShowOrder" class="btn btn-white rounded px-3 mb-3 me-3 text-hover-primary  w-100px"
+                  [ngClass]="{'btn-color-primary': eKind === 'order' }" (click)="onSelectOrder()">
+                  <div class="symbol symbol-40px mb-2">
+                    <span class="symbol-label">
+                      <span class="svg-icon svg-icon-1qx me-0">
+                        <fa-icon [icon]="faTruck"></fa-icon>
+                      </span>
+                    </span>
+                  </div>
+                  <span class="d-block text-truncate fs-7 fw-bolder" [ngClass]="eKind === 'order' ? 'text-primary' : 'text-gray-800'">{{"ORDER" | translate}}</span>
+                </button>
+
+                <button class="btn btn-white rounded px-3 mb-3 me-3 text-hover-primary  w-100px"
+                  [ngClass]="{'btn-color-primary': eKind === 'repair' }" (click)="eKind = 'repair'; addItem('repair')">
+                  <div class="symbol symbol-40px mb-2">
+                    <span class="symbol-label">
+                      <span class="svg-icon svg-icon-1qx me-0">
+                        <fa-icon [icon]="faScrewdriverWrench"></fa-icon>
+                      </span>
+                    </span>
+                  </div>
+
+                  <span class="d-block text-truncate fs-7 fw-bolder" [ngClass]="eKind === 'repair' ? 'text-primary' : 'text-gray-800'">{{"REPAIR" | translate}}</span>
+                </button>
+
+                <button class="btn btn-white rounded px-3  mb-3 me-3 text-hover-primary  w-100px"
+                  [ngClass]="{'btn-color-primary': eKind === 'giftcard' }"
+                  (click)="eKind = 'giftcard'; addItem('giftcard')">
+                  <div class="symbol symbol-40px mb-2">
+                    <span class="symbol-label">
+                      <span class="svg-icon svg-icon-1qx me-0">
+                        <fa-icon [icon]="faGifts"></fa-icon>
+                      </span>
+                    </span>
+                  </div>
+                  <span class="d-block text-truncate fs-7 fw-bolder" [ngClass]="eKind === 'giftcard' ? 'text-primary' : 'text-gray-800'">
+                    {{"GIFTCARD" | translate}}
+                  </span>
+                </button>
+
+                <button *ngIf="tillService.settings?.bShowGoldPurchase" class="btn btn-white rounded px-3 mb-3 me-3 text-hover-primary  w-100px"
+                  (click)="eKind = 'gold-purchase'; addItem('gold-purchase')">
+                    <div class="symbol symbol-40px mb-2">
+                      <span class="symbol-label">
+                        <span class="svg-icon svg-icon-1qx me-0">
+                          <fa-icon [icon]="faRing"></fa-icon>
+                        </span>
+                      </span>
+                    </div>
+                    <span class="d-block text-truncate fs-7 fw-bolder" [ngClass]="eKind === 'gold-purchase' ? 'text-primary' : 'text-gray-800'">
+                      {{"GOLD_PURCHASE" |translate}}
+                    </span>
+                </button>
+
+                <button class="btn btn-white rounded px-3  mb-3 me-3 text-hover-primary  w-100px"
+                  (click)="openExpenses()">
+                  <div class="symbol symbol-40px mb-2">
+                    <span class="symbol-label">
+                      <span class="svg-icon svg-icon-1qx me-0">
+                        <fa-icon [icon]="faMoneyBill"></fa-icon>
+                      </span>
+                    </span>
+                  </div>
+                  <span class="d-block fw-bolder text-gray-800 fs-7 text-truncate">{{"ADD_EXPENSES" | translate}}</span>
+                </button>
+
+                <button *ngIf="tillService.settings?.bShowOpenDrawer" class="btn btn-white rounded px-3 mb-3 me-3 text-hover-primary w-100px" [disabled]="!bAllowOpenManualCashDrawer"
+                  (click)="openDrawer()">
+                  <div class="d-flex flex-column justify-center align-items-center flex-grow-1">
+                    <div class="symbol symbol-40px mb-2">
+                      <span class="symbol-label">
+                        <span class="svg-icon svg-icon-1qx me-0">
+                          <fa-icon [icon]="faMoneyBill"></fa-icon>
+                        </span>
+                      </span>
+                    </div>
+                    <span class="d-block fw-bolder text-gray-800 fs-7 text-truncate">{{"OPEN_DRAWER" | translate}}</span>
+                  </div>
+                </button>
+              </div>
+
+              <div *ngIf="sNumber && sNumber !== ''" class="col-lg-4 col-sm-5 mb-3 rounded bg-white p-4">
+                <p class="text-gray-600 mb-2 ms-xl-0 ms-sm-5 fs-xl-5 fs-sm-7">{{"YOU_ARE_MODIFYING_EXISTING_ITEM" | translate}} </p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="fw-bolder" [innerHTML]="sNumber"></span>
+                  <div>
+                    <a class="cancel my-auto" (click)="clearAll()">
+                        <i class="fa fa-times fabutton"></i>
+                    </a>
+                 </div>
+                </div>
+                
+              </div>
+
+            </div>
+
+            <div class="column-auto till-body ps-0 pe-0">
+              <div class="card card-flush mb-4 mt-3">
+                <div id="till-items-header" class="card-header p-3 lh-1 justify-content-start min-h-0">
+                  <div class="row w-100 fw-bolder text-gray-600 align-items-center">
+                    <span class="col-1 text-truncate">{{"QUANTITY" | translate}}</span>
+                    <span class="col-4">{{ "DESCRIPTION" | translate}}</span>
+                    <span class="col">{{ "PRICE" | translate}}</span>
+                    <span class="col">{{ "DISCOUNT" | translate}}</span>
+                    <span class="col" *ngIf="nGiftcardAmount">{{ "GIFTCARD_DISCOUNT" | translate}}</span>
+                    <span class="col" *ngIf="redeemedLoyaltyPoints">{{ "LOYALTY_POINTS_DISCOUNT" | translate}}</span>
+                    <span class="col">{{ "TAX" | translate}}</span>
+                    <span class="col">{{ "TOTAL" | translate}}</span>
+                    <span class="col">{{ "PREPAYMENT" | translate}}</span>
+                    <span class="col"></span>
+                  </div>
+                </div>
+                <div class="card-body p-0">
+                  <div class="accordion" id="till-items-accordion" [itemLength]="transactionItems.length">
+                    <ng-container *ngFor="let item of transactionItems; let i = index">
+                      <div style="display:inline-table;">
+                        <!-- regular -->
+                        <div class="accordion-item w-100 d-table-cell" till-product
+                          *ngIf="(item.type === 'regular' || item.type === 'reservation') && item.bProductLoaded"
+                          [item]="item" [taxes]="tillService.taxes" [disablePrepayment]="!availableAmount || availableAmount === 0"
+                          (itemChanged)="itemChanged($event, i)" [bSerialSearchMode]="bSerialSearchMode" [availableAmount]="availableAmount"></div>
+                        <!-- order -->
+                        <div class="accordion-item w-100 d-table-cell" *ngIf="item.type === 'order'" till-order
+                          [item]="item" [disablePrepayment]="!availableAmount || availableAmount === 0" [taxes]="tillService.taxes"
+                          [availableAmount]="availableAmount" [bSerialSearchMode]="bSerialSearchMode"  [settings]="tillService.settings.currentLocation"
+                          [oStaticData]="oStaticData"
+                          (itemChanged)="itemChanged($event, i)">
+                        </div>
+
+
+                        <!-- repair -->
+                        <div class="accordion-item w-100 d-table-cell" till-repair *ngIf="item.type === 'repair'"
+                          [disablePrepayment]="!availableAmount || availableAmount === 0" [item]="item" [taxes]="tillService.taxes"
+                          [availableAmount]="availableAmount"  [settings]="tillService.settings.currentLocation"
+                          [oStaticData]="oStaticData"
+                          (itemChanged)="itemChanged($event, i)">
+                        </div>
+                        <!-- giftcard -->
+                        <div class="accordion-item w-100 d-table-cell w-100" till-gift *ngIf="item.type === 'giftcard'"
+                          [item]="item" [transactionItems]="transactionItems" [taxes]="tillService.taxes"
+                          (itemChanged)="itemChanged($event, i)" (createGiftCard)="createGiftCard($event, i)">
+                        </div>
+                        <!-- gold-purchase -->
+                        <div class="accordion-item w-100 d-table-cell w-100" till-goldpurchase
+                          *ngIf="item.type === 'gold-purchase'" [item]="item" (itemChanged)="itemChanged($event, i)">
+                        </div>
+                        <!-- empty-line -->
+                        <div class="accordion-item w-100 d-table-cell w-100" till-other
+                          *ngIf="item.type=== 'empty-line'" [item]="item" [taxes]="tillService.taxes"
+                          (itemChanged)="itemChanged($event, i)">
+
+                        </div>
+
+                          <!-- loyalty-points NOT REQUIRED TO SHOW IT BECAUSE NOW WE ARE DISPLAYING REDEEMED POINTS PER ITEM-->
+
+                        <!-- <div class="accordion-item w-100 d-table-cell w-100" till-loyalty-points-discount
+                          *ngIf="item.type=== 'loyalty-points'" [item]="item" [taxes]="taxes"
+                          (itemChanged)="itemChanged($event, i)"></div> -->
+
+                          <div class="d-table-cell" *ngIf="item.type !== 'loyalty-points'">
+                          <button class="btn btn-sm  btn-icon  btn-active-color-danger mx-6 ms-4"
+                            (click)="itemChanged({type:'delete'}, i)">
+                            <span class="svg-icon svg-icon-3qx me-0">
+                              <fa-icon [icon]="faTimes"></fa-icon>
+                            </span>
+                          </button>
+                        </div>
+
+                      </div>
+                    </ng-container>
+                    <div class="row justify-content-start card-footer w-100 p-3 text-gray-600 align-items-center"
+                      *ngIf="nItemsTotalQuantity > 0">
+                      <span class="col-1">{{ nItemsTotalQuantity }}</span>
+                      <span class="col-4">&nbsp;</span>
+                      <span class="col"></span>
+                      <span class="col">{{ nItemsTotalDiscount | currency: tillService.currency}}</span>
+                      <span class="col" *ngIf="appliedGiftCards?.length">{{ nGiftcardAmount | currency: tillService.currency}}</span>
+                      <span class="col" *ngIf="redeemedLoyaltyPoints">{{ redeemedLoyaltyPoints }}</span>
+                      <span class="col">{{nItemsTotalToBePaid | currency: tillService.currency}}</span>
+                      <span class="col"></span>
+                      <span class="col-1">&nbsp;</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card card-flush">
+                <div class="card-body p-3">
+                  <div class="d-flex flex-wrap-reverse justify-content-between align-items-center mb-5" style="row-gap: 10px;">
+                    <div class="d-flex col-xxl-6 col-lg-12 align-items-center me-3">
+                      <div class="flex-grow-1 me-3">
+                        <input type="text" *ngIf="eKind === 'order'" class="form-control highlight-search"
+                          placeholder="{{'SEARCH_ORDER' | translate}} ..." [(ngModel)]="searchKeyword"
+                          (ngModelChange)="searchKeyword? shopProducts = shopProducts : shopProducts = []"
+                          (keydown.enter)="search()" (focus)="switchMode()" #searchField />
+
+                        <input type="text" *ngIf="eKind !== 'order'" class="form-control highlight-search"
+                          placeholder="{{'SEARCH' | translate}} ..." [(ngModel)]="searchKeyword"
+                          (ngModelChange)="searchKeyword ? shopProducts = shopProducts : shopProducts = []"
+                          (keydown.enter)="search()" (focus)="switchMode()" #searchField>
+                      </div>
+
+                      <label class="form-check form-switch form-check-custom form-check-solid">
+                        <input class="form-check-input" type="checkbox" [(ngModel)]="bSerialSearchMode" />
+                        <span class="form-check-label fw-bold">{{ "SERIAL_NUMBER_MODE" | translate }}</span>
+                      </label>
+                    </div>
+                    <div class="d-flex align-items-center">
+                      <button class="btn btn-secondary d-flex"
+                        (click)="openTransactionSearchDialog()">
+                        <fa-icon [icon]="faSearch" style="margin-right: 10px;"></fa-icon>{{ "TRANSACTION" | translate}}
+                      </button>
+
+                      <button class="btn btn-secondary min-w-120px mx-3" style="white-space: nowrap;"
+                        (click)="addNewLine()">{{"TEXT_LINE_OR_SPACE" |translate}}
+                      </button>
+
+                      <!-- <button class="btn btn-secondary min-w-100px" (click)="addNewLine()">{{ "EMPTY_LINE" | translate}}</button> -->
+
+                      <button class="btn btn-icon btn-secondary min-w-85px" (click)="cancelItems()"
+                        [disabled]="transactionItems.length === 0">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                      </button>
+
+                    </div>
+                  </div>
+                  <div class="d-flex create-order p-5 mb-3" *ngIf="searchKeyword && eKind === 'order'">
+                    <fa-icon [icon]="faTimes" class="topright cursor-pointer" (click)="searchKeyword = ''"></fa-icon>
+                    <div>
+                      <span class="text-danger"> {{"USE_ENTER_KEY_TO_SEARCH" | translate }} </span>
+                      <br>
+                      <button type="button" class="btn btn-primary mt-2" (click)="addOrder({ name: searchKeyword })">
+                        <h4 class="mb-0 text-white">{{searchKeyword}}</h4>
+                        <span>
+                          {{ "USE_THIS_INPUT" |translate}}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <ng-container *ngTemplateOutlet="contentPlaceholder;context:{loaderVariable: bSearchingProduct}"></ng-container>
+
+                  <div class="row bg-light py-5" *ngIf="shopProducts?.length">
+                    <pagination-controls
+                      id="paginate_shop_products"
+                      (pageChange)="pageChanged($event, 'shopProducts', searchKeyword)"
+                      (pageBoundsCorrection)="pageChanged($event, 'shopProducts', searchKeyword)"
+                      [previousLabel]="'PREVIOUS' | translate"
+                      [nextLabel]="'NEXT' | translate"
+                      screenReaderPaginationLabel="Pagination"
+                      [screenReaderPageLabel]="'PAGE' | translate">
+                    </pagination-controls>
+
+                    <div class="col-xl-6 col-sm-12 cursor-pointer p-0" *ngFor="let product of shopProducts | paginate: oShopProductsPaginationConfig"
+                      (mouseenter)="product['showWarning'] = true" (mouseleave)="product['showWarning'] = false">
+                      <a (click)="onSelectProduct(product, 'business', 'shopProducts')">
+                        <div class="card m-2 shadow-sm custom-height" [ngClass]="product['showWarning'] && product?.oCurrentLocation?.nStock == 0 && !product.bHasStock && eKind != 'order'? 'big':''">
+                          <div class="card-body d-flex align-items-center p-3">
+                            <div class="image-container">
+                              <img src="{{product.aImage[0]? product.aImage[0] : '../assets/images/no-photo-available.jpg' }}" class="rounded">
+                            </div>
+                            <div class="w-100 mx-4">
+                              <p class="d-block m-0 mb-2 fs-7 text-uppercase text-primary fw-bolder">
+                                {{ product?.sProductName ||"Unknown"}}</p>
+                              <div class="d-flex align-items-start justify-content-between flex-wrap">
+                                <p class="col-xl-6 col-sm-4 m-0 text-gray-800">
+                                  <strong>{{ product?.sProductNumber || ("NO_PROUCT_NUMBER" | translate)}}</strong><br>
+                                  <strong>{{"EAN" | translate}}</strong>: {{ product.sEan || ('NO_EAN' | translate)}}<br>
+                                  <strong>{{"STOCK"| translate}}</strong>: <span
+                                    [ngClass]="product?.oCurrentLocation?.nStock == 0 && eKind != 'order'? 'text-danger' : ''">{{
+                                    (bSerialSearchMode? '1' : (product?.oCurrentLocation?.nStock || "0"))}}</span>
+                                  <span *ngIf="product?.oCurrentLocation?.nStock == 0 && eKind != 'order'" class="text-danger ms-3">
+                                    <i data-bs-toggle="tooltip" data-bs-placement="top" title="{{'WARNING_STOCK_QUANTITY_IS_0'|translate}}"
+                                      class="fa fa-circle-exclamation"></i>
+                                  </span>
+                                </p>
+                                <p class="col-xl-5 col-sm-4 m-xl-0 mx-sm-2 text-gray-800">
+                                  <strong>{{"ARTICLE_NUMBER" | translate}}</strong>: <br>
+                                  {{product?.sNewArticleNumber ? product?.sNewArticleNumber : (product?.sArticleNumber || '-') }}
+                                  <i class="fa fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="{{product.sArticleNumber}}"></i>
+                                  <br>
+                                  <span *ngIf="bSerialSearchMode"><strong>{{"SERIAL_NO_ABB" | translate}}</strong>: {{ product?.sSerialNumber ||
+                                    "-" }}</span>
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="p-3 pt-0" *ngIf="product['showWarning'] && product?.oCurrentLocation?.nStock == 0 && !product.bHasStock && eKind != 'order'">
+                            <p class="m-0 text-warning col-xl-12 col-sm-12 small">
+                              {{"PRODUCT_WITHOUT_STOCK_WARNING" | translate}}
+                            </p>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                  <hr *ngIf="commonProducts?.length">
+                  <ng-container *ngTemplateOutlet="contentPlaceholder;context:{loaderVariable: bSearchingCommonProduct}"></ng-container>
+
+                  <div class="row" *ngIf="commonProducts?.length">
+                    <pagination-controls
+                      id="paginate_common_products"
+                      (pageChange)="pageChanged($event, 'commonProducts', searchKeyword)"
+                      (pageBoundsCorrection)="pageChanged($event, 'commonProducts', searchKeyword)"
+                      [previousLabel]="'PREVIOUS' | translate"
+                      [nextLabel]="'NEXT' | translate"
+                      screenReaderPaginationLabel="Pagination"
+                      [screenReaderPageLabel]="'PAGE' | translate">
+                    </pagination-controls>
+
+                    <div class="col-xl-6 col-sm-12 cursor-pointer p-0" *ngFor="let product of commonProducts | paginate: oCommonProductsPaginationConfig"
+                      (mouseenter)="product['showOption'] = true" (mouseleave)="product['showOption'] = false">
+                      <a (click)="onSelectProduct(product, 'business', 'commonProducts')">
+                        <div class="card m-2 shadow-sm" style="height: 125px !important;">
+                          <div class="card-body d-flex p-3">
+                            <!-- <div class="d-flex"> -->
+                            <div class="image-container">
+                              <img
+                                src="{{product.aImage[0]? product.aImage[0]: '../assets/images/no-photo-available.jpg' }}"
+                                class="rounded">
+                            </div>
+                            <div class="w-100 mx-4">
+                              <!-- <label
+                                  class="business-bg-color rounded-full px-2 py-1 text-white text-sm">{{"BUSINESS_PRODUCT"
+                                  |
+                                  translate}}</label> -->
+                              <!-- <span>
+                                <fa-icon [icon]="faCopy" aria-label="copy-article-number" class="ml-4"></fa-icon>
+                              </span> -->
+                              <p class="d-block m-0 mb-2 text-uppercase text-primary fw-bolder">{{ product.oName['en'] || "Unknown" }}</p>
+                              <div class="d-flex align-items-start justify-content-between">
+                                <p class="col-5 m-0 text-gray-800">
+                                  <strong>{{ product?.sProductNumber || '-'}}</strong> <br>
+                                  <span class="text-muted fw-bolder">{{"EAN" | translate}}</span>: {{ product.sEan || ('NO_EAN' | translate)}}
+                                </p>
+                                <div class="relative col-6 ">
+                                  <p class="m-0 text-gray-800">
+                                    <strong>{{"ARTICLE_NUMBER" | translate}}</strong>: {{ product?.sArticleNumber || '-'}}
+                                  </p>
+                                  <!-- <div class="mt-3" *ngIf="product['showOption']">
+                                    <div class="absolute d-flex justify-content-center">
+                                      <button class="btn btn-secondary w-100 mr-2 p-0">{{ "ADD_THIS_ARTICLE" |
+                                        translate}}</button>
+                                    </div>
+                                  </div> -->
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+
+                  <div class="d-flex mt-2" *ngIf="bIsTransactionLoading">
+                    <div class="spinner-border mx-auto"></div>
+                  </div>
+
+                  <div class="py-3">
+                    <ul *ngIf="quickButtons.length" id="quick-buttons" class="nav nav-pills nav-pills-custom mb-3">
+                      <li class="nav-item mb-3 me-3" *ngFor="let button of quickButtons">
+                        <div style="height: 100%;">
+                          <button
+                            class="nav-link d-flex justify-content-center flex-column align-items-center flex-center overflow-hidden w-85px h-85px py-4 position-relative"
+                            (click)="onSelectProduct(button, 'quick-button', '', button)">
+                            <h4 class="nav-text text-gray-800 fw-bold fs-6 lh-1 text-center mb-2">{{button.sName}}</h4>
+                            <span class="text-gray-600">{{button.nPrice | currency: tillService.currency}}</span>
+                            <div *ngIf="button.loading" class="spinner-border mx-auto"
+                              style="position: absolute;left: 0;right: 0;"></div>
+                          </button>
+                        </div>
+                      </li>
+                    </ul>
+                    <div>
+                      <div class="d-flex">
+                        <div class="text-center" *ngIf="!quickButtons.length && !bSearchingProduct">
+                          <button [routerLink]="['/business/settings/cash-register']" class="btn">
+                            {{ "CLICK_HERE_TO_ADD_NEW_FAVOURITE" | translate}}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+          </div>
+          <div class="col-lg-3 col-md-4 col-5 col-xs-12 payment-section">
+            <div class="fixed-content">
+              <button *ngIf="!customer" class="btn d-flex btn-white rounded p-3 mb-3 text-hover-primary w-100"
+                (click)="openCustomerDialog()">
+                <div class="d-flex justify-center align-items-center flex-grow-1">
+                  <div class="symbol symbol-40px me-2">
+                    <span class="symbol-label">
+                      <span class="svg-icon svg-icon-2qx me-0">
+                        <fa-icon icon="user-plus"></fa-icon>
+                      </span>
+                    </span>
+                  </div>
+                  <div class="fs-5 ms-4">
+                    <span class="text-gray-700 fw-bolder">{{"CUSTOMER" | translate}}</span>
+                  </div>
+                </div>
+              </button>
+
+              <div *ngIf="customer" class="d-flex flex-column bg-white rounded p-3 mb-3 w-100">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex justify-center align-items-center flex-grow-1">
+                    <div class="symbol symbol-40px me-2">
+                      <span class="symbol-label">
+                        <span class="svg-icon svg-icon-1qx me-0">
+                          <fa-icon icon="user"></fa-icon>
+                        </span>
+                      </span>
+                    </div>
+                    <div class="fs-5 ms-4">
+                      <span class="text-gray-800 fw-bold">{{"CUSTOMER" | translate}}</span>
+                    </div>
+                  </div>
+                  <button class="btn btn-sm btn-light" (click)="customer = null">
+                    <span class="svg-icon svg-icon-1qx me-0">
+                      <i class="fa fa-times"></i>
+                    </span>
+                  </button>
+                </div>
+                <div>
+                  <p  class="mt-5 mb-0 text-gray-800" *ngIf="customer.bCounter">
+                    <span *ngIf="customer.NAME && !customer.bIsCompany">{{customer.NAME}} <br></span>
+                  </p>
+                  <p class="mt-5 mb-0 text-gray-800" *ngIf="!customer.bCounter">
+                    <span>{{"NCLIENTID" | translate}}: {{nClientId || '-'}} <i *ngIf="nClientId !== '-' && nClientId !== ''" class="fa fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="{{customer.nClientId}}"></i><br></span>
+                    <span *ngIf="customer.NAME && !customer.bIsCompany">{{customer.NAME}} <br></span>
+                    <span *ngIf="customer.sCompanyName"> {{customer.sCompanyName}} <br> </span>
+                    <span *ngIf="customer.bIsCompany"> {{customer.oContactPerson.sFirstName}} {{customer.oContactPerson.sLastName}}<br></span>
+                    <span *ngIf="customer.sEmail">{{customer.sEmail}} <br> </span>
+                    <span *ngIf="customer['INVOICE_ADDRESS']">
+                        {{customer['INVOICE_ADDRESS']}}
+                    </span>
+                    <!-- <span *ngIf="customer.oInvoiceAddress?.sStreet || customer.oInvoiceAddress?.sHouseNumber">
+                      <span *ngIf="bNormalOrder">{{customer.oInvoiceAddress?.sStreet}} {{customer.oInvoiceAddress?.sHouseNumber}}{{customer.oInvoiceAddress?.sHouseNumberSuffix}}</span>
+                      <span *ngIf="!bNormalOrder">{{customer.oInvoiceAddress?.sHouseNumber}}{{customer.oInvoiceAddress?.sHouseNumberSuffix}} {{customer.oInvoiceAddress?.sStreet}}</span>
+                      <br>
+                    </span>
+                    <span *ngIf="customer.oInvoiceAddress?.sPostalCode || customer.oInvoiceAddress?.sCity || customer.oInvoiceAddress?.sState">
+                      <span *ngIf="bNormalOrder">{{customer.oInvoiceAddress?.sPostalCode}} {{customer.oInvoiceAddress?.sCity}} {{customer.oInvoiceAddress?.sState}}</span><br>
+                      <span *ngIf="!bNormalOrder">{{customer.oInvoiceAddress?.sCity}} {{customer.oInvoiceAddress?.sState}} {{customer.oInvoiceAddress?.sPostalCode}}</span><br>
+                    </span> -->
+                  </p>
+                  <p class="mt-3 mb-0 text-gray-800" *ngIf="tillService.oSavingPointSettings.bEnabled && !customer.bCounter" >
+                    <!-- <span class="fw-bolder">{{"SAVING_POINTS" | translate}}:</span> <span>{{ customer.oPoints.spendable }}</span> -->
+                    <span class="fw-bolder">{{"SAVING_POINTS" | translate}}: </span><span>{{ customer?.nLoyaltyPoints || 0 }} ({{ (customer?.nLoyaltyPointsValue || 0) | currency: tillService.currency}}) </span>
+                  </p>
+                </div>
+              </div>
+
+              <div class="form-floating input-group mb-5 py-0 ">
+                <select class="form-select" style="padding-top: 0.75rem;" [(ngModel)]="selectedTransaction"
+                  (ngModelChange)="fetchParkedTransactionInfo()">
+                  <option [ngValue]="null" disabled selected>
+                    {{"PARKED_TRANSACTIONS" | translate}}
+                  </option>
+                  <option *ngFor="let transaction of parkedTransactions" [ngValue]="transaction">{{transaction.sNumber}}
+                    ({{transaction.dUpdatedDate | date: 'short'}})
+                  </option>
+                </select>
+                <ng-container>
+                  <button class="btn btn-secondary"
+                    (click)="selectedTransaction ? updateParkedTransaction() : park()" [disabled]="transactionItems.length == 0 && !selectedTransaction">
+                    {{(selectedTransaction ? "SAVE" : "PARK") |translate}}</button>
+                  <button class="btn btn-secondary" (click)="clearAll()" *ngIf="selectedTransaction">
+                    <fa-icon [icon]="faTimesCircle"></fa-icon>
+                  </button>
+                  <button class="btn btn-secondary" *ngIf="selectedTransaction" (click)="deleteParkedTransaction()">
+                    <fa-icon [icon]="faTrashAlt"></fa-icon>
+                  </button>
+                </ng-container>
+              </div>
+              <!-- Payment Buttons  -->
+              <ng-container *ngFor="let payment of payMethods; let i = index">
+                <div class="input-group" [ngClass]="{'mb-3':i===0,'my-3':i>0}">
+                  <input type="number" class="form-control bg-white col-6" [(ngModel)]="payment.amount"
+                    placeholder="{{'AMOUNT' | translate}}" (ngModelChange)="changeInPayment()">
+                  <button class="btn btn-primary col-6 text-truncate" [disabled]="payment.isDisabled" (click)="assignAllAmount(i)">
+                    {{payment.sName | uppercase | translate}}
+                  </button>
                 </div>
               </ng-container>
-              <section class="row product-row p-3 text-gray-600 align-items-center" *ngIf="getTotals('quantity') !== 0">
-                <div class="col-1">{{getTotals('quantity')}}</div>
-                <div class="col-4">&nbsp;</div>
-                <div class="col">{{getTotals('price') | currency: tillService.currency}}</div>
-                <div class="col">{{getTotals('discount') | currency: tillService.currency}}</div>
-                <div class="col"></div>
-              </section>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-flush">
-          <div class="card-body p-3">
-            <div class="mb-5">
-              <div class="d-flex">
-                <input type="text" *ngIf="eKind == 'order'" class="form-control me-3 highlight-search" placeholder="{{'SEARCH_ORDER' | translate}} ..."
-                  [(ngModel)]="searchKeyword"
-                  (ngModelChange)="searchKeyword? shopProducts = shopProducts: shopProducts = []"
-                  (keyup.enter)="search()" (focus)="switchMode()" #searchField>
-                  <input type="text" *ngIf="eKind != 'order'" class="form-control me-3 highlight-search" placeholder="{{'SEARCH' | translate}} ..."
-                  [(ngModel)]="searchKeyword"
-                  (ngModelChange)="searchKeyword? shopProducts = shopProducts: shopProducts = []"
-                  (keyup.enter)="search()" (focus)="switchMode()" #searchField>
-                <button class="btn btn-secondary me-3 d-flex search-button" (click)="openTransactionSearchDialog()">
-                  <fa-icon [icon]="faSearch"></fa-icon> {{ "TRANSACTION" | translate}}
-                </button>
-                <button class="btn btn-secondary me-3 search-button" (click)="addNewLine()">{{ "TEXT_LINE" |
+              <div class="input-group till-padding mt-2">
+                <button class="btn btn-primary w-100" (click)="openMorePaymentMethodModal()">{{"MORE" |
+                  translate}}...</button>
+              </div>
+              <div class="input-group till-padding mt-2 mb-2">
+                <button class="btn btn-primary w-100" (click)="openCardsModal()">{{"REDEEM_GIFTCARD" |
                   translate}}</button>
-                <button class="btn btn-secondary me-3 search-button" (click)="addNewLine()">{{ "EMPTY_LINE" |
-                  translate}}</button>
-                <button class="btn btn-icon btn-secondary w-85px" (click)="cancelItems()"
-                  [disabled]="transactionItems.length === 0">
-                  <i class="fa fa-trash"></i>
-                </button>
               </div>
-              <div class="d-flex create-order p-5" *ngIf="searchKeyword && eKind === 'order'">
-                <fa-icon [icon]="faTimes" class="topright cursor-pointer" (click)="searchKeyword = ''"></fa-icon>
-                <div>
-                  <span class="text-danger"> {{"USE_ENTER_KEY_TO_SEARCH" | translate }} </span>
-                  <div class="cursor-pointer mt-2" (click)="addOrder({ name: searchKeyword })">
-                    <h4>{{searchKeyword}}</h4>
-                    <span>
-                      {{ "USE_THIS_INPUT" |translate}}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row bg-light py-5" *ngIf="shopProducts && shopProducts.length > 0">
-              <div class="col-md-6 cursor-pointer py-5 px-2" *ngFor="let product of shopProducts"
-                (mouseenter)="product['showOption'] = true" (mouseleave)="product['showOption'] = false">
-                <a (click)="onSelectProduct(product, 'business', 'shopProducts')">
-                  <div class="card m-1 shadow-sm h-100">
-                    <div class="card-body">
-                      <div class="d-flex">
-                        <div class="p-2">
-                          <img
-                            src="{{product.aImage[0]? product.aImage[0]: '../assets/images/no-photo-available.jpg' }}"
-                            class="w-50">
-                        </div>
-                        <div class="px-2">
-                          <label class="business-bg-color rounded-full px-2 py-1 text-white text-sm">{{
-                            "BUSINESS_PRODUCT"| translate}}</label>
-                          <span>
-                            <fa-icon [icon]="faCopy" aria-label="copy-article-number" class="ml-4"></fa-icon>
-                          </span>
-                          <p class="block mt-2">{{ product.oName? product.oName['en'] : 'No name' }}</p>
-                          <p class="mt-2">{{ product.sEan }}</p>
-                          <p class="mt-2">{{ product.sProductNumber }}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-            </div>
-            <hr *ngIf="commonProducts && commonProducts.length > 0">
-            <div class="row" *ngIf="commonProducts && commonProducts.length > 0">
-              <div class="col-md-6 cursor-pointer" *ngFor="let product of commonProducts"
-                (mouseenter)="product['showOption'] = true" (mouseleave)="product['showOption'] = false">
-                <a (click)="onSelectProduct(product, 'business', 'commonProducts')">
-                  <div class="card m-1 shadow-sm">
-                    <div class="card-body">
-                      <div class="d-flex">
-                        <div class="p-2">
-                          <img
-                            src="{{product.aImage[0]? product.aImage[0]: '../assets/images/no-photo-available.jpg' }}"
-                            class="w-50">
-                        </div>
-                        <div class="w-50 px-2">
-                          <label
-                            class="business-bg-color rounded-full px-2 py-1 text-white text-sm">{{"BUSINESS_PRODUCT" |
-                            translate}}</label>
-                          <span>
-                            <fa-icon [icon]="faCopy" aria-label="copy-article-number" class="ml-4"></fa-icon>
-                          </span>
-                          <p class="block mt-2">{{ product.oName? product.oName['en'] : 'No name' }}</p>
-                          <p class="mt-2">{{ product.sEan }}</p>
-                          <p class="mt-2">{{ product.sProductNumber }}</p>
-                        </div>
-                      </div>
-                      <div class="absolute hover-product-option mt-n6" *ngIf="product['showOption']">
-                        <div class="d-flex">
-                          <button class="btn btn-secondary w-50 mr-2 p-0">{{ "ADD_THIS_ARTICLE" | translate}}</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-            </div>
-
-            <ng-container *ngIf="bSearchingProduct">
-              <div class="d-flex mt-2">
-                <div class="spinner-border mx-auto"></div>
-              </div>
-            </ng-container>
-
-            <div class="py-3">
-              <ul *ngIf="quickButtons.length" id="quick-buttons" class="nav nav-pills nav-pills-custom mb-3">
-                <li class="nav-item mb-3 me-3" *ngFor="let button of quickButtons">
+              <div class="mt-2" *ngIf="appliedGiftCards.length || redeemedLoyaltyPoints > 0">
+                <div class="pmd-chip" *ngFor="let giftcard of appliedGiftCards; index as i">
                   <div>
-                    <button
-                      class="nav-link d-flex justify-content-center flex-column flex-center overflow-hidden w-85px h-85px py-4 position-relative"
-                      (click)="onSelectProduct(button, 'quick-button', '', button)">
-                      <h4 class="nav-text text-gray-800 fw-bold fs-6 lh-1 text-center mb-2">{{button.sName}}</h4>
-                      <span class="text-gray-600">{{button.nPrice | currency: tillService.currency}}</span>
-                      <div *ngIf="button.loading" class="spinner-border mx-auto" style="position: absolute;left: 0;right: 0;"></div>
-                    </button>
+                    <img class="mx-1" src="{{giftcard.profileIconUrl}}" alt="" height="20px" width="20px" *ngIf="giftcard.profileIconUrl">
+                    <span class="mx-1">{{giftcard.nAmount | currency: tillService.currency}}</span>
                   </div>
-                </li>
-              </ul>
-              <div>
-                <div class="d-flex">
-                  <div class="text-center" *ngIf="!quickButtons.length && !bSearchingProduct">
-                    <button [routerLink]="['/business/settings/cash-register']" class="btn">
-                      {{ "CLICK_HERE_TO_ADD_NEW_FAVOURITE" | translate}}
-                    </button>
+
+                  <div>
+                    <span *ngIf="giftcard.type == 'custom'">{{giftcard.sGiftCardNumber}}</span>
+                    <span *ngIf="giftcard.type != 'custom'">{{giftcard.type}}</span>
+                  </div>
+                  
+                  <div class="d-flex">
+                    <div class="mx-2 cursor-pointer" (click)="openCardsModal('edit', giftcard)" *ngIf="giftcard.type == 'custom'">
+                      <i class="fa fa-edit text-info"></i>
+                    </div>
+                    
+                    <div (click)="removeGift(i)" class="pmd-chip-action">
+                      <i class="close fas fa-times"></i>
+                    </div>
+                  </div>
+
+                </div>
+                <div class="chip d-flex align-items-center my-2" *ngIf="redeemedLoyaltyPoints">
+                  {{ "LOYALTY_POINTS" | translate }}, {{redeemedLoyaltyPoints | currency: tillService.currency}}
+                  <img class="mx-1" src="../assets/images/loyalty_points.png" alt="" height="20px" width="20px">
+                  <div (click)="removeLoyaltyPoints()">
+                    &nbsp;<i class="close fas fa-times cursor-pointer  text-danger"></i>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-xs-12">
-        <button *ngIf="!customer" class="btn d-flex btn-white rounded p-5 mb-3 text-hover-primary w-100"
-          (click)="openCustomerDialog()">
-          <div class="d-flex justify-center align-items-center flex-grow-1">
-            <div class="symbol symbol-40px me-2">
-              <span class="symbol-label">
-                <span class="svg-icon svg-icon-2qx me-0">
-                  <i class="fa fa-user-plus"></i>
-                </span>
-              </span>
-            </div>
-            <div class="fs-5 ms-4">
-              <span class="text-gray-800 fw-bold">{{"CUSTOMER" | translate}}</span>
-            </div>
-          </div>
-        </button>
+              <div class="d-flex">
+                <h5 *ngIf='!payMethods.length && !payMethodsLoading'> {{"NO_PAYMENT_METHOD_FOUND"}}</h5>
+                <div *ngIf="payMethodsLoading" class="spinner-border mx-auto"></div>
+              </div>
 
-        <div *ngIf="customer" class="d-flex flex-column bg-white rounded p-5 mb-3 w-100">
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex justify-center align-items-center flex-grow-1">
-              <div class="symbol symbol-40px me-2">
-                <span class="symbol-label">
-                  <span class="svg-icon svg-icon-1qx me-0">
-                    <i class="fa fa-user"></i>
+              <h1 class="m-0 fs-xl-1 fs-sm-2">
+                <span *ngIf="nTotalPayment < nItemsTotalToBePaid && availableAmount <= nTotalPayment">{{ "YET_TO_PAY" | translate}}</span>
+                <span *ngIf="availableAmount >= nItemsTotalToBePaid || nTotalPayment < availableAmount || nTotalPayment === nItemsTotalToBePaid">{{ "CHANGE" | translate}}</span>:
+
+                {{ nFinalAmount | currency: tillService.currency}}
+              </h1>
+
+              <div class="m-0" *ngIf="nTotalPayment < nItemsTotalToBePaid">
+                <p class="m-0 fs-xl-6 fs-sm-7">
+                  {{ "PREPAYMENT" | translate}}: {{ nTotalPayment | currency: tillService.currency}}
+                  <br>
+                  {{'FROM_TOTAL' | translate}} {{ nItemsTotalToBePaid | currency:tillService.currency}}
+                </p>
+              </div>
+
+              <h4  class="m-0 fs-xl-6 fs-sm-7" *ngIf="nTotalPayment === nItemsTotalToBePaid">{{ "PAYMENT" | translate}}: {{nTotalPayment | currency:tillService.currency}}
+              </h4>
+              <!-- <h4 *ngIf="nFinalAmount > 0">{{ "PREPAYMENT" | translate}}: {{nTotalPayment | currency:
+                tillService.currency}}
+              </h4> -->
+
+              <div class="d-flex flex-wrap mt-2">
+                <button class="btn btn-primary till-save-button flex-grow-1 me-2" (click)="createTransaction()"
+                  [disabled]="bDisableCheckout">
+                  <!-- [disabled]="saveInProgress || 1 > transactionItems.length || !amountDefined || !bAllGiftcardPaid"> -->
+                  <span class="mr-3" *ngIf="saveInProgress">
+                    <fa-icon [icon]="faSpinner" class="fa fa-spinner fa-spin"></fa-icon>
                   </span>
-                </span>
+                  <span>
+                    {{ "C_CHECKOUT" | translate}}
+                  </span>
+                </button>
+                <button class="btn btn-secondary" (click)="clearPaymentAmounts()" [disabled]="!amountDefined">
+                  <fa-icon [icon]="faRotateLeft" class="fa-spin"></fa-icon>
+                </button>
+                <div @fade *ngIf="!bAllGiftcardPaid" class="badge badge-danger mt-3">
+                  {{'PLEASE_PAY_ALL_GIFTCARD_TO_CHECKOUT' | translate}}</div>
+                <div @fade *ngIf="bShowOverassignedWarning" class="badge badge-danger mt-3">
+                  {{ 'YOU_HAVE_ASSIGNED_TOO_MUCH_AMOUNT' | translate}}</div>
               </div>
-              <div class="fs-5 ms-4">
-                <span class="text-gray-800 fw-bold">{{"CUSTOMER" | translate}}</span>
-              </div>
-            </div>
-            <button class="btn btn-icon btn-secondary w-35px h-35px" (click)="customer = null">
-              <span class="svg-icon svg-icon-1qx me-0">
-                <i class="fa fa-times"></i>
-              </span>
-            </button>
-          </div>
-          <div>
-            <p class="mt-5 mb-0 text-gray-800">
-              <span *ngIf="customer.number">{{customer.number}} <br> </span>
-              <span *ngIf="customer.NAME">{{customer.NAME}} <br> </span>
-              <span *ngIf="customer.oShippingAddress?.street || customer.oShippingAddress?.number">
-                {{customer.oShippingAddress?.street}} {{customer.oShippingAddress?.number}}
-                <br>
-              </span>
-              <span *ngIf="customer.oShippingAddress?.zip || customer.oShippingAddress?.city">
-                {{customer.oShippingAddress?.zip}} {{customer.oShippingAddress?.city}}<br>
-              </span>
-              <span *ngIf="customer.sEmail"> {{customer.sEmail}} </span>
-            </p>
-          </div>
-        </div>
-
-        <div class="form-floating input-group mb-5 py-0 ">
-          <select class="form-select" [(ngModel)]="selectedTransaction" (ngModelChange)="fetchParkedTransactionInfo()">
-            <option [ngValue]="null" disabled selected>
-              {{"PARKED_TRANSACTIONS" | translate}}
-            </option>
-            <option *ngFor="let transaction of parkedTransactions" [ngValue]="transaction">{{transaction.sNumber}}
-              ({{transaction.dUpdatedDate | date: 'short'}})
-            </option>
-          </select>
-          <ng-container>
-            <button class="btn btn-secondary" (click)="selectedTransaction ? updateParkedTransaction(): park()">{{
-              selectedTransaction ? "SAVE" : "PARK" |
-              translate}}</button>
-            <button class="btn btn-secondary" (click)="selectedTransaction = null" *ngIf="selectedTransaction">
-              <fa-icon [icon]="faTimesCircle"></fa-icon>
-            </button>
-            <button class="btn btn-secondary" *ngIf="selectedTransaction" (click)="deleteParkedTransaction()">
-              <fa-icon [icon]="faTrashAlt"></fa-icon>
-            </button>
-          </ng-container>
-        </div>
-        <!-- Payment Buttons  -->
-        <ng-container *ngFor="let payment of payMethods; let i = index">
-          <div class="input-group" [ngClass]="{'mb-3':i===0,'my-3':i>0}">
-            <input type="number" class="form-control col-5" [(ngModel)]="payment.amount"
-              placeholder="{{'AMOUNT' | translate}}" (ngModelChange)="changeInPayment()">
-            <button class="btn btn-primary col-7" [disabled]="payment.isDisabled" (click)="assignAllAmount(i)">{{
-              payment.sName | uppercase | translate}}</button>
-          </div>
-        </ng-container>
-        <div class="input-group till-padding mt-2">
-          <button class="btn btn-primary w-100" (click)="openMorePaymentMethodModal()">{{"MORE" |
-            translate}}...</button>
-        </div>
-        <div class="input-group till-padding mt-2">
-          <button class="btn btn-primary w-100" (click)="openCardsModal()">{{"REDEEM_GIFTCARD" | translate}}</button>
-        </div>
-        <div class="mt-2" *ngIf="appliedGiftCards.length || redeemedLoyaltyPoints > 0">
-          <div class="chip d-flex" *ngFor="let giftcard of appliedGiftCards; index as i">
-            {{giftcard.sGiftCardNumber}}, {{giftcard.nAmount | currency: tillService.currency}}
-            <div *ngIf="giftcard.profileIconUrl">
-              <img class="ml-1" src="{{giftcard.profileIconUrl}}" alt="" height="20px" width="20px">
-            </div>
-            <div (click)="removeGift(i)">
-              &nbsp;<i class="close fas fa-times cursor-pointer"></i>
             </div>
           </div>
-          <div class="chip d-flex">
-            {{ "LOYALTY_POINTS" | translate }}, {{redeemedLoyaltyPoints | currency: tillService.currency}}
-            <img class="ml-1" src="../assets/images/loyalty_points.png" alt="" height="20px" width="20px">
-            <div (click)="redeemedLoyaltyPoints = 0">
-              &nbsp;<i class="close fas fa-times cursor-pointer"></i>
-            </div>
-          </div>
-        </div>
-        <div class="d-flex">
-          <h5 *ngIf='!payMethods.length && !payMethodsLoading'> {{"NO_PAYMENT_METHOD_FOUND"}}</h5>
-          <div *ngIf="payMethodsLoading" class="spinner-border mx-auto"></div>
-        </div>
-
-        <h1 *ngIf="(getUsedPayMethods(true) - getTotals('price')) <0">{{ "YET_TO_PAY" | translate}}:
-          {{getUsedPayMethods(true) - getTotals('price') | currency: tillService.currency}}</h1>
-        <h1 *ngIf="(getUsedPayMethods(true) - getTotals('price')) >=0">{{ "CHANGE" | translate}}:
-          {{getUsedPayMethods(true) - getTotals('price') | currency: tillService.currency}}</h1>
-
-        <h4 *ngIf="(getUsedPayMethods(true) - getTotals('price')) <0">{{ "PREPAYMENT" | translate}}: {{totalPrepayment()
-          | currency: tillService.currency}} {{'FROM_TOTAL' | translate}} {{getTotals('price') | currency:
-          tillService.currency}}</h4>
-        <h4 *ngIf="(getUsedPayMethods(true) - getTotals('price')) ==0">{{ "PAYMENT" | translate}}: {{totalPrepayment() |
-          currency: tillService.currency}}</h4>
-        <h4 *ngIf="(getUsedPayMethods(true) - getTotals('price')) >0">{{ "PREPAYMENT" | translate}}: {{totalPrepayment()
-          | currency: tillService.currency}}</h4>
-
-        <div class="d-flex flex-wrap">
-          <button class="btn btn-primary till-save-button flex-grow-1 me-2" (click)="createTransaction()"
-            [disabled]="saveInProgress || 1 > transactionItems.length || !amountDefined">
-            <span class="d-flex" *ngIf="saveInProgress">
-              <fa-icon [icon]="faSpinner" class="fa-spin"></fa-icon>
-            </span>
-            <span *ngIf="!saveInProgress">
-              {{ "C_CHECKOUT" | translate}}
-            </span>
-          </button>
-          <button class="btn btn-primary" (click)="clearPaymentAmounts()" [disabled]="!amountDefined">
-            <fa-icon [icon]="faRotateLeft" class="fa-spin"></fa-icon>
-          </button>
         </div>
       </div>
+
     </div>
+
+
   </div>
 
   <div class="spinner-border mx-auto overlay" *ngIf="parkedTransactionLoading"></div>
 </div>
+<ng-template #contentPlaceholder let-loaderVariable="loaderVariable">
+  <div class="row skeletonLoader" @fade *ngIf="loaderVariable">
+    <div class="col-4 custom-loader" *ngFor="let row of [].constructor(3)">
+      <div class="card shadow-sm mb-2">
+        <div class="card-body p-1 skeleton skeleton--card">
+          <div class="d-flex skeleton--content">
+            <div class="w-50 p-4 d-flex">
+              <div class="h-100px w-100px custom-loader mx-auto"></div>
+            </div>
+            <div class="w-50 p-4">
+              <div class="skeleton--line1 custom-loader "></div>
+              <div class="skeleton--line1 custom-loader"></div>
+              <div class="skeleton--line1 custom-loader"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

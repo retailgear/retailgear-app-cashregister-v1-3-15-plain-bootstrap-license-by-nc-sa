@@ -9,20 +9,15 @@
                 <div class="col-md-4">
                     <label class="fs-6 form-label fw-bolder text-dark">{{'LOCATION' | translate}}</label>
                     <div class="w-100" *ngIf="aLocation?.length">
-                        <ng-select [multiple]="true" [items]="aLocation" [(ngModel)]="aSelectedLocation" (ngModelChange)="selectedLocationChanged()"
-                            name="iLocationId" bindValue="_id" bindLabel="sName" placeholder="{{'SELECT' | translate}}" required
-                            [closeOnSelect]="false">
-                            <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
-                                <input id="item-{{index}}" type="checkbox" name="item-{{index}}"
-                                    [ngModel]="item$.selected" />
-                                {{item.sName}}
-                            </ng-template>
+                        <ng-select class="form-control form-control-solid p-0" [multiple]="true" [(ngModel)]="aSelectedLocation" (ngModelChange)="selectedLocationChanged()"
+                            [clearable]="false">
+                            <ng-option *ngFor="let location of aLocation" [value]="location._id">{{location.sName}}</ng-option>
                         </ng-select>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4" *ngIf="sDayClosureMethod === 'workstation' ">
                     <label class="fs-6 form-label fw-bolder text-dark">{{'WORK_STATION' | translate}}</label>
-                    <ng-select class="form-control p-0" [(ngModel)]="oSelectedWorkStation" placeholder="{{'SELECT' | translate}}"
+                    <ng-select class="form-control form-control-solid p-0" [(ngModel)]="oSelectedWorkStation" placeholder="{{'SELECT' | translate}}"
                         [clearable]="true">
                         <ng-option *ngFor="let oWorkStation of aWorkStation" [value]="oWorkStation">
                             {{oWorkStation.sName}}
@@ -33,7 +28,7 @@
             <div class="row">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <button type="button" class="btn btn-primary" data-kt-roles-modal-action="submit"
+                        <button type="button" class="btn btn-info" data-kt-roles-modal-action="submit"
                             (click)="fetchDayClosureList()">
                             <span class="indicator-label">{{ "APPLY_FILTER" | translate}}</span>
                         </button>
@@ -67,12 +62,12 @@
                             <td>{{oDayClosure?.nPaymentMethodTotal}}</td>
                             <td>{{oDayClosure?.nTotalRevenue}}</td>
                             <td>{{oDayClosure?.oCountings?.nCashAtStart}}</td>
-                            <td>{{oDayClosure?.oCountings?.nCashCounted}}</td>
+                            <td>{{(oDayClosure?.oCountings?.nCashCounted).toFixed(2) || 0}}</td>
                             <td>{{oDayClosure?.oCountings?.nSkim}}</td>
                             <td>{{oDayClosure?.oCountings?.nCashRemain}}</td>
 
                             <td>
-                                <button class="btn btn-primary" (click)="goToView(oDayClosure._id, oDayClosure?.dOpenDate, oDayClosure?.dCloseDate)">
+                                <button class="btn btn-secondary" (click)="goToView(oDayClosure)">
                                     {{"VIEW" | translate}}
                                 </button>
                             </td>
@@ -86,7 +81,7 @@
                 </h5>
                 <div *ngIf="showLoader" class="spinner-border mx-auto"></div>
             </div>
-            <div class="row">
+            <div class="row" *ngIf='aDayClosure?.length'>
                 <div
                     class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
                     <div class="dataTables_length" id="kt_ecommerce_sales_table_length">

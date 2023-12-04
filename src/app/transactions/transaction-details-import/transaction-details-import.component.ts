@@ -1,12 +1,12 @@
 import { Component, Input, OnInit, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
-import { ToastService } from 'src/app/shared/components/toast';
-import { ApiService } from 'src/app/shared/service/api.service';
+import { ToastService } from '../../shared/components/toast';
+import { ApiService } from '../../shared/service/api.service';
 import { faTimes, faSync } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-transaction-details-import',
   templateUrl: './transaction-details-import.component.html',
-  styleUrls: ['./transaction-details-import.component.sass']
+  styleUrls: ['./transaction-details-import.component.scss']
 })
 export class TransactionDetailsImportComponent implements OnInit, OnChanges {
 
@@ -46,6 +46,13 @@ export class TransactionDetailsImportComponent implements OnInit, OnChanges {
     { name: 'SPANISH', key: 'es' }
   ]
 
+  aActionHeaders: Array<any> = [
+    { key: 'DO_NOTHING', value: 'do-nothing' },
+    { key: 'OVERWRITE', value: 'overwrite' },
+    { key: 'ADD_IF_UNDEFINED', value: 'add-if-undefined' },
+    { key: 'APPEND', value: 'append' }
+  ]
+
   constructor(
     private apiService: ApiService,
     private toasterService: ToastService
@@ -59,6 +66,7 @@ export class TransactionDetailsImportComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (this.parsedTransactionData && this.parsedTransactionData.length > 0) {
+      this.allFields.all = [];
       this.headerOptions = Object.keys(this.parsedTransactionData[0]);
       this.transactionDetailsForm = {};
       this.updateTemplateForm = {};
@@ -70,16 +78,15 @@ export class TransactionDetailsImportComponent implements OnInit, OnChanges {
   // Function for get dynamic field
   getDynamicFields(isResetAttributes: boolean) {
     let filter = {
+      iBusinessId: this.iBusinessId,
       oFilterBy: {
-        "sName": "import transaction details"
-      },
-      "iBusinessId": this.iBusinessId,
-      "iLocationId": this.iLocationId
+        "sName": "IMPORT_TRANSACTION_DETAILS"
+      }
     };
 
     this.apiService.postNew('core', '/api/v1/properties/list', filter).subscribe((result: any) => {
       if (result && result.data && result.data.length > 0) {
-        this.allFields['all'] = result.data[0].aOptions;
+        this.allFields['all'] = result.data[0].result[0].aOptions;
         if (isResetAttributes) {
           this.transactionDetailsForm = {};
           this.updateTemplateForm = {};
@@ -87,6 +94,7 @@ export class TransactionDetailsImportComponent implements OnInit, OnChanges {
         this.allFields['all'].filter((field: any) => {
           if (this.headerOptions.indexOf(field.sKey) > -1) {
             this.transactionDetailsForm[field.sKey] = field.sKey;
+            this.updateTemplateForm[field.sKey] = 'overwrite';
           }
         });
       }
@@ -119,6 +127,13 @@ export class TransactionDetailsImportComponent implements OnInit, OnChanges {
 
   // Function for go to step(next / previous)
   gotoStep(step: string) {
+    if(step == 'previous') 
+    {
+      this.updateTemplateForm = {};
+      this.transactionDetailsForm = {};
+      this.parsedTransactionData = [];
+      this.allFields.all = [];
+    }
     if (Object.keys(this.transactionDetailsForm).length != this.headerOptions.length) {
       this.toasterService.show({ type: 'danger', text: 'You have not set some of the attributes exist in file.' });
     }

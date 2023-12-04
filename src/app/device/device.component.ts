@@ -7,7 +7,7 @@ import { DialogService } from '../shared/service/dialog';
 @Component({
   selector: 'app-device',
   templateUrl: './device.component.html',
-  styleUrls: ['./device.component.sass']
+  styleUrls: ['./device.component.scss']
 })
 export class DeviceComponent implements OnInit {
 

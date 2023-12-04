@@ -1,0 +1,92 @@
+.fabutton {
+	font-size: 30px;
+}
+
+a.cancel {
+	cursor: pointer;
+	color: #a63b55;
+}
+
+// .custom-card
+// 	padding: 20px !important
+// 	height: 150px !important
+
+// 	&.common-prod
+// 		height: 220px !important
+
+
+// 	.card-body
+// 		padding: 0 !important
+// 		display: flex
+// 		align-items: center
+// 		height: 100%
+
+// 		&.custom-flex
+// 			flex-wrap: wrap
+// 			.r-content
+// 				flex: 1
+
+// 			.l-content
+// 				flex: 1
+
+// 			.b-content
+// 				flex: 0 0 100%
+
+
+
+// 		.r-content
+// 			width: 45%
+// 			height: 100%
+// 			margin-right: 15px
+
+// 			img
+// 				width: 100% !important
+// 				height: 100%
+// 				object-fit: contain
+// 				object-position: center
+
+
+
+// 		.l-content
+// 			width: 55%
+
+// 			label
+// 				width: 100%
+
+
+// 			p
+// 				margin: 0 !important
+
+// 			.prod-name
+// 				font-weight: 600
+// 				overflow: hidden
+// 				text-overflow: ellipsis
+// 				display: -webkit-box
+// 				-webkit-line-clamp: 2
+// 				-webkit-box-orient: vertical
+// 				margin: 10px 0 !important
+// 				text-transform: uppercase
+.custom-card:hover {
+	border: solid 1px green;
+}
+
+.prod-name {
+	font-weight: 600;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	text-transform: uppercase;
+}
+
+.image-container {
+	width: 110px;
+	height: 85px;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+}

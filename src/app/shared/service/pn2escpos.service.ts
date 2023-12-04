@@ -1,5 +1,10 @@
+import { Injectable } from "@angular/core";
 import { TranslateService } from "@ngx-translate/core";
-
+import { CommonPrintSettingsService } from "./common-print-settings.service";
+import * as moment from 'moment';
+@Injectable({
+  providedIn: 'root',
+})
 export class Pn2escposService {
 
   debug: any
@@ -14,25 +19,30 @@ export class Pn2escposService {
   excerpt_suffix: any;
   replace_symbols: any;
   do_validate: any;
-  symbols: { euro: string; '€': string; };
+  symbols: any;
   syntaxname: string;
   syntax: any
   data: any;
-  translateService: any;
-  constructor(parameters: any = Object, translateService: TranslateService) {
+  parameters: any = Object;
+  dateFormat: string = "DD-MM-yyyy hh:mm";
+  dateOnlyFormat: string = "DD-MM-yyyy";
+  constructor( 
+      private translateService: TranslateService,
+      private commonService: CommonPrintSettingsService
+    ) {
     this.translateService = translateService;
-    this.debug = (this.isDefined(parameters.debug)) ? parameters.debug : true;
-    this.default_spacing = (this.isDefined(parameters.default_spacing)) ? parameters.default_spacing : 6;
-    this.divider_gutter = (this.isDefined(parameters.divider_gutter)) ? parameters.divider_gutter : 4;
-    this.drawerpin = (this.isDefined(parameters.drawerpin)) ? parameters.drawerpin : 2;
-    this.paper_cut = (this.isDefined(parameters.paper_cut)) ? parameters.paper_cut : 2;
-    this.max_line_length_n = (this.isDefined(parameters.linelength_n)) ? parameters.linelength_n : 48;
-    this.max_line_length_l = (this.isDefined(parameters.linelength_l)) ? parameters.linelength_l : 24;
+    this.debug = (this.isDefined(this.parameters.debug)) ? this.parameters.debug : true;
+    this.default_spacing = (this.isDefined(this.parameters.default_spacing)) ? this.parameters.default_spacing : 6;
+    this.divider_gutter = (this.isDefined(this.parameters.divider_gutter)) ? this.parameters.divider_gutter : 4;
+    this.drawerpin = (this.isDefined(this.parameters.drawerpin)) ? this.parameters.drawerpin : 2;
+    this.paper_cut = (this.isDefined(this.parameters.paper_cut)) ? this.parameters.paper_cut : 2;
+    this.max_line_length_n = (this.isDefined(this.parameters.linelength_n)) ? this.parameters.linelength_n : 48;
+    this.max_line_length_l = (this.isDefined(this.parameters.linelength_l)) ? this.parameters.linelength_l : 24;
     this.default_line_length = this.max_line_length_n;
-    this.encoding = (this.isDefined(parameters.encoding)) ? this.epSetEncoding(parameters.encoding) : this.epSetEncoding("CP1253"); //ESC t 16 = Cp1253
-    this.excerpt_suffix = (this.isDefined(parameters.excerpt_suffix)) ? parameters.excerpt_suffix : "..";
-    this.replace_symbols = (this.isDefined(parameters.replace_symbols)) ? parameters.replace_symbols : false
-    this.do_validate = (this.isDefined(parameters.do_validate)) ? parameters.do_validate : false
+    this.encoding = (this.isDefined(this.parameters.encoding)) ? this.epSetEncoding(this.parameters.encoding) : this.epSetEncoding("CP1253"); //ESC t 16 = Cp1253
+    this.excerpt_suffix = (this.isDefined(this.parameters.excerpt_suffix)) ? this.parameters.excerpt_suffix : "..";
+    this.replace_symbols = (this.isDefined(this.parameters.replace_symbols)) ? this.parameters.replace_symbols : false
+    this.do_validate = (this.isDefined(this.parameters.do_validate)) ? this.parameters.do_validate : false
 
     /**
      * Some symbols are not printed correctly and need to be replaced.
@@ -41,20 +51,13 @@ export class Pn2escposService {
      */
     //var euro = this.epSetEncoding('CP1253_ALT') + this.helperSanitizeCommand("€")
     this.symbols = {
-      'euro': '\x1b\x74\x10\x1B\x74\x13\xD5',
-      '\u20AC': '\x1b\x74\x10\x1B\x74\x13\xD5',
-      // '€': '\x1B\x74\x13\xD5'
-      //
-      //'€': cptable.utils.encode(1252, '€'),
-      // 'euro': cptable.utils.encode(1253, '€'),
-      // '\u20AC': cptable.utils.encode(1253, '€'),
-      // '\u20ac': cptable.utils.encode(1253, '€'),
+      'euro': '\x1B\x74\x13\xD5',
+      'pound': '\x1B\x74\x13\x9C',
+      'swiss': '\x1B\x74\x13\x9F',
     };
-
-    //1253
-
+    
     //If Epson syntax doesn't work, try star
-    if (parameters.syntax === "star") {
+    if (this.parameters.syntax === "star") {
       this.syntaxname = 'star';
       this.syntax = this.syntaxStar;
     } else {
@@ -63,15 +66,18 @@ export class Pn2escposService {
     }
   }
 
-  generate(template: any, dataObject: any) {
+  generate(template: any, dataObject: any, parameters?:any) {
     if (this.helperValidateJSON(template)) {
 
       template = JSON.parse(template);
+      
+      if (parameters?.nLineLength_normal) this.default_line_length = parameters?.nLineLength_normal;
+      // console.log(this.default_line_length);
 
       if (this.helperValidateJSON(dataObject)) {
         this.data = JSON.parse(dataObject);
       }
-      // console.log(this.data);
+      // console.log({data: this.data, template, parameters});
 
       var commandString = "";
 
@@ -81,20 +87,19 @@ export class Pn2escposService {
       //Loop over the actions defined in the template
 
       Object.keys(template).forEach((key: any) => {
-        var action: any = this.createObjectFromTemplateLine(template[key]);
-        // console.log({action});
+        const action: any = this.createObjectFromTemplateLine(template[key]);
+        // console.log({action})
         if (action.do) {
           //this.clog('EXECUTING {"'+action.do+'":"'+action.data+'"}')
           let a;
           if (action.if) {
-            if (this.checkConditions(action.if, this.data)) {
+            // console.log('if', action?.object)
+            if (this.checkConditions(action.if, (action?.object) ? this.data[action.object] : this.data)) {
               a = this.doAction(action, key)
-              // console.log('after process if', a)
               commandString += a;
             }
           } else {
             a = this.doAction(action, key)
-            // console.log('after process else', a)
             commandString += a;
           }
 
@@ -168,9 +173,8 @@ export class Pn2escposService {
 
     var foreachString = "";
     var requestedData = this.data[command.data];
-
     //The value passed to the foreach-action should exist in the data array
-    if (typeof requestedData !== 'undefined') {
+    if (requestedData) {
 
       //the foreach data object should contain child objects
       if (typeof Object.values(requestedData)[0] == 'object') {
@@ -186,15 +190,14 @@ export class Pn2escposService {
 
             action.inforeach = true;
 
-            if (typeof command.columns !== 'undefined') {
-              if (typeof command.columns[i] !== 'undefined') {
+            if (command.columns) {
+              if (command.columns[i]) {
 
                 var colwidthsum = 0;
 
-                for (let a = 0; a < command.columns.length; a++) {
+                for (let k = 0; k < command.columns.length; k++) {
                   colwidthsum += command.columns[i];
                 }
-
                 if (colwidthsum == this.default_line_length) {
                   this.cwarn('The sum of the columns in your foreach equal the default line length. This should be equal to the default line length minus the number of columns)')
                 }
@@ -209,11 +212,12 @@ export class Pn2escposService {
             }
 
             if (action.if) {
-              if (this.checkConditions(action.if, JSON.stringify(requestedData[a]))) {
-                foreachString += this.doAction(action, i)
+              // console.log('action.if 212 ', action.if);
+              if (this.checkConditions(action.if, requestedData[a])) {
+                foreachString += this.doAction(action, i, a)
               }
             } else {
-              foreachString += this.doAction(action, i);
+              foreachString += this.doAction(action, i, a);
             }
           }
         }
@@ -267,30 +271,34 @@ export class Pn2escposService {
   }
 
   addQrCode(value: any) {
-
+    // console.log('add qr value =', value)
     var qr = value;
     qr = this.replaceVariables(qr);
-    var dots = '\x09';
-
+    // qr = 'this is some text';
+    // console.log({qr})
+    var dots = '\x33';
+    // console.log({dots})
     // Some proprietary size calculation
     var qrLength = qr.length + 3;
-    var size1 = String.fromCharCode(qrLength % 256);
-    var size0 = String.fromCharCode(Math.floor(qrLength / 256));
+    // console.log({ qrLength }, qrLength % 256, Math.floor(qrLength / 256))
 
+    var pL = String.fromCharCode(qrLength % 256);
+    var pH = String.fromCharCode(Math.floor(qrLength / 256));
+    // console.log({pL, pH})
     var data = [
       // Some text and a few line feeds to make sure the initiation and first line are coming through
       //'\x1B' + 
       // <!-- BEGIN QR DATA -->
-      '\x1D' + '\x28' + '\x6B' + '\x04' + '\x00' + '\x31' + '\x41' + '\x32' + '\x00' + // <Function 165> select the model (model 2 is widely supported)
-      '\x1D' + '\x28' + '\x6B' + '\x03' + '\x00' + '\x31' + '\x43' + dots + // <Function 167> set the size of the module
-      '\x1D' + '\x28' + '\x6B' + '\x03' + '\x00' + '\x31' + '\x45' + '\x30' +  // <Function 169> select level of error correction (48,49,50,51) printer-dependent
-      '\x1D' + '\x28' + '\x6B' + size1 + size0 + '\x31' + '\x50' + '\x30' + qr +// <Function 080> send your data (testing 123) to the image storage area in the printer
-      '\x1D' + '\x28' + '\x6B' + '\x03' + '\x00' + '\x31' + '\x51' + '\x30' + // <Function 081> print the symbol data in the symbol storage area
-      '\x1D' + '\x28' + '\x6B' + '\x03' + '\x00' + '\x31' + '\x52' + '\x30'// <Function 082> Transmit the size information of the symbol data in the symbol storage area
+      '\x1D\x28\x6B\x04\x00\x31\x41\x32\x00' +                // <Function 165> select the model (model 2 is widely supported)
+      '\x1D\x28\x6B\x03\x00\x31\x43' + dots +                 // <Function 167> set the size of the module
+      '\x1D\x28\x6B\x03\x00\x31\x45\x31' +                    // <Function 169> select level of error correction (48,49,50,51) printer-dependent
+      '\x1D\x28\x6B' + pL + pH + '\x31\x50\x30' + qr +  // <Function 080> send your data (testing 123) to the image storage area in the printer
+      '\x1D\x28\x6B\x03\x00\x31\x51\x30' +                    // <Function 081> print the symbol data in the symbol storage area
+      '\x1D\x28\x6B\x03\x00\x31\x52\x30'                      // <Function 082> Transmit the size information of the symbol data in the symbol storage area
       // <!-- END QR DATA -->
       //+ '\x0A' + '\x0A'
-    ];
-
+  ];
+    // console.log({data})
     return data;
   }
 
@@ -352,8 +360,7 @@ export class Pn2escposService {
     return divider;
   }
 
-  doAction(command: any, currentKey: any) {
-
+  doAction(command: any, currentKey: any, index:number = 0) {
     switch (command.do) {
 
       case "align":
@@ -393,10 +400,10 @@ export class Pn2escposService {
         return this.addForeach(command)
 
       case "text":
-        return this.addText(command)
+        return this.addText(command, false, index)
 
       case "line":
-        return this.addText(command, true)
+        return this.addText(command, true, index)
 
       case "break":
         return this.epBreak(command.data)
@@ -411,44 +418,65 @@ export class Pn2escposService {
       case "measureprinter":
         return this.printMeasuringReceipt();
 
+      case "multiple":
+        return this.handleMultiple(command.data);
+
       default:
         this.cerror(command.do + '" is not a valid action', command);
         return "";
     }
   }
 
-  replaceVariables(commandText: any, itemData = null, colpos = 0, colwidth = 0, colcount = 0, pullright = false) {
+  handleMultiple(elements:any){
+    // console.log('multiple',{elements})
+    let data = '';
+    elements.forEach((el:any) => {
+      const action = Object.keys(el)[0];
+      if(action === 'text')
+        data += this.addText({data: el.text});
+      else if(action === 'barcode_right') 
+        data += this.addBarcodeRight(el.barcode_right)
+    })
+    // console.log(data)
+    return data;
+  }
+
+  replaceVariables(commandText: any, itemData = null, colpos = 0, colwidth = 0, colcount = 0, pullright = false, itemIndex?:number) {
 
     //match on any text between "[[" and "]]"
-    var extractedVariables = commandText.match(/\[\[(.*?)]]/ig); //includes child variables
-    var multiple_vars_in_column = false;
-
+    // console.log({commandText})
+    const extractedVariables = commandText.match(/\[\[(.*?)]]/ig); //includes child variables
+    // console.log({commandText, extractedVariables})
+    let multiple_vars_in_column = false;
+    let providedData;
+    
     //in a foreach, the data is provided. If not provided, the parent variables will be searched
     if (itemData) {
-      var providedData: any = itemData;
+      providedData = itemData;
     } else {
-      var providedData: any = this.data;
+      providedData = this.data;
     }
 
     //we first assume there are no matches, the return data will then be equal to the provided data.
-    var finalString = commandText;
+    let finalString = commandText;
 
     if (extractedVariables !== null) {
-
       /**
        * if there is more than one variable in a column, justification should not
        * be applied to the variables individually but only to the text as a whole
        */
       if (extractedVariables.length > 1) {
         multiple_vars_in_column = true;
+        // console.log({ multiple_vars_in_column })
       }
 
       //for each variable, we loop over the data array to find a match
       for (let a = 0; a < extractedVariables.length; a++) {
 
-        var currentMatch = extractedVariables[a];
-        var placeholder = "";
-        var maxlength = 0;
+        let currentMatch = extractedVariables[a];
+        // console.log({currentMatch})
+        let placeholder = "";
+        let maxlength = 0;
 
         //Finding more than 2 "[" means there's a variable not closed properly
         if (currentMatch.match(/\[/g).length == 2) {
@@ -458,13 +486,22 @@ export class Pn2escposService {
 
           //remove brackets
           let variableStringFilteredIndex0 = currentMatch.replace('[[', '').replace(']]', '');
-          const hasFormat = variableStringFilteredIndex0.includes('|');
+          if (variableStringFilteredIndex0 === 'nIndex'){
+            let n = (itemIndex) ? itemIndex : 0;
+            finalString = finalString.replace(currentMatch, String(++n));
+            finalString = this.helperJustifyInColumn(finalString, colcount, colwidth, colpos, pullright);
+            continue;
+          } 
+          const hasFormat = variableStringFilteredIndex0.includes('^');
+          // console.log({ variableStringFilteredIndex0, hasFormat})
           let aFormatParts;
           let format;
           if(hasFormat) {
-            aFormatParts = variableStringFilteredIndex0.split('|');
+            // console.log('hasFormat if')
+            aFormatParts = variableStringFilteredIndex0.split('^');
             variableStringFilteredIndex0 = aFormatParts[0]
             format = aFormatParts[1];
+            // console.log({variableStringFilteredIndex0, aFormatParts, format })
           }
           
           //check for "|"
@@ -489,41 +526,45 @@ export class Pn2escposService {
             variableStringFilteredIndex0 = variableParameters[0];
           }
 
-          var variableStringFilteredIndex1: String | undefined;
-          var variableStringFilteredIndex2: String | undefined;
+          let variableStringFilteredIndex1: string = '';
+          let variableStringFilteredIndex2: string = '';
           //Detect nested variables, e.g. {shop.address}
           if (variableStringFilteredIndex0 && variableStringFilteredIndex0.match(/\./g)) {
             if (variableStringFilteredIndex0.match(/\./g).length <= 3) {
-              var parts = variableStringFilteredIndex0.split('.');
+              const parts = variableStringFilteredIndex0.split('.');
+              // console.log({parts})
               providedData = this.data[parts[0]];
+              // console.log({ providedData })
               variableStringFilteredIndex0 = parts[1];
               variableStringFilteredIndex1 = parts[2];
               variableStringFilteredIndex2 = parts[3];
+              // console.log('nested', { variableStringFilteredIndex0, variableStringFilteredIndex1, variableStringFilteredIndex2 })
             } else {
               this.cerror('Cannot use "' + variableStringFilteredIndex0 + '", nesting is limited to three level', variableStringFilteredIndex0);
             }
           }
+          let matched = false;
+          let newtext: any = "";
 
-          var matched = false;
-          var newtext: any = "";
-          
-          
           if (providedData[variableStringFilteredIndex0]) { //a match on key
-            if (String(providedData[variableStringFilteredIndex0]).length > 0) { // ..there's data
+            if (String(providedData[variableStringFilteredIndex0]).length) { // ..there's data
               newtext = providedData[variableStringFilteredIndex0];
               
-              if (typeof (variableStringFilteredIndex1) == 'string' && String(providedData[variableStringFilteredIndex0][variableStringFilteredIndex1]).length > 0) {
-                if (typeof (variableStringFilteredIndex2) == 'string' && providedData[variableStringFilteredIndex0][variableStringFilteredIndex1][variableStringFilteredIndex2]) {
-                  newtext = providedData[variableStringFilteredIndex0][variableStringFilteredIndex1][variableStringFilteredIndex2];
-                  
-                } else {
-                  newtext = providedData[variableStringFilteredIndex0][variableStringFilteredIndex1];
-                  
-                }
+              if (
+                variableStringFilteredIndex1?.length && variableStringFilteredIndex2?.length &&
+                providedData[variableStringFilteredIndex0] && 
+                providedData[variableStringFilteredIndex0][variableStringFilteredIndex1] &&
+                providedData[variableStringFilteredIndex0][variableStringFilteredIndex1][variableStringFilteredIndex2]) {
+                // console.log(534, 'if', { newtext })
+                newtext = providedData[variableStringFilteredIndex0][variableStringFilteredIndex1][variableStringFilteredIndex2];
+              } else if (variableStringFilteredIndex1?.length && providedData[variableStringFilteredIndex0][variableStringFilteredIndex1]){
+                newtext = providedData[variableStringFilteredIndex0][variableStringFilteredIndex1];
+                // console.log(537, 'else if', {newtext})
               }
-
-              if (!multiple_vars_in_column)
-                newtext = this.helperJustifyInColumn(newtext, colcount, colwidth, colpos, pullright);
+              if(format) {
+                newtext = this.formatContent(newtext, format)
+              }
+              // console.log({format, newtext})
 
               // finalString = finalString.replace(currentMatch, newtext, 0);
               matched = true;
@@ -547,59 +588,19 @@ export class Pn2escposService {
           }
           finalString = finalString.replace(currentMatch, newtext, 0);
 
-          // backup code for some time
-
-          // Object.keys(providedData).forEach((key, index) => {
-          //   if (key == variableStringFilteredIndex0) { //a match on key
-          //     if (String(providedData[variableStringFilteredIndex0]).length > 0) { // ..there's data
-          //       newtext = providedData[variableStringFilteredIndex0];
-          //       console.log(502, { newtext, variableStringFilteredIndex0 })
-          //       if (typeof (variableStringFilteredIndex1) == 'string' && String(providedData[variableStringFilteredIndex0][variableStringFilteredIndex1]).length > 0) {
-          //         if (typeof (variableStringFilteredIndex2) == 'string' && providedData[variableStringFilteredIndex0][variableStringFilteredIndex1][variableStringFilteredIndex2]) {
-          //           newtext = providedData[variableStringFilteredIndex0][variableStringFilteredIndex1][variableStringFilteredIndex2];
-          //           console.log(506, { newtext, variableStringFilteredIndex0, variableStringFilteredIndex1, variableStringFilteredIndex2 })
-          //         } else {
-          //           newtext = providedData[variableStringFilteredIndex0][variableStringFilteredIndex1];
-          //           console.log(509, { newtext, variableStringFilteredIndex0, variableStringFilteredIndex1 })
-          //         }
-          //       }
-
-          //       if (!multiple_vars_in_column)
-          //         newtext = this.helperJustifyInColumn(newtext, colcount, colwidth, colpos, pullright);
-
-          //       finalString = finalString.replace(currentMatch, newtext, 0);
-
-          //       matched = true;
-          //     } else if (variableStringFilteredIndex0.startsWith("__")) {
-          //       newtext = this.translateService.instant(variableStringFilteredIndex0.substring(2));
-          //     }
-          //     else {
-          //       if (!multiple_vars_in_column)
-          //         finalString = this.helperJustifyInColumn(finalString, colcount, colwidth, colpos, pullright);
-
-          //       if (placeholder)
-          //         finalString = placeholder;
-
-          //       finalString = finalString.replace(currentMatch, newtext, 0);
-          //     }
-          //   }
-          // });
-
           if (!matched) {
             if (placeholder) {
               this.clog('"' + variableStringFilteredIndex0 + '" replaced by placeholder "' + placeholder + '"')
             } else {
               this.cwarn('"' + finalString + '" could not be matched with the provided data.');
             }
-
-            if (!multiple_vars_in_column)
-              finalString = this.helperJustifyInColumn("", colcount, colwidth, colpos, pullright);
-          }
-
+          } 
         } else {
           this.cerror('A variable in "' + currentMatch + '" is not closed properly.', currentMatch)
         }
       }
+      finalString = this.helperJustifyInColumn(finalString, colcount, colwidth, colpos, pullright);
+
     } else {
       if (colwidth !== 0) {
         if (!multiple_vars_in_column)
@@ -607,15 +608,43 @@ export class Pn2escposService {
       }
     }
 
-    if (multiple_vars_in_column) {
-      finalString = this.helperJustifyInColumn(finalString, colcount, colwidth, colpos, pullright, true);
-    }
-
     return finalString;
   }
 
-  helperJustifyInColumn(newtext: any = null, colcount: any, colwidth: any, colpos: any, pullright = false, multiple_vars_in_column = false) {
+  private formatContent(val: any, type: string): any {
+    switch (type) {
+      case 'money':
+        return this.convertStringToMoney(val);
+      case 'date':
+        // console.log({val, dateFormat: this.dateFormat, 'moment(val)': moment(val), 'moment(val).format': moment(val).format(this.dateFormat)})
+        return (val === '' || val === 'NO_DATE_SELECTED' || moment(val).format(this.dateFormat) == 'Invalid date') ? val : moment(val).format(this.dateFormat);
+      case 'dateonly':
+        // console.log({val, dateFormat: this.dateFormat, 'moment(val)': moment(val), 'moment(val).format': moment(val).format(this.dateFormat)})
+        return (val === '' || val === 'NO_DATE_SELECTED' || moment(val).format(this.dateFormat) == 'Invalid date') ? val : moment(val).format(this.dateOnlyFormat);
+    }
+  }
 
+  private convertStringToMoney(val: any): any {
+    const sCurrencyName = this.data.businessDetails.currentLocation.eCurrency;
+    const currency:any = this.symbols[sCurrencyName]
+    // console.log('sCurrencyName', sCurrencyName, 'currency',currency)
+
+    if (val % 1 === 0) {
+      //no decimals
+      return currency + ((val) ? String(val + ',00') : '0,00');
+    } else {
+      val = String(val);
+      let parts = val.split('.');
+
+      if (parts[1].length === 1) {
+        val = val + '0';
+      }
+      return currency + val.replace('.', ',')
+    }
+  }
+
+  helperJustifyInColumn(newtext: any = null, colcount: any, colwidth: any, colpos: any, pullright = false, multiple_vars_in_column = false) {
+    newtext = String(newtext)
     if (newtext == null || newtext.length == 0) {
       newtext = "";
       for (let i = 0; i < colwidth; i++) {
@@ -624,16 +653,12 @@ export class Pn2escposService {
     } else {
       if (colwidth > 0) {
         if (newtext.length <= colwidth) {
-
           var spacesneeded = colwidth - newtext.length;
-          var extra = ""
+          var extra = " ".repeat(spacesneeded);
+          // for (let i = 0; i < spacesneeded; i++) {
+          // }
 
-          for (let i = 0; i < spacesneeded; i++) {
-            extra += " ";
-          }
-
-          newtext = (pullright) ? String(extra + newtext) : String(newtext + extra);
-
+          newtext = (pullright) ? String(extra + newtext) : String((newtext===' ' ? extra : newtext+extra));
         } else {
           if (newtext.substr(newtext.length - 1) !== " ") {
             newtext = this.helperSubstring(newtext, colwidth);
@@ -643,46 +668,52 @@ export class Pn2escposService {
     }
 
     if (colpos < (colcount - 1)) {
-      newtext += " ";
+      newtext += "";
     }
 
     if (multiple_vars_in_column == true) {
-      newtext += " ";
+      newtext += "";
     }
 
     return newtext;
   }
 
-  addText(command: any, breakafter = false) {
-
-    var text = "";
-    var dataString = String(command.data);
+  addText(command: any, breakafter = false, itemIndex?:number) {
+    // console.log('addText', {command, breakafter})
+    let text = "";
+    let dataString = String(command.data);
 
     //to split the text into columns, it must be a lin and not in a foreach
-    if (breakafter && dataString.indexOf('|') > -1 && typeof command.inforeach == 'undefined') {
+    if (dataString.indexOf('|') > -1) { //breakafter &&  && typeof command.inforeach == 'undefined'
 
       //split the line into parts and remove empty ones
-      var parts = dataString.split('|').filter(function (el) {
+      const parts = dataString.split('|').filter((el) => {
         return el != "";
       });
 
-      var table = [];
+      let table = [];
 
       if (parts.length > 0) {
-        var table = [];
+        table = [];
         for (let i = 0; i < parts.length; i++) {
           var col = parts[i];
           var nr_of_cols = parts.length;
-          var colwidth = Math.floor((this.default_line_length - (nr_of_cols - 1)) / nr_of_cols);
-
-          col = this.replaceVariables(col, null, i, colwidth, nr_of_cols)
-
+          if (command?.colWeights?.length) {
+            var colwidth = command.colWeights[i] * Math.floor(this.default_line_length/12);
+          } else {
+            var colwidth = Math.floor((this.default_line_length - (nr_of_cols - 1)) / nr_of_cols);
+          }
+          const source = (command?.object) ? this.data[command.object] : command.source;
+          // console.log('source', source, command.object)
+          col = this.replaceVariables(col, source, i, colwidth, nr_of_cols, command.pullright, itemIndex)
           table.push(col);
         }
         dataString = table.join('');
       }
     } else {
-      dataString = this.replaceVariables(dataString, command.source, command.columnpos, command.columnwidth, command.colcount, command.pullright)
+      const source = (command?.object) ? this.data[command.object] : command.source;
+      // console.log('source', source, command.object)
+      dataString = this.replaceVariables(dataString, source, command.columnpos, command.columnwidth, command.colcount, command.pullright, itemIndex)
     }
 
     if (dataString.indexOf('<<>>') > -1) {
@@ -696,7 +727,7 @@ export class Pn2escposService {
     }
 
     text += dataString;
-
+    // console.log({text}, text.length)
     if (breakafter && text.length != 0)
       text += this.epBreak();
 
@@ -748,7 +779,7 @@ export class Pn2escposService {
 
     var finishing = "";
 
-    finishing += this.epOpenDrawer();
+    // finishing += this.epOpenDrawer();
     finishing += this.epBreak(this.default_spacing);
     finishing += cut_syntax;
 
@@ -756,13 +787,13 @@ export class Pn2escposService {
   }
 
   helperSanitizeCommand(string: any) {
-
+    // console.log('helperSanitizeCommand')
     for (const [key, value] of Object.entries(this.symbols)) {
       if (string.indexOf(key) > -1) {
         string = string.replaceAll(key, value);
       }
     }
-
+    // console.log('returning', string)
     return string;
   }
 
@@ -840,7 +871,6 @@ export class Pn2escposService {
   }
 
   createObjectFromTemplateLine(templateline: any, requestedData = null) {
-
     var action: any = new Object();
 
     var action_keys: any = Object.keys(templateline);
@@ -854,6 +884,7 @@ export class Pn2escposService {
     } else {
       if (action_keys[1] == "if") {
         action.if = action_vals[1]
+        // console.log('IF CONDITION: ', action_vals[1]);
       }
     }
 
@@ -873,9 +904,19 @@ export class Pn2escposService {
   }
 
   checkConditions(conditions: any, dataSourceObject: any) {
+    // console.log('checking conditions', {conditions, dataSourceObject});
     // dataSourceObject = JSON.parse(dataSourceObject);
 
-    var item = dataSourceObject; //Used for the eval() function
+    // var item = dataSourceObject; //Used for the eval() function
+    const bTestResult = conditions.every((rule: any) => {
+      const target = (rule?.type === 'var') ? dataSourceObject[rule.target] : rule.target;
+      //console.log({ rule, target }, dataSourceObject[rule.field]);
+      return (target != null) ? this.commonService.comparators[rule.compare](dataSourceObject[rule.field], target) : false;
+      
+    })
+    // console.log({bTestResult})
+    return bTestResult;
+    
 
     if (conditions && conditions !== "" && !conditions.startsWith('item') && !conditions.startsWith('!item')) {
       throw String('Conditions should be preceded by "item.", so this should something like item.' + conditions)

@@ -1,7 +1,7 @@
 <div class="card shadow-sm">
     <div class="card-header" style="margin-top: 20px;">
-        <h4 *ngIf="transaction">{{"TRANSACTION_COMPLETED" | translate}}</h4>
-        <h4 *ngIf="!transaction">{{'PROCESSING_YOUR_TRANSACTION' | translate }}</h4>
+        <h4 *ngIf="oDataSource">{{"TRANSACTION_COMPLETED" | translate}}</h4>
+        <h4 *ngIf="!oDataSource">{{'PROCESSING_YOUR_TRANSACTION' | translate }}</h4>
         <div>
             <button type="button" class="btn btn-sm btn-light" (click)="close(false)">
                 <fa-icon [icon]="faTimes"></fa-icon>
@@ -11,10 +11,10 @@
     <div class="card-body">
         <div class="row">
             <div class="text-center">
-                <h3 *ngIf="transaction">{{'TRANSACTION_COMPLETED_SUCCESSFULLY' | translate }} !</h3>
-                <h3 *ngIf="!transaction">{{'PLEASE_WAIT' | translate }}...</h3>
+                <h3 *ngIf="oDataSource">{{'TRANSACTION_COMPLETED_SUCCESSFULLY' | translate }} !</h3>
+                <h3 *ngIf="!oDataSource">{{'PLEASE_WAIT' | translate }}...</h3>
             </div>
-            <!-- <div class="processing-div" *ngIf="!transaction">
+            <!-- <div class="processing-div" *ngIf="!oDataSource">
                 <div class="box">
                     <div class="cube"></div>
                     <div class="cube"></div>
@@ -25,11 +25,11 @@
             <div>
                 <div class="success-checkmark">
 
-                    <div class="processing-div" *ngIf="!transaction">
+                    <div class="processing-div" *ngIf="!oDataSource?._id">
                         <div class="outer"></div>
                         <div class="inner"></div>
                     </div>
-                    <div class="check-icon" *ngIf="transaction">
+                    <div class="check-icon" *ngIf="oDataSource?._id">
                         <span class="icon-line line-tip"></span>
                         <span class="icon-line line-long"></span>
                         <div class="icon-circle"></div>
@@ -39,9 +39,9 @@
             </div>
             <hr>
         </div>
-        <div class="row border-bottom-2" *ngIf="transaction?.oCustomer?.sEmail || transaction?.oCustomer?.sEmail == ''">
+        <div class="row border-bottom-2" *ngIf="oDataSource?.oCustomer?.sEmail || oDataSource?.oCustomer?.sEmail == ''">
             <div class="col-6 pb-4 flex-column align-items-center">
-                <input type="mail" [(ngModel)]="transaction.oCustomer.sEmail" class="form-control">
+                <input type="mail" [(ngModel)]="oDataSource.oCustomer.sEmail" class="form-control">
             </div>
             <div class="col-4 pb-4 flex-column d-flex align-items-center">
                 <label class="form-check form-switch form-check-custom form-check-solid my-auto">
@@ -58,71 +58,81 @@
         <div class="row">
             <div class="col-4 d-flex flex-column align-items-center" *ngIf="bRegularCondition">
                 <span>{{ 'PROOF_OF_PAYMENT' | translate }}</span>
-                <div class="d-flex flex-column w-50" *ngFor="let action of aActionSettings">
-                    <span
-                        *ngIf="(transaction.oCustomer.sEmail && transaction.oCustomer.sEmail != '' && action =='EMAIL') || action !='EMAIL'"
-                        [ngClass]="{'badge-info': action=='PRINT_THERMAL', 'badge-secondary': action =='EMAIL', 'badge-dark': action=='PRINT_PDF', 'badge-success': action=='DOWNLOAD' }"
-                        class="badge cursor-pointer my-2" (click)="performAction('regular', action)">
+                <div class="d-flex flex-column w-75" *ngFor="let action of aActionSettings">
+                    <button
+                        *ngIf="(oDataSource.oCustomer.sEmail && oDataSource.oCustomer.sEmail != '' && action =='EMAIL') || action !='EMAIL'"
+                        [ngClass]="{'btn-info': action=='PRINT_THERMAL', 'btn-secondary': action =='EMAIL', 'btn-dark': action=='PRINT_PDF', 'btn-success': action=='DOWNLOAD'}"
+                        class="btn btn-sm my-2" (click)="performAction('regular', action, 0, $event)">
                         {{ action | translate }}
-                    </span>
+                    </button>
                 </div>
             </div>
             <div class="col-4 d-flex flex-column align-items-center" *ngIf="bOrderCondition">
                 <span>{{ 'OVERVIEW_OF_PROJECT' | translate }}</span>
-                <div class="d-flex flex-column w-50" *ngFor="let action of aActionSettings">
-                    <span
-                        *ngIf="(transaction.oCustomer.sEmail && transaction.oCustomer.sEmail != '' && action =='EMAIL') || action !='EMAIL'"
-                        [ngClass]="{'badge-info': action=='PRINT_THERMAL', 'badge-secondary': action =='EMAIL', 'badge-dark': action=='PRINT_PDF', 'badge-success': action=='DOWNLOAD' }"
-                        class="badge cursor-pointer my-2" (click)="performAction('order', action)">
+                <div class="d-flex flex-column w-75" *ngFor="let action of aActionSettings">
+                    <button
+                        *ngIf="(oDataSource.oCustomer.sEmail && oDataSource.oCustomer.sEmail != '' && action =='EMAIL') || action !='EMAIL'"
+                        [ngClass]="{'btn-info': action=='PRINT_THERMAL', 'btn-secondary': action =='EMAIL', 'btn-dark': action=='PRINT_PDF', 'btn-success': action=='DOWNLOAD' }"
+                        class="btn btn-sm my-2" 
+                        [disabled]="action=='DOWNLOAD' && bOrderDisabled == true"
+                        (click)="performAction('order', action, 0, $event)">
                         {{action | translate }}
-                    </span>
+                    </button>
                 </div>
             </div>
-            <div class="col-4 d-flex flex-column align-items-center" *ngIf="bGiftcardCondition">
-                <span>{{ 'GIFTCARD' | translate }}</span>
-                <div class="d-flex flex-column w-50" *ngFor="let action of aActionSettings">
-                    <span
-                        *ngIf="(transaction.oCustomer.sEmail && transaction.oCustomer.sEmail != '' && action =='EMAIL') || action !='EMAIL'"
-                        [ngClass]="{'badge-info': action=='PRINT_THERMAL', 'badge-secondary': action =='EMAIL', 'badge-dark': action=='PRINT_PDF', 'badge-success': action=='DOWNLOAD' }"
-                        class="badge cursor-pointer my-2 py-2" (click)="performAction('giftcard', action)">
+            
+            <div class="col-4 d-flex flex-column align-items-center" *ngFor="let oGiftcard of aGiftcardItems; let i = index">
+                <span>{{ 'GIFTCARD' | translate }} {{ i+1 }}</span>
+                <div class="d-flex flex-column w-75" *ngFor="let action of aActionSettings">
+                    <button
+                        *ngIf="(oDataSource.oCustomer.sEmail && oDataSource.oCustomer.sEmail != '' && action =='EMAIL') || action !='EMAIL'"
+                        [ngClass]="{'btn-info': action=='PRINT_THERMAL', 'btn-secondary': action =='EMAIL', 'btn-dark': action=='PRINT_PDF', 'btn-success': action=='DOWNLOAD' }"
+                        class="btn btn-sm my-2" 
+                        (click)="performAction('giftcard', action, i, $event)">
                         {{action | translate }}
-                    </span>
+                    </button>
                 </div>
             </div>
+            
         </div>
-        <div class="row mt-5" *ngIf="nRepairCount > 0">
+        <div class="row mt-5" *ngIf="nRepairCount > 0 || bOrderCondition">
             <div class="col-12">
                 <table class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border">
                     <thead class="bg-gray-100">
                         <tr class="fw-bold fs-6 text-gray-800">
-                            <th class="ps-9">{{'REPAIR_TITLE' | translate}}</th>
-                            <th class="text-center">{{'FOR_REPAIR' | translate}}</th>
-                            <th class="text-center">{{'FOR_REPAIR_ALTERNATIVE' | translate}}</th>
+                            <th class="ps-9 mw-150px">{{'SERVICE_TITLE' | translate}}</th> <!--REPAIR_TITLE-->
+                            <th class="text-center">{{'FOR_SERVICE_RECEIPT' | translate}}</th> <!--FOR_REPAIR-->
+                            <th class="text-center">{{'FOR_SERVICE_ALTERNATIVE_RECEIPT' | translate}}</th> <!--FOR_REPAIR_ALTERNATIVE-->
                         </tr>
                     </thead>
                     <tbody>
                         <tr class="p-2" *ngFor="let item of aRepairItems, let i = index">
-                            <td class="ps-9">{{item.sProductName}}</td>
+                            <td class="ps-9 mw-150px">
+                                <p class="mb-2">{{item.sProductName}}</p>
+                                <span class="badge badge-info" style="text-transform: capitalize;">
+                                    {{item.oType.eKind}}
+                                </span>
+                            </td>
                             <td class="ps-9 text-center">
                                 <ng-container *ngFor="let action of aActionSettings">
-                                    <span
-                                        *ngIf="(transaction.oCustomer.sEmail && transaction.oCustomer.sEmail != '' && action =='EMAIL') || action !='EMAIL'"
-                                        [ngClass]="{'badge-info': action=='PRINT_THERMAL', 'badge-secondary': action =='EMAIL', 'badge-dark': action=='PRINT_PDF', 'badge-success': action=='DOWNLOAD' }"
-                                        class="badge cursor-pointer mx-2 my-2"
-                                        (click)="performAction('repair', action, i)">
+                                    <button
+                                        *ngIf="(oDataSource.oCustomer.sEmail && oDataSource.oCustomer.sEmail != '' && action =='EMAIL') || action !='EMAIL'"
+                                        [ngClass]="{'btn-info': action=='PRINT_THERMAL', 'btn-secondary': action =='EMAIL', 'btn-dark': action=='PRINT_PDF', 'btn-success': action=='DOWNLOAD' }"
+                                        class="btn btn-sm mx-2 my-2"
+                                        (click)="performAction('repair', action, i, $event)">
                                         {{action | translate }}
-                                    </span>
+                                    </button>
                                 </ng-container>
                             </td>
                             <td class="ps-9 text-center">
                                 <ng-container *ngFor="let action of aActionSettings">
-                                    <span
-                                        *ngIf="(transaction.oCustomer.sEmail && transaction.oCustomer.sEmail != '' && action =='EMAIL') || action !='EMAIL'"
-                                        [ngClass]="{'badge-info': action=='PRINT_THERMAL', 'badge-secondary': action =='EMAIL', 'badge-dark': action=='PRINT_PDF', 'badge-success': action=='DOWNLOAD' }"
-                                        class="badge cursor-pointer mx-2 my-2"
-                                        (click)="performAction('repair_alternative', action, i)">
+                                    <button
+                                        *ngIf="(oDataSource.oCustomer.sEmail && oDataSource.oCustomer.sEmail != '' && action =='EMAIL') || action !='EMAIL'"
+                                        [ngClass]="{'btn-info': action=='PRINT_THERMAL', 'btn-secondary': action =='EMAIL', 'btn-dark': action=='PRINT_PDF', 'btn-success': action=='DOWNLOAD' }"
+                                        class="btn btn-sm mx-2 my-2"
+                                        (click)="performAction('repair_alternative', action, i, $event)">
                                         {{action | translate }}
-                                    </span>
+                                    </button>
                                 </ng-container>
                             </td>
                         </tr>
@@ -133,7 +143,8 @@
     </div>
 
     <div class="card-footer">
-        <div class="text-end" *ngIf="transaction">
+        <div class="text-end" *ngIf="oDataSource">
+            <button class="btn btn-info mx-2" (click)="openTransactionDetail()">{{'OPEN' | translate}} </button>
             <button type="button" class="btn btn-primary" (click)="close(false)">{{"FINISH" | translate}}</button>
         </div>
     </div>

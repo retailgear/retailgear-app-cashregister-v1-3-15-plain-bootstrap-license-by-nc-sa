@@ -1,0 +1,178 @@
+<div class="card shadow-lg">
+    <div class="card-header align-items-center py-5">
+        <h4 class="card-title">{{'CHOOSE_ADDRESSES_TO_USE' | translate}}</h4>
+        
+        <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+            <a class="cancel my-auto" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
+        </div>
+        
+    </div>
+    <div class="card-body main">
+        <ng-container *ngIf="mode === 'details'">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start" *ngIf="!editProfile">
+                                <div class="row">
+                                    <ng-select class="form-control form-control-solid p-0" [clearable]="false" [(ngModel)]="CustomerId" (change)="getCustomerAddress($event)">
+                                        <ng-option *ngFor="let customerdetail of customerList" [value]="customerdetail._id">
+                                            <p class="m-0" *ngIf="!customerdetail?.bIsCompany">{{customerdetail?.sFirstName || ''}} {{customerdetail?.sLastName || ''}}</p>
+                                            <p class="m-0" *ngIf="customerdetail?.bIsCompany">{{customerdetail?.sCompanyName || ''}}</p>
+                                        </ng-option>
+                                    </ng-select>
+                                </div>
+                                
+                                <div class="">
+                                    <h4 class="text-gray-700 fw-bolder mb-2">{{'SHIPPING_ADDRESS' | translate}}</h4>
+                                    <div class="" *ngIf="customer.oShippingAddress">
+                                        <p>
+                                            {{ customer.oShippingAddress.sHouseNumber }}
+                                            {{ customer.oShippingAddress.sStreet }}<br>
+                                            {{ customer.oShippingAddress.sPostalCode }}
+                                            {{ customer.oShippingAddress.sCity }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <h4 class="text-gray-700 fw-bolder mb-2">{{'INVOICE_ADDRESS' | translate}}</h4>
+                                    <div class="" *ngIf="customer.oInvoiceAddress">
+                                        <p>
+                                            {{ customer.oInvoiceAddress.sHouseNumber }} -
+                                            {{ customer.oInvoiceAddress.sStreet }},<br>
+                                            {{ customer.oInvoiceAddress.sPostalCode }},
+                                            {{ customer.oInvoiceAddress.sCity }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+               
+                   
+                </div>
+            </div>
+            
+        </ng-container>
+        <ng-container *ngIf="mode === 'create' || (mode === 'details' && editProfile)">
+            <div class="row">
+                <div class="col-12">
+                    
+                    
+                    <div class="row">
+                        <ng-select class="form-control form-control-solid p-0" [clearable]="false" [(ngModel)]="CustomerId" (change)="getCustomerAddress($event)">
+                            <ng-option *ngFor="let customerdetail of customerList" [value]="customerdetail._id">
+                                <p class="m-0" *ngIf="!customerdetail?.bIsCompany">{{customerdetail?.sFirstName || ''}} {{customerdetail?.sLastName || ''}}</p>
+                                <p class="m-0" *ngIf="customerdetail?.bIsCompany">{{customerdetail?.sCompanyName || ''}}</p>
+                            </ng-option>
+                        </ng-select>
+                    </div>
+                   
+                    <div class="row">
+                        <div class="col-12 mt-6">
+                            <div class="d-flex justify-content-between align-items-center mb-6">
+                                <h3>{{'INVOICE_ADDRESS' | translate}}</h3>
+                                <div>
+                                    <button (click)="CopyInvoiceAddressToShipping()"
+                                        class="btn btn-sm btn-secondary">{{'COPY_TO_SHIPPING_ADDRESS' |
+                                        translate}}</button>
+                                    <!-- <mark>todo: make this button copy all invoice details to shipping details</mark> -->
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-7">
+                                    <input class="form-control" placeholder="{{'STREET' | translate}}"
+                                        [(ngModel)]="customer.oInvoiceAddress.sStreet" />
+                                </div>
+
+                                <div class="col-3">
+                                    <input class="form-control" placeholder="{{'HOUSE_NUMBER' | translate}}"
+                                        [(ngModel)]="customer.oInvoiceAddress.sHouseNumber" />
+                                </div>
+                                <div class="col-2">
+                                    <input class="form-control" placeholder="{{'HOUSE_NUMBER_SUFFIX' | translate}}"
+                                        [(ngModel)]="customer.oInvoiceAddress.sHouseNumberSuffix" />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    <input class="form-control" placeholder="{{'PSOTAL_CODE' | translate}}"
+                                        [(ngModel)]="customer.oInvoiceAddress.sPostalCode"
+                                        (ngModelChange)="customer.oInvoiceAddress.sPostalCode = $event.toUpperCase()" />
+                                </div>
+                                <div class="col-8">
+                                    <input class="form-control" placeholder="{{'CITY' | translate}}"
+                                        [(ngModel)]="customer.oInvoiceAddress.sCity" />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div>
+                                    <label class="required" for="country">{{'COUNTRY' | translate}}</label>
+                                    <country-list id="country" [country]="customer.oInvoiceAddress.sCountryCode"
+                                        [(ngModel)]="customer.oInvoiceAddress.sCountry" ngDefaultControl
+                                        (customerCountryChanged)="customerCountryChanged('oInvoiceAddress', $event)"
+                                        name="country"></country-list>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-12 mt-6">
+                            <h3>{{'SHIPPING_ADDRESS' | translate}}</h3>
+
+                            <div class="row mb-3">
+                                <div class="col-7">
+                                    <input class="form-control" placeholder="{{'STREET' | translate}}"
+                                        [(ngModel)]="customer.oShippingAddress.sStreet" />
+                                </div>
+
+                                <div class="col-3">
+                                    <input class="form-control" placeholder="{{'HOUSE_NUMBER' | translate}}"
+                                        [(ngModel)]="customer.oShippingAddress.sHouseNumber" />
+                                </div>
+                                <div class="col-2">
+                                    <input class="form-control" placeholder="{{'HOUSE_NUMBER_SUFFIX' | translate}}"
+                                        [(ngModel)]="customer.oShippingAddress.sHouseNumberSuffix" />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    <input class="form-control" placeholder="{{'POSTAL_CODE' | translate}}"
+                                        [(ngModel)]="customer.oShippingAddress.sPostalCode"
+                                        (ngModelChange)="customer.oShippingAddress.sPostalCode = $event.toUpperCase()" />
+                                </div>
+                                <div class="col-8">
+                                    <input class="form-control" placeholder="{{'CITY' | translate}}"
+                                        [(ngModel)]="customer.oShippingAddress.sCity" />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div>
+                                    <label class="required" for="s_country">{{'COUNTRY' | translate}}</label>
+                                    <country-list id="s_country" [country]="customer.oShippingAddress.sCountryCode"
+                                        [(ngModel)]="customer.oShippingAddress.sCountry" ngDefaultControl
+                                        (customerCountryChanged)="customerCountryChanged('oShippingAddress', $event)"
+                                        name="country"></country-list>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </ng-container>
+    </div>
+    
+    <div class="card-footer d-flex justify-content-end align-items-center">
+      
+        <button class="btn btn-primary"  (click)="EditOrCreateCustomer()">
+            {{'SAVE_AND_CLOSE' | translate}}
+        </button>
+    </div>
+    
+</div>

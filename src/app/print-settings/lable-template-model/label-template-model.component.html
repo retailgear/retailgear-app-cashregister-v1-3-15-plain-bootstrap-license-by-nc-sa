@@ -2,10 +2,10 @@
   <div class="card-header" style="margin-top: 20px;">
     <h4>{{ mode==='create'?'CREATE_NEW_LABEL_TEMPLATE':'EDIT_LABEL_TEMPLATE' | translate}}</h4>
     <div>
-      <button type="button" class="btn btn-sm btn-light" (click)="close(false)">
-        <fa-icon [icon]="faTimes"></fa-icon>
-      </button>
-    </div>
+      <a class="cancel my-auto" (click)="close(false)">
+          <i class="fa fa-times fabutton"></i>
+      </a>
+  </div>
   </div>
   <div class="card-body py-3">
     <div class="row">
@@ -25,7 +25,7 @@
     </div>
 
   </div>
-  <div class="card-footer d-flex justify-content-end">
+  <div class="card-footer d-flex justify-content-end" *ngIf="eType != 'tspl' ">
     <button class="btn btn-primary" type="submit" (click)="preview()">{{ 'PREVIEW' |
       translate}}</button>
   </div>

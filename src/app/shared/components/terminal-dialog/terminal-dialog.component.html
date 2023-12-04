@@ -8,8 +8,8 @@
             </button>
         </div>
     </div>
-    <div class="card-body row">
-        <table>
+    <div class="card-body">
+        <table class="w-100">
             <thead>
                 <th>{{"PAYMENT_METHOD" | translate}}</th>
                 <th>{{"AMOUNT" | translate}}</th>
@@ -21,25 +21,30 @@
                 <tr *ngFor="let paymethod of cardPayments; index as i">
                     <td>{{paymethod.sCardName? paymethod.sName +"("+paymethod.sCardName+")":
                         paymethod.sName}}</td>
-                    <td>{{paymethod.amount | currency: '€'}}</td>
+                    <td>{{paymethod.amount | currencyFormat: tillService.currency:tillService.separator}}</td>
                     <td>
-                        <button class="btn btn-primary w-80"
-                            (click)="restartPaymentTimer = 45; startTerminal(paymethod, i)"
-                            [disabled]="(restartPaymentTimer > 0 && 46 > restartPaymentTimer) || paymethod.status === 'SUCCESS'">
-                            <span *ngIf="paymethod.status !== 'PROGRESS'">
-                                {{ paymethod.status | translate}}
-                            </span>
-                            <span class="d-flex" *ngIf="paymethod.status === 'PROGRESS'">
-                                <fa-icon [icon]="faSpinner" class="fa-spin"></fa-icon>
-                                {{"RETRY_IN:("+restartPaymentTimer+")" | translate}}
-                            </span>
-                            <span *ngIf="paymethod.status === 'RETRY'">
-                                <fa-icon [icon]="faRefresh"></fa-icon>
-                            </span>
-                            <span *ngIf="paymethod.status === 'SUCCESS'">
-                                <fa-icon [icon]="faCheck"></fa-icon>
-                            </span>
-                        </button>
+                        <div class="d-flex">
+                            <ng-select [items]="aProviders" bindLabel="eName" bindValue="eName" [clearable]="false" [(ngModel)]="sSelectedProvider"
+                                (ngModelChange)="checkPaymentIntegration()">
+                            </ng-select>
+                            <button class="btn btn-primary btn-sm w-80 ms-2"
+                                (click)="restartPaymentTimer = 45; isProceed = false ; startTerminal(paymethod, i)"
+                                [disabled]="(restartPaymentTimer > 0 && 46 > restartPaymentTimer) || paymethod.status === 'SUCCESS' || !bEnable"> <!---->
+                                <span *ngIf="paymethod.status !== 'PROGRESS'">
+                                    {{ 'START' | translate}}
+                                </span>
+                                <span class="d-flex" *ngIf="paymethod.status === 'PROGRESS'">
+                                    <fa-icon [icon]="faSpinner" class="fa-spin"></fa-icon>
+                                    {{"RETRY_IN" | translate}} : ({{restartPaymentTimer}})
+                                </span>
+                                <span *ngIf="paymethod.status === 'RETRY'">
+                                    <fa-icon [icon]="faRefresh"></fa-icon>
+                                </span>
+                                <span *ngIf="paymethod.status === 'SUCCESS'">
+                                    <fa-icon [icon]="faCheck"></fa-icon>
+                                </span>
+                            </button>
+                        </div>
                     </td>
                     <td> <span>
                             {{ paymethod.remark | translate}}
@@ -50,44 +55,59 @@
                 </tr>
                 <tr *ngFor="let paymethod of otherPayments">
                     <td>{{paymethod.sName}}</td>
-                    <td>{{paymethod.amount | currency: '€'}}</td>
+                    <td>{{paymethod.amount | currencyFormat: tillService.currency:tillService.separator}}</td>
                     <td>
-                        <button class="btn btn-primary"> {{ "DONE" | translate}}</button>
+                        <button class="badge badge-light-primary"> {{ "DONE" | translate}}</button>
                     </td>
-                    <td>NA</td>
-                    <td>NA</td>
+                    <td>-</td>
+                    <td></td>
                 </tr>
             </tbody>
             <tfoot>
                 <tr>
-                    <td> {{"CHANGE(CASH)" | translate}}</td>
-                    <td> {{ -changeAmount | currency: '€' }}</td>
+                    <td class="p-2 ps-0">
+                        <div class="border-top border-dark"></div>
+                    </td>
                 </tr>
                 <tr>
-                    <td> {{"TOTAL" | translate}}</td>
-                    <td> {{ totalAmount - changeAmount | currency: '€' }}</td>
+                    <td> <p class="m-0 text-gray-700 fw-bolder">{{"CHANGE(CASH)" | translate}}</p></td>
+                    <td> {{ changeAmount | currencyFormat: tillService.currency:tillService.separator }}</td>
+                </tr>
+                <tr>
+                    <td> <p class="m-0 fw-bolder">{{"TOTAL" | translate}}</p></td>
+                    <td> {{ totalAmount | currencyFormat: tillService.currency:tillService.separator }}</td>
                 </tr>
             </tfoot>
         </table>
 
-        <div class="mt-2">
+        <div class="mt-3" *ngIf="cardPayments?.length">
+            <div>
+                <span class="text-danger fw-bolder mb-3" *ngIf="!bFetchingPaymentIntegrations && !bEnable">{{"NO_TERMINAL_SET_ON_THIS_WORKSTATION"|translate}}</span>
+                <div *ngIf="bFetchingPaymentIntegrations" class="spinner-border mx-auto"></div>
+            </div>
             <mat-progress-bar mode="determinate" [value]="progressValue" [ngClass]="progressClass"></mat-progress-bar>
             <div *ngIf="restartPaymentTimer > 0 && 46 > restartPaymentTimer">
                 <span class="mt-1 text-info">{{"CANCEL_THE_DEBIT_CARD_TRANSACTION"| translate}}</span>
                 <br>
                 <span class="text-danger"> *{{"DO_NOT_CLOSE_THIS_WINDOW"| translate}}.</span>
             </div>
-
         </div>
     </div>
 
     <div class="card-footer">
         <div class="btn-holder">
-            <button type="button" class="btn btn-secondary" *ngIf="!ifCardSuccess"
+            <button type="button" class="btn btn-secondary me-3" *ngIf="!ifCardSuccess"
                 [disabled]="restartPaymentTimer > 0 && 46 > restartPaymentTimer" (click)="close(false)">{{"CANCEL" |
                 translate}}</button>
-            <button type="button" class="btn btn-primary" (click)="continue()"
-                [disabled]="restartPaymentTimer > 0 && 46 > restartPaymentTimer">{{"PROCEED" | translate}}</button>
+            
+            <button *ngIf="nTotalPaidUpToNow == nItemsTotalToBePaid" class="btn btn-primary" (click)="continue()"
+                [disabled]="(restartPaymentTimer > 0 && restartPaymentTimer < 46) || isProceed ">
+                {{"PROCEED" | translate}}
+            </button>
+            <button *ngIf="nTotalPaidUpToNow != nItemsTotalToBePaid" class="btn btn-warning" (click)="continue()"
+                [disabled]="(restartPaymentTimer > 0 && restartPaymentTimer < 46) || isProceed ">
+                {{"PROCEED_WITH_PREPAYMENT" | translate}}
+            </button>
         </div>
     </div>
 </div>

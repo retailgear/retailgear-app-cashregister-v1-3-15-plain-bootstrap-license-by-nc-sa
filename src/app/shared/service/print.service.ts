@@ -82,7 +82,7 @@ export class PrintService {
    * @param {String|null} transactionId
    * @param {Object|null} options
    */
-  printPDF(businessId: string, doc: string, printer: string, computer: string, qty: number, transactionId: string | null, options: any | null) {
+  printPDF(businessId: string, doc: string, printer: string, computer: string, qty: number, transactionId: string | null, title:any, options: any | null) {
     return new Promise((onSuccess, onError) => {
       this.apiService.postNew('cashregistry', '/api/v1/printnode/', {
         iBusinessId: businessId,
@@ -92,6 +92,7 @@ export class PrintService {
         printerId: printer,
         computerId: computer,
         quantity: qty,
+        title:title,
         options: options,
         APIKEY: this.businessDetails?.oPrintNode?.sApiKey
       }).subscribe(
@@ -120,7 +121,7 @@ export class PrintService {
    * @param {Number} qty
    * @param {Object|null} options
    */
-  printRawContent(businessId: string, doc: any, printer: any, computer: any, qty: number, options: any | null, apikey:any ) {
+  printRawContent(businessId: string, doc: any, printer: any, computer: any, qty: number, title:any, options: any | null, apikey:any ) {
     return new Promise((onSuccess, onError) => {
       this.apiService.postNew('cashregistry', '/api/v1/printnode', {
         id: businessId,
@@ -130,6 +131,7 @@ export class PrintService {
         printerId: printer,
         computerId: computer,
         quantity: qty,
+        title:title,
         options: options, 
         APIKEY: apikey
       }).subscribe((result: any) => {
@@ -154,7 +156,21 @@ export class PrintService {
    * @param {String} printer
    * @param {String} computer
    */
-  openDrawer(businessId: string, command: any, printer: any, computer: any, apikey: any, title?:any) {
-    return this.printRawContent(businessId, command, printer, computer, 1, { title: title }, apikey)
+  createPrintJob(businessId: string, command: any, printer: any, computer: any, apikey: any, title?:any) {
+    return this.printRawContent(businessId, command, printer, computer, 1, title, { paper: '', rotation: '', title:title }, apikey)
+  }
+
+  openDrawer(businessId: string, command: any, printer: any, computer: any, apikey: any) {
+    return this.apiService.postNew('cashregistry', '/api/v1/printnode', {
+      id: businessId,
+      iBusinessId: businessId,
+      contentType: 'raw_base64',
+      content: command,
+      printerId: printer,
+      computerId: computer,
+      quantity: 1,
+      options: { title: 'Open drawer'},
+      APIKEY: apikey,
+    });
   }
 }

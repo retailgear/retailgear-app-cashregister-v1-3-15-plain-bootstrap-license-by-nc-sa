@@ -9,7 +9,7 @@
 @import './core/vendors/plugins/mixins';
 
 // Custom variables
-@import './components/variables.custom';
+// @import './components/variables.custom';
 @import './core/components/variables';
 
 // Bootstrap initializaton
@@ -19,7 +19,7 @@
 @import '~bootstrap/scss/utilities';
 
 // 3rd-Party plugins variables
-@import './core/vendors/plugins/variables';
+// @import './core/vendors/plugins/variables';
 
 // Custom layout variables
 @import 'layout/variables';

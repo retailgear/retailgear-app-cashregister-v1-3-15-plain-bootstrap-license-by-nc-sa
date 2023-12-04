@@ -1,10 +1,10 @@
-<div class="container">
+<div class="container p-4">
     <div class="row mb-5">
         <div class="col-md-12">
-            <div class="card card-flush">
-                <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+            <div class="card p-3">
+                <div class="align-items-center px-3 py-5 gap-2 gap-md-5">
                     <!-- FILTERS -->
-                    <div class="card-body">
+                    <div class="">
                         <div class="row">
                             <div class="col"></div>
                             <div class="col-3 text-end">
@@ -13,7 +13,6 @@
                                 </button>
                             </div>
                         </div>
-
 
                         <!-- HIDE FILTERS DURING CLOSING DAY STATE AND SHOW ONLY TEXT -->
                         <ng-container *ngIf="!iStatisticId">
@@ -28,16 +27,14 @@
                                                 translate}}</label>
                                             <input type="datetime-local"
                                                 class="form-control form-control form-control-solid" name="startDate"
-                                                [ngModel]="filterDates.startDate"
-                                                (ngModelChange)="filterDates.startDate = $event;" />
+                                                [(ngModel)]="filterDates.startDate" />
                                         </div>
                                         <!-- END_DATE -->
                                         <div class="col-md-6">
                                             <label class="fs-6 form-label fw-bolder text-dark">{{'END_DATE' |
                                                 translate}}</label>
                                             <input type="datetime-local" class="form-control form-control-solid"
-                                                name="endDate" [ngModel]="filterDates.endDate"
-                                                (ngModelChange)="filterDates.endDate = $event;" />
+                                                name="endDate" [(ngModel)]="filterDates.endDate" />
                                         </div>
                                     </div>
 
@@ -47,38 +44,91 @@
                                         <div class="col-md-6">
                                             <label class="fs-6 form-label fw-bolder text-dark">{{'FROM_STATE' |
                                                 translate}}</label>
-                                            <ng-select class="form-control form-control-solid p-0"
-                                                [(ngModel)]="statisticFilter.dFromState" [clearable]="false"
-                                                (change)="onStateChange($event, true, aDayClosure)">
-                                                <ng-option *ngFor="let oDayClosure of aDayClosure"
-                                                    [value]="oDayClosure.dOpenDate">
-                                                    {{oDayClosure?.dOpenDate | date: 'yyyy-MM-dd HH:mm'}} |
-                                                    {{oDayClosure?.sWorkStationName}}
-                                                </ng-option>
-                                            </ng-select>
+                                            <div class="w-100" *ngIf="bDayClosureLoading">
+                                                <div class="spinner-border mx-auto"></div>
+                                            </div>
+                                            <div *ngIf="!aDayClosure?.length && !bDayClosureLoading">{{
+                                                "DAY_CLOSURE_NOT_FOUND" | translate }}</div>
+                                            <div class="w-100" *ngIf="aDayClosure?.length">
+                                                <span>
+                                                    {{statisticFilter.dFromState | date: 'yyyy-MM-dd HH:mm'}}
+                                                </span>
+
+                                                <!-- <p>{{aLocation?.length}} ---- {{aCalendarEvent?.length}}</p> -->
+                                                <button type="button" (click)="openCalendar('FROM_STATE')"
+                                                    class="btn btn-info"
+                                                    [disabled]="!aLocation?.length || bDayClosureLoading">
+                                                    <i class="fa fa-calendar"></i>
+                                                </button>
+                                            </div>
                                         </div>
 
                                         <div class="col-md-6">
                                             <label class="fs-6 form-label fw-bolder text-dark">{{'TO_STATE' |
-                                                translate}}</label>
-                                            <ng-select class="form-control form-control-solid p-0"
-                                                [(ngModel)]="statisticFilter.dToState" [clearable]="false"
-                                                (change)="onStateChange($event, false, aDayClosure)">
-                                                <ng-option *ngFor="let oDayClosure of aDayClosure"
-                                                    [value]="oDayClosure.dCloseDate"
-                                                    [disabled]="oDayClosure?.isDisable ? true : false">
-                                                    {{oDayClosure?.dCloseDate | date: 'yyyy-MM-dd HH:mm' }} |
-                                                    {{oDayClosure?.sWorkStationName}}
-                                                </ng-option>
-                                            </ng-select>
+                                                translate}}
+                                            </label>
+                                            <div class="w-100" *ngIf="bDayClosureLoading">
+                                                <div class="spinner-border mx-auto"></div>
+                                            </div>
+                                            <div *ngIf="!aDayClosure?.length && !bDayClosureLoading">{{
+                                                "DAY_CLOSURE_NOT_FOUND" | translate }}</div>
+                                            <div class="w-100" *ngIf="aDayClosure?.length">
+                                                <span>
+                                                    {{statisticFilter.dToState | date: 'yyyy-MM-dd HH:mm'}}
+                                                </span>
+                                                <!-- <p>{{aLocation?.length}} ---- {{aCalendarEvent?.length}}</p> -->
+                                                <button type="button" (click)="openCalendar('TO_STATE')"
+                                                    class="btn btn-info"
+                                                    [disabled]="!aLocation?.length || bDayClosureLoading">
+                                                    <i class="fa fa-calendar"></i>
+                                                </button>
+                                            </div>
                                         </div>
 
                                     </div>
 
                                 </div>
-
                                 <!-- VIEW -->
                                 <div class="col-md-3 show menu-dropdown">
+                                    <label class="fs-6 form-label fw-bolder text-dark">{{'VIEW' | translate}}</label>
+                                    <ul class="custom-dropdown-menu bg-light">
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown_select_box" href="#" role="button" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                {{sSelectedOptionMenu ||'Select'}}
+                                            </a>
+                                            <ul class="dropdown-menu" *ngIf="aOptionMenu.length">
+                                                <li class="nav-item dropend" *ngFor="let parent of aOptionMenu">
+                                                    <a class="nav-link" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                                        [class.disabled]="parent.bDisable">
+                                                        <span><i class="bi bi-bar-chart me-2"></i> {{parent.sKey | translate}}</span>
+                                                        <span class="dropdown_icon fa fa-angle-right"></span>
+                                                    </a>
+                                                    <ul class="dropdown-menu" *ngIf="parent.children.length">
+                                                        <li class="nav-item dropend" *ngFor="let child1 of parent.children">
+                                                            <a class="nav-link" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                                                [class.disabled]="child1.bDisable">
+                                                                <span><i class="bi bi-bar-chart me-2"></i> {{child1.sValue}}</span>
+                                                                <span class="dropdown_icon fa fa-angle-right"></span>
+                                                            </a>
+                                                            <ul class="dropdown-menu" *ngIf="child1.children.length">
+                                                                <li class="nav-item dropend" *ngFor="let child2 of child1.children">
+                                                                    <a class="nav-link" (click)="onDropdownItemSelected(parent,child1,child2)"
+                                                                        role="button" [class.disabled]="child2.bDisable">
+                                                                        <span><i class="bi bi-circle me-2"></i> {{child2.sValue}}</span>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- VIEW -->
+                                <div class="col-md-3 show menu-dropdown" *ngIf="false">
                                     <label class="fs-6 form-label fw-bolder text-dark">{{'VIEW' | translate}}</label>
                                     <!--begin::Menu-->
                                     <div class="menu menu-rounded menu-column menu-gray-600 menu-state-bg fw-semibold form-control form-control-solid"
@@ -101,7 +151,7 @@
                                                     <div class="menu-item" data-kt-menu-trigger="hover"
                                                         data-kt-menu-placement="right-start">
                                                         <!--begin::Menu link-->
-                                                        <a class="menu-link py-3">
+                                                        <a class="menu-link py-3" [class.disabled]="parent.bDisable">
                                                             <span class="menu-icon">
                                                                 <i class="bi bi-bar-chart fs-3"></i>
                                                             </span>
@@ -119,7 +169,8 @@
                                                                         class="menu-item" data-kt-menu-trigger="hover"
                                                                         data-kt-menu-placement="right-start">
                                                                         <!--begin::Menu link-->
-                                                                        <a class="menu-link py-3">
+                                                                        <a class="menu-link py-3"
+                                                                            [class.disabled]="child1.bDisable">
                                                                             <span class="menu-icon">
                                                                                 <i class="bi bi-bar-chart fs-3"></i>
                                                                             </span>
@@ -136,7 +187,8 @@
                                                                             <div *ngFor="let child2 of child1.children"
                                                                                 class="menu-item">
                                                                                 <a (click)="onDropdownItemSelected(parent,child1,child2)"
-                                                                                    class="menu-link px-1 py-3">
+                                                                                    class="menu-link px-1 py-3"
+                                                                                    [class.disabled]="child2.bDisable">
                                                                                     <span class="menu-bullet me-0">
                                                                                         <span
                                                                                             class="bullet bullet-dot"></span>
@@ -173,110 +225,104 @@
                                 </div>
 
                                 <!-- LOCATION -->
-                                <div class="col-md-3">
+                                <div class="col-md-3" *ngIf="statisticFilter.eChosenStateCreationType !== 'migration'">
                                     <label class="fs-6 form-label fw-bolder text-dark">{{'LOCATION' |
                                         translate}}</label>
+                                    <div class="w-100" *ngIf="!aLocation?.length">
+                                        <div class="spinner-border mx-auto"></div>
+                                    </div>
                                     <div class="w-100" *ngIf="aLocation?.length">
-                                        <ng-select [multiple]="true" [items]="aLocation" [(ngModel)]="aSelectedLocation"
-                                            name="iLocationId" bindValue="_id" bindLabel="sName" placeholder="Select"
-                                            required [closeOnSelect]="false" (change)="fetchAuditStatistic()">
-
-                                            <ng-template ng-option-tmp let-item="item" let-item$="item$"
-                                                let-index="index">
-                                                <input id="item-{{index}}" type="checkbox" name="item-{{index}}"
-                                                    [ngModel]="item$.selected" />
-                                                {{item.sName}}
-                                            </ng-template>
-
+                                        <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+                                            [(ngModel)]="aSelectedLocation" (change)="onChangeDropdown()"
+                                            [clearable]="false">
+                                            <ng-option *ngFor="let location of aLocation"
+                                                [value]="location._id">{{location.sName}}</ng-option>
                                         </ng-select>
-
                                     </div>
                                 </div>
+
                             </div>
 
                             <div class="row mb-5">
                                 <!-- EMPLOYEE -->
-                                <div class="col-md-6">
-                                    <div class="row mb-5">
-                                        <div class="col-md-6">
-                                            <label class="fs-6 form-label fw-bolder text-dark">{{'EMPLOYEE' |
-                                                translate}}</label>
-                                            <ng-select class="form-control form-control-solid p-0"
-                                                [(ngModel)]="selectedEmployee" (ngModelChange)="checkShowDownload()"
-                                                [clearable]="false">
-                                                <ng-option *ngFor="let oEmployee of aEmployee" [value]="oEmployee">
-                                                    {{oEmployee.sFirstName + ' ' +oEmployee.sLastName}}
-                                                </ng-option>
-                                            </ng-select>
-                                        </div>
-                                        <!-- WORK_STATION -->
-                                        <div class="col-md-6">
-                                            <label class="fs-6 form-label fw-bolder text-dark">{{'WORK_STATION' |
-                                                translate}}</label>
+                                <div class="col-3" *ngIf="statisticFilter.eChosenStateCreationType !== 'migration'">
+                                    <label class="fs-6 form-label fw-bolder text-dark">{{'EMPLOYEE' |
+                                        translate}}</label>
+                                    <ng-select class="form-control form-control-solid p-0"
+                                        [(ngModel)]="selectedEmployee" (ngModelChange)="checkShowDownload()"
+                                        [clearable]="false">
+                                        <ng-option *ngFor="let oEmployee of aEmployee" [value]="oEmployee">
+                                            {{oEmployee.sFirstName + ' ' +oEmployee.sLastName}}
+                                        </ng-option>
+                                    </ng-select>
+                                </div>
 
-                                            <ng-select [multiple]="true" [items]="aWorkStation"
-                                                [(ngModel)]="selectedWorkStation" name="selectedWorkStation"
-                                                bindValue="_id" bindLabel="sName" placeholder="Select" required
-                                                [closeOnSelect]="false" (change)="fetchAuditStatistic()">
+                                <div class="col-6" *ngIf="IsDynamicState">
+                                    <label class="fs-6 form-label fw-bolder text-dark">{{'BUSINESS_PARTNER' |
+                                        translate}}</label>
+                                    <ng-select class="form-control p-0" [multiple]="true"
+                                        [(ngModel)]="aSelectedBusinessPartnerId" [clearable]="true" bindValue="_id"
+                                        bindLabel="sName" [items]="aBusinessPartners">
+                                    </ng-select>
+                                </div>
 
-                                                <ng-template ng-option-tmp let-item="item" let-item$="item$"
-                                                    let-index="index">
-                                                    <input id="item-{{index}}" type="checkbox" name="item-{{index}}"
-                                                        [ngModel]="item$.selected" />
-                                                    {{item.sName}}
-                                                </ng-template>
+                                <!-- WORK_STATION -->
+                                <div class="col-3" *ngIf="sDayClosureMethod === 'workstation' || IsDynamicState">
+                                    <label class="fs-6 form-label fw-bolder text-dark">{{'WORK_STATION' |
+                                        translate}} </label>
+                                    <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+                                        [(ngModel)]="selectedWorkStation" (change)="onChangeDropdown()"
+                                        [clearable]="false">
+                                        <ng-option *ngFor="let workstation of aWorkStation"
+                                            [value]="workstation._id">{{workstation.sName}}
+                                        </ng-option>
+                                    </ng-select>
+                                </div>
+                            </div>
 
-                                            </ng-select>
+                            <div class="row mb-5">
+                                <!-- PROPERTIES -->
+                                <div class="col-6" *ngIf="bShowProperty">
+                                    <label class="fs-6 form-label fw-bolder text-dark">{{ "PROPERTIES" |
+                                        translate}}</label>
+                                    <div class="overflow-scroll py-1 h-200px">
 
+                                        <div *ngFor="let property of aProperty; let pIndex = index">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-4">
+                                                    <div>{{property?.sPropertyName | translate}}</div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div *ngIf="propertyOptions[property.iPropertyId]?.length">
+                                                        <ng-select class="w-100" [multiple]="true"
+                                                            [items]="propertyOptions[property.iPropertyId]"
+                                                            [(ngModel)]="selectedProperties[property.iPropertyId]"
+                                                            name="propertyId" bindValue="sName" bindLabel="sName"
+                                                            placeholder="Select"
+                                                            (click)="onProperties(property.iPropertyId)" required
+                                                            [closeOnSelect]="false">
+
+                                                            <ng-template ng-option-tmp let-item="item" let-item$="item$"
+                                                                let-index="index">
+                                                                <input id="item-{{index}}" type="checkbox"
+                                                                    name="item-{{index}}" [ngModel]="item$.selected" />
+                                                                {{item.sName}}
+                                                            </ng-template>
+
+                                                        </ng-select>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br>
                                         </div>
                                     </div>
                                 </div>
-
-                                <ng-container>
-                                    <!-- PROPERTIES -->
-                                    <div class="col-md-6" *ngIf="bShowProperty">
-                                        <label class="fs-6 form-label fw-bolder text-dark">{{ "PROPERTIES" |
-                                            translate}}</label>
-                                        <div class="overflow-scroll py-1 h-200px">
-
-                                            <div *ngFor="let property of aProperty; let pIndex = index">
-                                                <div class="row align-items-center">
-                                                    <div class="col-md-4">
-                                                        <div>{{property?.sPropertyName | translate}}</div>
-                                                    </div>
-                                                    <div class="col-md-8">
-                                                        <div *ngIf="propertyOptions[property.iPropertyId]?.length">
-                                                            <ng-select class="w-100" [multiple]="true"
-                                                                [items]="propertyOptions[property.iPropertyId]"
-                                                                [(ngModel)]="selectedProperties[property.iPropertyId]"
-                                                                name="propertyId" bindValue="sName" bindLabel="sName"
-                                                                placeholder="Select"
-                                                                (click)="onProperties(property.iPropertyId)" required
-                                                                [closeOnSelect]="false">
-
-                                                                <ng-template ng-option-tmp let-item="item"
-                                                                    let-item$="item$" let-index="index">
-                                                                    <input id="item-{{index}}" type="checkbox"
-                                                                        name="item-{{index}}"
-                                                                        [ngModel]="item$.selected" />
-                                                                    {{item.sName}}
-                                                                </ng-template>
-
-                                                            </ng-select>
-
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <br>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </ng-container>
                             </div>
 
                             <div class="row mb-5">
                                 <ng-container
-                                    *ngIf="sDisplayMethod === this.edisplayMethodKeysEnum.revenuePerBusinessPartner || sDisplayMethod === this.edisplayMethodKeysEnum.revenuePerArticleGroupAndProperty ">
+                                    *ngIf="sDisplayMethod === this.edisplayMethodKeysEnum.revenuePerBusinessPartner || sDisplayMethod === this.edisplayMethodKeysEnum.revenuePerArticleGroupAndProperty">
                                     <!-- LEVEL_FILTER -->
                                     <div class="col-md-3">
                                         <label class="fs-6 form-label fw-bolder text-dark">{{ "LEVEL_FILTER" |
@@ -317,6 +363,8 @@
                                 </ng-container>
 
                                 <!-- SHOW_DYNAMIC_STATE -->
+
+                                <!-- hide temporary -->
                                 <div class="col-md-3">
                                     <label class="fs-6 form-label fw-bolder text-dark">{{'SHOW_DYNAMIC_STATE' |
                                         translate}}</label>
@@ -354,7 +402,7 @@
                                         <span class="col-8"> {{ oStatisticsData.dStartDate | date:'medium' }}
                                         </span>
                                     </p>
-                                    <p class="row" *ngIf="bDisableCountings">
+                                    <p class="row" *ngIf="bDayStateClosed">
                                         <span class="col-4 fw-bolder">{{ "END_DATE" | translate}} : </span>
                                         <span class="col-8"> {{ oStatisticsData.dEndDate | date:'medium' }} </span>
                                     </p>
@@ -400,527 +448,359 @@
                     </div>
                 </div>
 
-                <div *ngIf="aStatistic?.length">
-
+                <div class="card p-3" *ngIf="aStatistic?.length">
                     <!-- LOAD DATA -BEGINS -->
-                    <div class="container">
+                    <div>
+                        <div class="row" *ngIf="aStatistic[0]?.overall?.length">
+                            <div class="col-md-4">
+                                <span>{{ 'QUANTITY' | translate}}</span>
+                                <h3 class="text-black">{{ nTotalQuantity }}</h3>
+                            </div>
+                            <div class="col-md-4">
+                                <span>{{ 'TOTAL' | translate}}</span>
+                                <h3 class="text-black">{{ nTotalRevenue | currency: auditService.currency }}</h3>
+                            </div>
+                            <div class="col-md-4">
+                                <strong *ngIf="!IsDynamicState">{{ 'STATIC_DATA' | translate }}</strong>
+                                <strong *ngIf="IsDynamicState">{{ 'DYNAMIC_DATA' | translate }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <ng-container *ngIf="bShowDownload">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="d-flex justify-content-end align-items-center">
+                                    <ng-container *ngIf="pdfGenerationInProgress">
+                                        <div class="spinner-border mx-2"></div>
+                                    </ng-container>
+                                    <div class="btn-group">
+                                        <button class="btn btn-primary fs-bold mx-2">
+                                            <span class="indicator-label" (click)="exportToPDF()">{{
+                                                "DOWNLOAD_COMPACT" | translate }}</span>
+                                        </button>
 
-                        <div>
-                            <div class="row" *ngIf="aStatistic[0]?.overall?.length">
-                                <div class="col-md-4">
-                                    <span class="">{{ 'QUANTITY' | translate}}</span>
-                                    <h3 class="text-black">{{aStatistic[0].overall[0].nQuantity}}</h3>
-                                </div>
-                                <div class="col-md-4">
-                                    <span class="">{{ 'TOTAL' | translate}}</span>
-                                    <h3 class="text-black">{{aStatistic[0].overall[0].nTotalRevenue}}</h3>
-                                </div>
-                                <div class="col-md-4">
-                                    <strong *ngIf="!IsDynamicState">{{ 'STATIC_DATA' | translate }}</strong>
-                                    <strong *ngIf="IsDynamicState">{{ 'DYNAMIC_DATA' | translate }}</strong>
+                                        <button class="btn btn-primary btn-icon fs-bold d-flex justify-content-between align-items-center" role="button">
+                                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-200px py-2"
+                                                data-kt-menu="true">
+                                                <div class="menu-item px-3 text-center">
+                                                    <div class="menu-link px-3" (click)="exportToPDF('detailed')">{{
+                                                        'DOWNLOAD_DETAILED' | translate }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="btn btn-icon" data-kt-menu-trigger="hover"
+                                                data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end"
+                                                data-kt-menu-flip="bottom">
+                                                <span class="svg-icon svg-icon-2 m-0">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                        viewBox="0 0 24 24" fill="none">
+                                                        <path
+                                                            d="M11.4343 12.7344L7.25 8.55005C6.83579 8.13583 6.16421 8.13584 5.75 8.55005C5.33579 8.96426 5.33579 9.63583 5.75 10.05L11.2929 15.5929C11.6834 15.9835 12.3166 15.9835 12.7071 15.5929L18.25 10.05C18.6642 9.63584 18.6642 8.96426 18.25 8.55005C17.8358 8.13584 17.1642 8.13584 16.75 8.55005L12.5657 12.7344C12.2533 13.0468 11.7467 13.0468 11.4343 12.7344Z"
+                                                            fill="black"></path>
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <hr>
-                        <ng-container *ngIf="bShowDownload">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="d-flex justify-content-end align-items-center">
-                                        <ng-container *ngIf="pdfGenerationInProgress">
-                                            <div class="spinner-border mx-2"></div>
-                                        </ng-container>
-                                        <button class="btn btn-primary" (click)="exportToPDF()">{{ 'DOWNLOAD' | translate}}</button>
-                                    </div>
+                    </ng-container>
+
+                    <div class="row">
+
+                        <div class="overflow-y-auto p-0" *ngIf="sDisplayMethod === 'revenuePerBusinessPartner'">
+                            <section>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong> {{ 'REVENUE_PER_BUSINESS_PARTNER' | translate}}</strong>
                                 </div>
-                            </div>
-                        </ng-container>
-
-                        <div class="row">
-
-                            <div class="card overflow-y-auto" *ngIf="sDisplayMethod === 'revenuePerBusinessPartner'">
-                                <p> {{ 'REVENUE_PER_BUSINESS_PARTNER' | translate}} </p>
-                                <div class="card-body">
-                                    <div class="table-responsive"
-                                        *ngFor="let oStatistic of aStatistic; let statisticIndex = index">
-                                        <table
-                                            class="table table-rounded border border-gray-300 table-row-bordered table-row-gray-300 gy-5 gs-5 text-gray-600"
-                                            *ngFor="let oSupplier of oStatistic.individual; let supplierIndex = index">
-                                            <thead>
-                                                <tr>
-                                                    <th><span class="">{{ 'SUPPLIER' | translate}}</span>
-                                                        <h3 class="text-black">{{oSupplier.sBusinessPartnerName}}</h3>
-                                                    </th>
-                                                    <th class="w-150px"><span class="">{{"QUANTITY" | translate}}</span>
-                                                        <h4 class="text-black">{{oSupplier.nQuantity}}</h4>
-                                                    </th>
-                                                    <th class="w-150px"><span class="">{{"PRICE_WITH_VAT" |
-                                                            translate}}</span>
-                                                        <h4 class="text-black">{{oSupplier.nTotalRevenue | number
-                                                            :'1.2-2'}}</h4>
-                                                    </th>
-                                                    <th class="w-150px"><span class="">{{"PURCHASE_PRICE" |
-                                                            translate}}</span>
-                                                        <h4 class="text-black">{{oSupplier.nTotalPurchaseAmount | number
-                                                            :'1.2-2'}}</h4>
-                                                    </th>
-                                                    <th class="w-150px"><span class="">{{"GROSS_PROFIT" |
-                                                            translate}}</span>
-                                                        <h4 class="text-black">{{oSupplier.nProfit | number :'1.2-2'}}
-                                                        </h4>
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td colspan="6" class="p-2">
-                                                        <table
-                                                            class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border"
-                                                            *ngFor="let oArticleGroup of oSupplier.aArticleGroups; let articleGroupIndex = index">
-                                                            <!-- start of articlegroup -->
-                                                            <thead class="bg-gray-100">
-                                                                <tr class="fw-bold fs-6 text-gray-800">
-                                                                    <th scope="col">{{oArticleGroup.sName}}
-                                                                        <div class="mx-5">
-                                                                            <i *ngIf="!oArticleGroup.bIsCollapseItem"
-                                                                                class="px-sm-2 cursor-pointer bi bi-chevron-down"
-                                                                                (click)="oArticleGroup.bIsCollapseItem = true;">
-                                                                            </i>
-                                                                            <i *ngIf="oArticleGroup.bIsCollapseItem"
-                                                                                class="px-sm-2 cursor-pointer bi bi-chevron-up"
-                                                                                (click)="oArticleGroup.bIsCollapseItem = false;"></i>
-                                                                        </div>
-                                                                    </th>
-                                                                    <th scope="col" class="w-150px">
-                                                                        {{oArticleGroup.nQuantity}}</th>
-                                                                    <th scope="col" class="w-150px">
-                                                                        {{oArticleGroup.nTotalRevenue | number
-                                                                        :'1.2-2'}}
-                                                                    </th>
-                                                                    <th scope="col" class="w-150px">
-                                                                        {{oArticleGroup.nTotalPurchaseAmount | number
-                                                                        :'1.2-2'}}
-                                                                    </th>
-                                                                    <th scope="col" class="w-150px">
-                                                                        {{oArticleGroup.nProfit| number :'1.2-2'}}</th>
-
-                                                                </tr>
-                                                            </thead>
-                                                            <ng-container
-                                                                *ngIf="oArticleGroup.aRevenueByProperty.length && oArticleGroup.bIsCollapseItem">
-                                                                <tbody class="p-2"
-                                                                    *ngFor="let oRevenueByProperty of oArticleGroup.aRevenueByProperty; let revenuePropertyIndex = index">
-                                                                    <!--start of dyamic property -->
-                                                                    <tr>
-                                                                        <td class="ps-9">
-                                                                            {{oRevenueByProperty.aCategory.join(' |')}}
-                                                                        </td>
-                                                                        <td>{{oRevenueByProperty.nQuantity}}</td>
-                                                                        <td>{{oRevenueByProperty.nTotalRevenue | number
-                                                                            :'1.2-2'}}</td>
-                                                                        <td>{{oRevenueByProperty.nTotalPurchaseAmount |
-                                                                            number :'1.2-2'}}
-                                                                        </td>
-                                                                        <td>{{oRevenueByProperty.nProfit| number
-                                                                            :'1.2-2'}}</td>
-                                                                        <td>{{oRevenueByProperty.nMargin}}</td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </ng-container>
-                                                            <!-- start of articlegroup -->
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card" *ngIf="sDisplayMethod === 'revenuePerSupplierAndArticleGroup'">
-                                <p> {{ 'REVENUE_PER_SUPPLIER_AND_ARTICLE_GROUP' | translate}} </p>
-                                <div class="card-body">
-                                    <div class="table-responsive" *ngFor="let oStatistic of aStatistic; let i = index">
-                                        <table
-                                            class="table table-rounded border border-gray-300 table-row-bordered table-row-gray-300 gy-5 gs-5 text-gray-600"
-                                            *ngFor="let oSupplier of oStatistic.individual; let supplierIndex = index">
-                                            <thead>
-                                                <tr>
-                                                    <th><span class="">{{ 'SUPPLIER' | translate}}</span>
-                                                        <h3 class="text-black">{{oSupplier.sBusinessPartnerName}}</h3>
-                                                    </th>
-                                                    <th class="w-150px"><span class="">{{"QUANTITY" | translate}}</span>
-                                                        <h4 class="text-black">{{oSupplier.nQuantity}}</h4>
-                                                    </th>
-                                                    <th class="w-150px"><span class="">{{"PRICE_WITH_VAT" |
-                                                            translate}}</span>
-                                                        <h4 class="text-black">{{oSupplier.nTotalRevenue | number
-                                                            :'1.2-2'}}</h4>
-                                                    </th>
-                                                    <th class="w-150px"><span class="">{{"PURCHASE_PRICE" |
-                                                            translate}}</span>
-                                                        <h4 class="text-black">{{oSupplier.nTotalPurchaseAmount | number
-                                                            :'1.2-2'}}</h4>
-                                                    </th>
-                                                    <th class="w-150px"><span class="">{{"GROSS_PROFIT" |
-                                                            translate}}</span>
-                                                        <h4 class="text-black">{{oSupplier.nProfit | number :'1.2-2' }}
-                                                        </h4>
-                                                    </th>
-
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                <tr>
-                                                    <td colspan="6" class="p-2">
-                                                        <table
-                                                            class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border"
-                                                            *ngFor="let oArticleGroup of oSupplier.aArticleGroups; let articleGroupIndex = index">
-                                                            <thead class="bg-gray-100">
-                                                                <tr class="fw-bold fs-6 text-gray-800">
-                                                                    <th scope="col">
-                                                                        <div
-                                                                            class="d-flex justify-content-between align-items-center">
-                                                                            {{oArticleGroup.sName}}
-                                                                            <div class="mx-5">
-                                                                                <i *ngIf="!oArticleGroup.bIsCollapseItem"
-                                                                                    class="px-sm-2 cursor-pointer bi bi-chevron-down"
-                                                                                    (click)="expandItem(oArticleGroup, oSupplier.iBusinessPartnerId, 'articlegroup')">
-                                                                                </i>
-                                                                                <i *ngIf="oArticleGroup.bIsCollapseItem"
-                                                                                    class="px-sm-2 cursor-pointer bi bi-chevron-up"
-                                                                                    (click)="oArticleGroup.bIsCollapseItem = !oArticleGroup.bIsCollapseItem"></i>
-                                                                            </div>
-                                                                        </div>
-
-                                                                    </th>
-                                                                    <th scope="col" class="w-150px">
-                                                                        {{oArticleGroup.nQuantity}}</th>
-                                                                    <th scope="col" class="w-150px">
-                                                                        {{oArticleGroup.nTotalRevenue | number
-                                                                        :'1.2-2'}}
-                                                                    </th>
-                                                                    <th scope="col" class="w-150px">
-                                                                        {{oArticleGroup.nTotalPurchaseAmount | number
-                                                                        :'1.2-2'}}
-                                                                    </th>
-                                                                    <th scope="col" class="w-150px">
-                                                                        {{oArticleGroup.nProfit | number :'1.2-2'}}</th>
-
-                                                                </tr>
-                                                                <tr *ngIf="oArticleGroup.isLoading">
-                                                                    <td colspan="6" class="text-center">
-                                                                        <div class="spinner-border mx-auto">
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                                <ng-container *ngIf="oArticleGroup.bIsCollapseItem">
-                                                                    <tr class="bg-white"
-                                                                        *ngFor="let item of oArticleGroup.aTransactionItems">
-                                                                        <td> {{item.sProductName ||
-                                                                            item?.sProductNumber}} </td>
-                                                                        <td> {{ item.nQuantity }}</td>
-                                                                        <td> {{ item.nRevenueAmount | number :'1.2-2' }}
-                                                                        </td>
-                                                                        <td> {{ item.nCostOfRevenue | number :'1.2-2' }}
-                                                                        </td>
-                                                                        <td> {{item.nProfitOfRevenue | number :'1.2-2'}}
-                                                                        </td>
-                                                                        <td></td>
-                                                                    </tr>
-                                                                </ng-container>
-                                                            </thead>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card" *ngIf="sDisplayMethod === 'revenuePerArticleGroupAndProperty'">
-                                <p> {{ 'REVENUE_PER_ARTICLE_GROUP_AND_PROPERTY' | translate}} </p>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table
-                                            class="table table-rounded border border-gray-300 table-row-bordered table-row-gray-300 gy-5 gs-5 text-gray-600">
-
-                                            <thead>
-                                                <tr>
-                                                    <th>
-                                                        <span class="">{{ 'ARTICLE' | translate}}</span>
-                                                        <h4 class="text-black">-</h4>
-                                                    </th>
-                                                    <th class="w-150px">
-                                                        <span class="">{{"QUANTITY" | translate}}</span>
-                                                        <h4 class="text-black">{{aStatistic[0]?.overall[0]?.nQuantity}}
-                                                        </h4>
-                                                    </th>
-                                                    <th class="w-150px">
-                                                        <span class="">{{"PRICE_WITH_VAT" | translate}}</span>
-                                                        <h4 class="text-black">
-                                                            {{aStatistic[0]?.overall[0]?.nTotalRevenue | number
-                                                            :'1.2-2'}}</h4>
-                                                    </th>
-                                                    <th class="w-150px">
-                                                        <span class="">{{"PURCHASE_PRICE_EX_VAT" | translate}}</span>
-                                                        <h4 class="text-black">
-                                                            {{aStatistic[0]?.overall[0]?.nTotalPurchaseAmount | number
-                                                            :'1.2-2'}}</h4>
-                                                    </th>
-                                                    <th class="w-150px">
-                                                        <span class="">{{"GROSS_PROFIT" | translate}}</span>
-                                                        <h4 class="text-black">{{aStatistic[0]?.overall[0]?.nProfit |
-                                                            number :'1.2-2'}}</h4>
-                                                    </th>
-
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td colspan="6" class="p-2">
-                                                        <div class="table-responsive"
-                                                            *ngFor="let oStatistic of aStatistic; let i = index">
-                                                            <table
-                                                                class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border"
-                                                                *ngFor="let oArticleGroup of oStatistic.individual; let articleGroupIndex = index">
-
-                                                                <thead class="bg-gray-100">
-                                                                    <tr class="fw-bold fs-6 text-gray-800">
-                                                                        <th scope="col">{{oArticleGroup.sName}}</th>
-                                                                        <th scope="col" class="w-150px">
-                                                                            {{oArticleGroup.nQuantity}}</th>
-                                                                        <th scope="col" class="w-150px">
-                                                                            {{oArticleGroup.nTotalRevenue | number
-                                                                            :'1.2-2'}}</th>
-                                                                        <th scope="col" class="w-150px">
-                                                                            {{oArticleGroup.nTotalPurchaseAmount |
-                                                                            number :'1.2-2'}}
-                                                                        </th>
-                                                                        <th scope="col" class="w-150px">
-                                                                            {{oArticleGroup.nProfit| number
-                                                                            :'1.2-2'}}</th>
-
-                                                                    </tr>
-                                                                </thead>
-                                                                <ng-container
-                                                                    *ngIf="oArticleGroup.aRevenueByProperty.length">
-                                                                    <tbody class="p-2"
-                                                                        *ngFor="let oRevenueByProperty of oArticleGroup.aRevenueByProperty; let revenuePropertyIndex = index">
-                                                                        <tr>
-                                                                            <td class="ps-9">
-                                                                                {{oRevenueByProperty.aCategory.join('
-                                                                                |')}}
-                                                                            </td>
-                                                                            <td>{{oRevenueByProperty.nQuantity}}</td>
-                                                                            <td>{{oRevenueByProperty.nTotalRevenue |
-                                                                                number :'1.2-2'}}
-                                                                            </td>
-                                                                            <td>{{oRevenueByProperty.nTotalPurchaseAmount
-                                                                                | number :'1.2-2'}}
-                                                                            </td>
-                                                                            <td>{{oRevenueByProperty.nProfit| number
-                                                                                :'1.2-2'}}</td>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </ng-container>
-                                                            </table>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card" *ngIf="sDisplayMethod === 'revenuePerProperty'">
-                                <p> {{ 'REVENUE_PER_PROPERTY' | translate}} </p>
-
-                                <div class="card-body">
-                                    <div class="table-responsive" *ngFor="let oStatistic of aStatistic; let i = index">
-                                        <table
-                                            class="table table-rounded border border-gray-300 table-row-bordered table-row-gray-300 gy-5 gs-5 text-gray-600">
-                                            <thead>
-                                                <tr>
-                                                    <th>
-                                                        <span class="">{{ 'ARTICLE' | translate}}</span>
-                                                        <h4 class="text-black">-</h4>
-                                                    </th>
-                                                    <th class="w-150px">
-                                                        <span class="">{{"QUANTITY" | translate}}</span>
-                                                        <h4 class="text-black">{{aStatistic[0]?.overall[0]?.nQuantity}}
-                                                        </h4>
-                                                    </th>
-                                                    <th class="w-150px">
-                                                        <span class="">{{"PRICE_WITH_VAT" | translate}}</span>
-                                                        <h4 class="text-black">
-                                                            {{aStatistic[0]?.overall[0]?.nTotalRevenue | number
-                                                            :'1.2-2'}}</h4>
-                                                    </th>
-                                                    <th class="w-150px">
-                                                        <span class="">{{"PURCHASE_PRICE_EX_VAT" | translate}}</span>
-                                                        <h4 class="text-black">
-                                                            {{aStatistic[0]?.overall[0]?.nTotalPurchaseAmount | number
-                                                            :'1.2-2'}}</h4>
-                                                    </th>
-                                                    <th class="w-150px">
-                                                        <span class="">{{"GROSS_PROFIT" | translate}}</span>
-                                                        <h4 class="text-black">{{aStatistic[0]?.overall[0]?.nProfit |
-                                                            number :'1.2-2'}}
-                                                        </h4>
-                                                    </th>
-
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <td style="padding:0" colspan="6">
-                                                    <table
-                                                        class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border"
-                                                        *ngFor="let oRevenueByProperty of oStatistic.individual; let articleGroupIndex = index">
-                                                        <!-- start of article-group -->
+                                <div *ngFor="let oStatistic of aStatistic; let statisticIndex = index">
+                                    <table class="table table-rounded table-row-gray-300 gy-5 gs-5 text-gray-600"
+                                        *ngFor="let oSupplier of oStatistic.individual; let supplierIndex = index">
+                                        <thead>
+                                            <tr>
+                                                <th><span>{{ 'SUPPLIER' | translate}}</span>
+                                                    <h3 class="text-black">{{oSupplier.sBusinessPartnerName}}</h3>
+                                                </th>
+                                                <th class="w-150px"><span>{{"QUANTITY" | translate}}</span>
+                                                    <h4 class="text-black">{{oSupplier.nQuantity}}</h4>
+                                                </th>
+                                                <th class="w-150px"><span>{{"PRICE_WITH_VAT" |
+                                                        translate}}</span>
+                                                    <h4 class="text-black">{{oSupplier.nTotalRevenue | number
+                                                        :'1.2-2'}}</h4>
+                                                </th>
+                                                <th class="w-150px"><span>{{"PURCHASE_PRICE" |
+                                                        translate}}</span>
+                                                    <h4 class="text-black">{{oSupplier.nTotalPurchaseAmount | number
+                                                        :'1.2-2'}}</h4>
+                                                </th>
+                                                <th class="w-150px"><span>{{"GROSS_PROFIT" |
+                                                        translate}}</span>
+                                                    <h4 class="text-black">{{oSupplier.nProfit.toFixed(2)}}
+                                                    </h4>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="6" class="p-2">
+                                                    <table class="table gy-5 gs-5 mb-0 text-gray-600 fw-bold"
+                                                        *ngFor="let oArticleGroup of oSupplier.aArticleGroups; let articleGroupIndex = index">
+                                                        <!-- start of articlegroup -->
                                                         <thead class="bg-gray-100">
                                                             <tr class="fw-bold fs-6 text-gray-800">
-                                                                <td>
-                                                                    <div
-                                                                        class="d-flex justify-content-between align-items-center">
-                                                                        {{oRevenueByProperty?.aCategory?.length
-                                                                        ?
-                                                                        oRevenueByProperty.aCategory.join(' | ') : '-'}}
-                                                                        <div class="mx-5">
-                                                                            <i *ngIf="!oRevenueByProperty.bIsCollapseItem"
-                                                                                class="px-sm-2 cursor-pointer bi bi-chevron-down"
-                                                                                (click)="expandItem(oRevenueByProperty)">
-                                                                            </i>
-                                                                            <i *ngIf="oRevenueByProperty.bIsCollapseItem"
-                                                                                class="px-sm-2 cursor-pointer bi bi-chevron-up"
-                                                                                (click)="expandItem(oRevenueByProperty)"></i>
-                                                                        </div>
+                                                                <th scope="col">{{oArticleGroup.sName}}
+                                                                    <div class="mx-5">
+                                                                        <i *ngIf="!oArticleGroup.bIsCollapseItem"
+                                                                            class="px-sm-2 cursor-pointer bi bi-chevron-down"
+                                                                            (click)="oArticleGroup.bIsCollapseItem = true;">
+                                                                        </i>
+                                                                        <i *ngIf="oArticleGroup.bIsCollapseItem"
+                                                                            class="px-sm-2 cursor-pointer bi bi-chevron-up"
+                                                                            (click)="oArticleGroup.bIsCollapseItem = false;"></i>
                                                                     </div>
-
-
-                                                                </td>
-                                                                <th class="w-150px">
-                                                                    {{oRevenueByProperty.sPropertyName}}
                                                                 </th>
-                                                                <th class="w-150px">
-                                                                    {{oRevenueByProperty.nTotalRevenue | number
+                                                                <th scope="col" class="w-150px">
+                                                                    {{oArticleGroup.nQuantity}}</th>
+                                                                <th scope="col" class="w-150px">
+                                                                    {{oArticleGroup.nTotalRevenue | number
                                                                     :'1.2-2'}}
                                                                 </th>
-                                                                <th class="w-150px">
-                                                                    {{oRevenueByProperty.nTotalPurchaseAmount | number
-                                                                    :'1.2-2'}}</th>
-                                                                <th class="w-150px">
-                                                                    {{oRevenueByProperty.nProfit| number :'1.2-2'}}</th>
+                                                                <th scope="col" class="w-150px">
+                                                                    {{oArticleGroup.nTotalPurchaseAmount | number
+                                                                    :'1.2-2'}}
+                                                                </th>
+                                                                <th scope="col" class="w-150px">
+                                                                    {{oArticleGroup.nProfit.toFixed(2)}}</th>
 
                                                             </tr>
-                                                            <tr *ngIf="oRevenueByProperty.isLoading">
-                                                                <td colspan="6" class="text-center">
-                                                                    <div class="spinner-border mx-auto">
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            <ng-container *ngIf="oRevenueByProperty.bIsCollapseItem">
-                                                                <tr class="bg-white"
-                                                                    *ngFor="let item of oRevenueByProperty.aTransactionItems">
-                                                                    <td> {{item.sProductName || item?.sProductNumber}}
-                                                                    </td>
-                                                                    <td> {{ item.nQuantity }}</td>
-                                                                    <td> {{ item.nRevenueAmount | number :'1.2-2'}}</td>
-                                                                    <td> {{ item.nCostOfRevenue | number :'1.2-2'}}</td>
-                                                                    <td>{{item.nProfitOfRevenue | number :'1.2-2'}}</td>
-                                                                    <td></td>
-                                                                </tr>
-                                                                <tr
-                                                                    *ngIf="!oRevenueByProperty?.aTransactionItems?.length && !oRevenueByProperty.isLoading">
-                                                                    <td colspan="6" class="text-center"> {{
-                                                                        "NO_DATA_FOUND" | translate}}
-                                                                    </td>
-                                                                </tr>
-                                                            </ng-container>
                                                         </thead>
+                                                        <ng-container
+                                                            *ngIf="oArticleGroup.aRevenueByProperty.length && oArticleGroup.bIsCollapseItem">
+                                                            <tbody class="p-2"
+                                                                *ngFor="let oRevenueByProperty of oArticleGroup.aRevenueByProperty; let revenuePropertyIndex = index">
+                                                                <!--start of dyamic property -->
+                                                                <tr>
+                                                                    <td class="ps-9">
+                                                                        {{oRevenueByProperty.aCategory.join(' |')}}
+                                                                    </td>
+                                                                    <td>{{oRevenueByProperty.nQuantity}}</td>
+                                                                    <td>{{oRevenueByProperty.nTotalRevenue | number
+                                                                        :'1.2-2'}}</td>
+                                                                    <td>{{oRevenueByProperty.nTotalPurchaseAmount |
+                                                                        number :'1.2-2'}}
+                                                                    </td>
+                                                                    <td>{{oRevenueByProperty.nProfit| number
+                                                                        :'1.2-2'}}</td>
+                                                                    <td>{{oRevenueByProperty.nMargin}}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </ng-container>
+                                                        <!-- start of articlegroup -->
                                                     </table>
                                                 </td>
-                                            </tbody>
-                                        </table>
-
-                                    </div>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
-                            </div>
-
-                            <div class="card" *ngIf="sDisplayMethod === 'revenuePerArticleGroup'">
-                                <p> {{ 'REVENUE_PER_ARTICLE_GROUP' | translate}} </p>
-                                <div class="card-body">
-                                    <div class="table-responsive" *ngFor="let oStatistic of aStatistic; let i = index">
-                                        <table
-                                            class="table table-rounded border border-gray-300 table-row-bordered table-row-gray-300 gy-5 gs-5 text-gray-600">
-                                            <thead>
-                                                <tr>
-                                                    <th>
-                                                        <span class="">{{ 'ARTICLE' | translate}}</span>
-                                                        <h4 class="text-black">-</h4>
-                                                    </th>
-                                                    <th class="w-150px">
-                                                        <span class="">{{"QUANTITY" | translate}}</span>
-                                                        <h4 class="text-black">{{aStatistic[0]?.overall[0]?.nQuantity}}
-                                                        </h4>
-                                                    </th>
-                                                    <th class="w-150px">
-                                                        <span class="">{{"PRICE_WITH_VAT" | translate}}</span>
-                                                        <h4 class="text-black">
-                                                            {{aStatistic[0]?.overall[0]?.nTotalRevenue | number
-                                                            :'1.2-2'}}</h4>
-                                                    </th>
-                                                    <th class="w-150px">
-                                                        <span class="">{{"PURCHASE_PRICE_EX_VAT" | translate}}</span>
-                                                        <h4 class="text-black">
-                                                            {{aStatistic[0]?.overall[0]?.nTotalPurchaseAmount | number
-                                                            :'1.2-2'}}</h4>
-                                                    </th>
-                                                    <th class="w-150px">
-                                                        <span class="">{{"GROSS_PROFIT" | translate}}</span>
-                                                        <h4 class="text-black">{{aStatistic[0]?.overall[0]?.nProfit |
-                                                            number
-                                                            :'1.2-2'}}
-                                                        </h4>
-                                                    </th>
-
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <td style="padding:0" colspan="6">
+                            </section>
+                            <!-- REVENUE_PER_BUSINESS_PARTNER START -->
+                            
+                            <!-- REVENUE_PER_BUSINESS_PARTNER END -->
+                        </div>
+                        <div class="overflow-y-auto p-0" *ngIf="sDisplayMethod === 'aRevenuePerTurnoverGroup'">
+                            <!-- REVENUE_PER_TURNOVER_GROUP_PER_TRANSACTION_ITEM START -->
+                            <section>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong> {{ 'REVENUE_PER_TURNOVER_GROUP_PER_TRANSACTION_ITEM' | translate}}</strong>
+                                    </div>
+                                <div class="card-body"
+                                    *ngFor="let oStatistic of aStatistic; let statisticIndex = index">
+                                    <table class="table border table-striped"
+                                        *ngFor="let oSupplier of oStatistic.individual; let supplierIndex = index">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <span>{{ 'CATEGORY' | translate}}</span>
+                                                    <h3 class="text-black">{{oSupplier.sCategory | translate}}</h3>
+                                                </th>
+                                                <th class="w-150px"><span>{{"QUANTITY" | translate}}</span>
+                                                    <h4 class="text-black">{{oSupplier.nQuantity}}</h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"PRICE_WITH_VAT" | translate}}</span>
+                                                    <h4 class="text-black">{{oSupplier.nTotalRevenue.toFixed(2)}}
+                                                    </h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"PURCHASE_PRICE" | translate}}</span>
+                                                    <h4 class="text-black">
+                                                        {{oSupplier.nTotalPurchaseAmount.toFixed(2)}}</h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"GROSS_PROFIT" |translate}}</span>
+                                                    <h4 class="text-black">{{oSupplier.nProfit.toFixed(2)}}</h4>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-light">
+                                            <tr>
+                                                <td colspan="6" class="p-2">
                                                     <table
-                                                        class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border"
-                                                        *ngFor="let oArticleGroup of oStatistic.individual; let articleGroupIndex = index">
+                                                        class="table table-borderless gy-5 gs-5 mb-0 text-gray-600 fw-bold"
+                                                        *ngFor="let oArticleGroup of oSupplier.aArticleGroups; let articleGroupIndex = index">
                                                         <!-- start of articlegroup -->
-                                                        <tbody class="bg-gray-100">
+                                                        <thead class="bg-gray-100">
                                                             <tr class="fw-bold fs-6 text-gray-800">
-                                                                <td>
-                                                                    <div
-                                                                        class="d-flex justify-content-between align-items-center">
-                                                                        {{oArticleGroup.sName}}
-                                                                        <div class="mx-5">
+                                                                <th scope="col">
+                                                                    <div class="d-flex justify-content-between align-items-center">
+                                                                        <span
+                                                                            *ngIf="oArticleGroup?.oName && object.keys(oArticleGroup?.oName)?.length">
+                                                                            {{
+                                                                            oArticleGroup?.oName[translateService.currentLang]
+                                                                            || oArticleGroup.sName }}
+                                                                        </span>
+                                                                        <span
+                                                                            *ngIf="!oArticleGroup?.oName || !object.keys(oArticleGroup?.oName)?.length">
+                                                                            {{ oArticleGroup.sName }}
+                                                                        </span>
+                                                                        <div class="">
                                                                             <i *ngIf="!oArticleGroup.bIsCollapseItem"
                                                                                 class="px-sm-2 cursor-pointer bi bi-chevron-down"
                                                                                 (click)="expandItem(oArticleGroup)">
                                                                             </i>
                                                                             <i *ngIf="oArticleGroup.bIsCollapseItem"
                                                                                 class="px-sm-2 cursor-pointer bi bi-chevron-up"
-                                                                                (click)="expandItem(oArticleGroup)"></i>
+                                                                                (click)="expandItem(oArticleGroup)">
+                                                                            </i>
+                                                                        </div>
+                                                                    </div>
+                                                                </th>
+                                                                <th scope="col" class="w-150px">
+                                                                    {{oArticleGroup.nQuantity}}</th>
+                                                                <th scope="col" class="w-150px">
+                                                                    {{oArticleGroup.nTotalRevenue.toFixed(2) }}</th>
+                                                                <th scope="col" class="w-150px">
+                                                                    {{oArticleGroup.nTotalPurchaseAmount.toFixed(2)
+                                                                    }}</th>
+                                                                <th scope="col" class="w-150px">
+                                                                    {{oArticleGroup.nProfit.toFixed(2) }}</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <ng-container
+                                                                *ngIf="oArticleGroup.bIsCollapseItem && sOptionMenu?.child1?.sKey === 'Bookkeeping'">
+                                                                <tr class="bg-white line-height-2rem"
+                                                                    *ngFor="let item of oArticleGroup.aTransactionItems">
+                                                                    <td>
+                                                                        <a (click)="openTransactionDetailsModal(item)"
+                                                                            class="bg-success badge cursor-pointer">
+                                                                            {{ item?.sTransactionNumber || ''}}
+                                                                        </a>
+                                                                        <span class="mx-3">
+                                                                            {{ item.sProductName || item?.sProductNumber
+                                                                            }}
+                                                                            {{ item?.sComment || '' }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td> {{ item.nQuantity }} </td>
+                                                                    <td> {{ item.nRevenueAmount.toFixed(2) }}</td>
+                                                                    <td> {{ item.nCostOfRevenue.toFixed(2) }}</td>
+                                                                    <td> {{ item.nProfitOfRevenue.toFixed(2) }}
+                                                                    </td>
+                                                                </tr>
+                                                            </ng-container>
+
+                                                            <ng-container
+                                                                *ngIf="oArticleGroup.bIsCollapseItem && sOptionMenu?.child1?.sKey === 'ArticleGroup'">
+                                                                <tr class="bg-white"
+                                                                    *ngFor="let oRevenueByProperty of oArticleGroup.aRevenueByProperty; let revenuePropertyIndex = index">
+                                                                    <td class="ps-9">
+                                                                        {{oRevenueByProperty.aCategory.join(' |')}}
+                                                                    </td>
+                                                                    <td> {{oRevenueByProperty.nQuantity}} </td>
+                                                                    <td> {{oRevenueByProperty.nTotalRevenue.toFixed(2)
+                                                                        }} </td>
+                                                                    <td> {{oRevenueByProperty.nTotalPurchaseAmount.toFixed(2)
+                                                                        }} </td>
+                                                                    <td> {{oRevenueByProperty.nProfit.toFixed(2) }}
+                                                                    </td>
+                                                                </tr>
+                                                            </ng-container>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+</section>
+<!-- REVENUE_PER_TURNOVER_GROUP_PER_TRANSACTION_ITEM END -->
+                        </div>
+                        <div class="card" *ngIf="sDisplayMethod === 'revenuePerSupplierAndArticleGroup'">
+                            <strong> {{ 'REVENUE_PER_SUPPLIER_AND_ARTICLE_GROUP' | translate}} </strong>
+                            <div class="card-body">
+                                <div class="table-responsive" *ngFor="let oStatistic of aStatistic; let i = index">
+                                    <table class="table table-rounded table-row-gray-300 gy-5 gs-5 text-gray-600"
+                                        *ngFor="let oSupplier of oStatistic.individual; let supplierIndex = index">
+                                        <thead>
+                                            <tr>
+                                                <th><span>{{ 'SUPPLIER' | translate}}</span>
+                                                    <h3 class="text-black">{{oSupplier.sBusinessPartnerName}}</h3>
+                                                </th>
+                                                <th class="w-150px"><span>{{"QUANTITY" | translate}}</span>
+                                                    <h4 class="text-black">{{oSupplier.nQuantity}}</h4>
+                                                </th>
+                                                <th class="w-150px"><span>{{"PRICE_WITH_VAT" | translate}}</span>
+                                                    <h4 class="text-black">{{oSupplier.nTotalRevenue.toFixed(2)}}
+                                                    </h4>
+                                                </th>
+                                                <th class="w-150px"><span>{{"PURCHASE_PRICE" | translate}}</span>
+                                                    <h4 class="text-black">
+                                                        {{oSupplier.nTotalPurchaseAmount.toFixed(2)}}</h4>
+                                                </th>
+                                                <th class="w-150px"><span>{{"GROSS_PROFIT" | translate}}</span>
+                                                    <h4 class="text-black">{{oSupplier.nProfit.toFixed(2) }}
+                                                    </h4>
+                                                </th>
+
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="6" class="p-2">
+                                                    <table
+                                                        class="table table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold"
+                                                        *ngFor="let oArticleGroup of oSupplier.aArticleGroups; let articleGroupIndex = index">
+                                                        <thead class="bg-gray-100">
+                                                            <tr class="fw-bold fs-6 text-gray-800">
+                                                                <th scope="col">
+                                                                    <div
+                                                                        class="d-flex justify-content-between align-items-center">
+                                                                        {{oArticleGroup.sName}}
+                                                                        <div class="mx-5">
+                                                                            <i *ngIf="!oArticleGroup.bIsCollapseItem"
+                                                                                class="px-sm-2 cursor-pointer bi bi-chevron-down"
+                                                                                (click)="expandItem(oArticleGroup, oSupplier.iBusinessPartnerId, 'articlegroup')">
+                                                                            </i>
+                                                                            <i *ngIf="oArticleGroup.bIsCollapseItem"
+                                                                                class="px-sm-2 cursor-pointer bi bi-chevron-up"
+                                                                                (click)="oArticleGroup.bIsCollapseItem = !oArticleGroup.bIsCollapseItem"></i>
                                                                         </div>
                                                                     </div>
 
-                                                                </td>
-                                                                <td class="w-150px">{{oArticleGroup.nQuantity}}</td>
-                                                                <td class="w-150px">{{oArticleGroup.nTotalRevenue |
-                                                                    number :'1.2-2'}}</td>
-                                                                <td class="w-150px">
-                                                                    {{oArticleGroup.nTotalPurchaseAmount | number
-                                                                    :'1.2-2'}}</td>
-                                                                <td class="w-150px">{{oArticleGroup.nProfit | number
-                                                                    :'1.2-2'}}</td>
-                                                                <!-- <td class="w-150px">{{oArticleGroup.nMargin}}</td> -->
+                                                                </th>
+                                                                <th scope="col" class="w-150px">
+                                                                    {{oArticleGroup.nQuantity}}</th>
+                                                                <th scope="col" class="w-150px">
+                                                                    {{oArticleGroup.nTotalRevenue.toFixed(2)}}</th>
+                                                                <th scope="col" class="w-150px">
+                                                                    {{oArticleGroup.nTotalPurchaseAmount.toFixed(2)}}
+                                                                </th>
+                                                                <th scope="col" class="w-150px">
+                                                                    {{oArticleGroup.nProfit.toFixed(2)}}</th>
                                                             </tr>
                                                             <tr *ngIf="oArticleGroup.isLoading">
                                                                 <td colspan="6" class="text-center">
@@ -931,260 +811,642 @@
                                                             <ng-container *ngIf="oArticleGroup.bIsCollapseItem">
                                                                 <tr class="bg-white"
                                                                     *ngFor="let item of oArticleGroup.aTransactionItems">
-                                                                    <td> {{item.sProductName || item?.sProductNumber}}</td>
-                                                                    <td class="w-150px"> {{ item.nQuantity }}</td>
-                                                                    <td class="w-150px"> {{ item.nRevenueAmount | number :'1.2-2'}}</td>
-                                                                    <td class="w-150px"> {{ item.nCostOfRevenue | number :'1.2-2'}}</td>
-                                                                    <td class="w-150px">{{item.nProfitOfRevenue | number :'1.2-2'}}</td>
-                                                                    <!-- <td></td> -->
+                                                                    <td> {{item.sProductName ||
+                                                                        item?.sProductNumber}} </td>
+                                                                    <td>{{ item.nQuantity }}</td>
+                                                                    <td>{{ item.nRevenueAmount.toFixed(2) }}</td>
+                                                                    <td>{{ item.nCostOfRevenue.toFixed(2) }}</td>
+                                                                    <td>{{ item.nProfitOfRevenue.toFixed(2) }}</td>
+                                                                    <td></td>
                                                                 </tr>
                                                             </ng-container>
-                                                        </tbody>
-                                                        <!-- end of articlegroup -->
+                                                        </thead>
                                                     </table>
                                                 </td>
-                                            </tbody>
-                                        </table>
-
-
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card" *ngIf="sDisplayMethod === 'aVatRates'">
-                                <p> {{ 'VAT_RATES' | translate}} </p>
-
-                                <div class="card-body">
-                                    <div class="table-responsive" *ngFor="let oStatistic of aStatistic; let i = index">
-                                        <table
-                                            class="table table-rounded border border-gray-300 table-row-bordered table-row-gray-300 gy-5 gs-5 text-gray-600">
-                                            <thead>
-                                                <tr>
-                                                    <th><span class="">{{ 'VAT_TYPE' | translate}}</span></th>
-                                                    <th class="w-150px"><span class="">{{ "PRICE_WITH_VAT" |
-                                                            translate}}</span></th>
-                                                    <th class="w-150px"><span class="">{{ "PURCHASE_PRICE_EX_VAT" |
-                                                            translate}}</span></th>
-                                                    <th class="w-150px"><span class="">{{ "GROSS_PROFIT" |
-                                                            translate}}</span></th>
-                                                    <th class="w-150px"><span class="">{{"VAT_AMOUNT" |
-                                                            translate}}</span>
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <td style="padding:0" colspan="6">
-                                                    <ng-container
-                                                        *ngFor="let oVatRate of oStatistic.aVatRates; let vatRateIndex = index">
-                                                        <table
-                                                            class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border">
-                                                            <tr>
-                                                                <td class="text-center fw-bolder bg-gray-100"
-                                                                    colspan="5">
-                                                                    {{"VAT_RATE" | translate}} - {{oVatRate?.nVat}}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <ng-container [ngTemplateOutlet]="vatRateTemplates"
-                                                                    [ngTemplateOutletContext]="{ data: {sVatMethod: 'oShopPurchase', oVatRate: oVatRate} }"
-                                                                    *ngIf="optionMenu === 'cash-registry'">
-                                                                </ng-container>
-                                                            </tr>
-                                                            <tr>
-                                                                <ng-container [ngTemplateOutlet]="vatRateTemplates"
-                                                                    [ngTemplateOutletContext]="{ data: {sVatMethod: 'oWebShop', oVatRate: oVatRate} }"
-                                                                    *ngIf="optionMenu === 'cash-registry'">
-                                                                </ng-container>
-                                                            </tr>
-                                                            <tr>
-                                                                <ng-container [ngTemplateOutlet]="vatRateTemplates"
-                                                                    [ngTemplateOutletContext]="{ data: {sVatMethod: 'oDeliverySupplier', oVatRate: oVatRate} }"
-                                                                    *ngIf="optionMenu === 'purchase-order' && sUserType === 'supplier'">
-                                                                </ng-container>
-                                                            </tr>
-                                                            <tr>
-                                                                <ng-container [ngTemplateOutlet]="vatRateTemplates"
-                                                                    [ngTemplateOutletContext]="{ data: {sVatMethod: 'oDeliveryRetailer', oVatRate: oVatRate} }"
-                                                                    *ngIf="optionMenu === 'purchase-order' && sUserType === 'retailer'">
-                                                                </ng-container>
-                                                            </tr>
-                                                            <tr>
-                                                                <ng-container [ngTemplateOutlet]="vatRateTemplates"
-                                                                    [ngTemplateOutletContext]="{ data: {sVatMethod: 'oSalesOrderSupplier', oVatRate: oVatRate} }"
-                                                                    *ngIf="optionMenu === 'sales-order'">
-                                                                </ng-container>
-                                                            </tr>
-                                                        </table>
-                                                    </ng-container>
-                                                </td>
-                                            </tbody>
-                                        </table>
-
-                                    </div>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
 
+                        <div class="card" *ngIf="sDisplayMethod === 'revenuePerArticleGroupAndProperty'">
+                            <strong> {{ 'REVENUE_PER_ARTICLE_GROUP_AND_PROPERTY' | translate}} </strong>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-rounded table-row-gray-300 gy-5 gs-5 text-gray-600">
+
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <span>{{ 'ARTICLE' | translate}}</span>
+                                                    <h4 class="text-black">-</h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"QUANTITY" | translate}}</span>
+                                                    <h4 class="text-black">{{aStatistic[0]?.overall[0]?.nQuantity}}
+                                                    </h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"PRICE_WITH_VAT" | translate}}</span>
+                                                    <h4 class="text-black">
+                                                        {{aStatistic[0]?.overall[0]?.nTotalRevenue.toFixed(2)}}</h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"PURCHASE_PRICE_EX_VAT" | translate}}</span>
+                                                    <h4 class="text-black">
+                                                        {{aStatistic[0]?.overall[0]?.nTotalPurchaseAmount.toFixed(2)}}
+                                                    </h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"GROSS_PROFIT" | translate}}</span>
+                                                    <h4 class="text-black">
+                                                        {{aStatistic[0]?.overall[0]?.nProfit.toFixed(2)}}</h4>
+                                                </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="6" class="p-2">
+                                                    <div class="table-responsive"
+                                                        *ngFor="let oStatistic of aStatistic; let i = index">
+                                                        <table
+                                                            class="table table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold"
+                                                            *ngFor="let oArticleGroup of oStatistic.individual; let articleGroupIndex = index">
+
+                                                            <thead class="bg-gray-100">
+                                                                <tr class="fw-bold fs-6 text-gray-800">
+                                                                    <th scope="col">{{oArticleGroup.sName}}</th>
+                                                                    <th scope="col" class="w-150px">
+                                                                        {{oArticleGroup.nQuantity}}</th>
+                                                                    <th scope="col" class="w-150px">
+                                                                        {{oArticleGroup.nTotalRevenue.toFixed(2) }}
+                                                                    </th>
+                                                                    <th scope="col" class="w-150px">
+                                                                        {{oArticleGroup.nTotalPurchaseAmount.toFixed(2)
+                                                                        }}</th>
+                                                                    <th scope="col" class="w-150px">
+                                                                        {{oArticleGroup.nProfit.toFixed(2) }}</th>
+
+                                                                </tr>
+                                                            </thead>
+                                                            <ng-container
+                                                                *ngIf="oArticleGroup.aRevenueByProperty.length">
+                                                                <tbody class="p-2"
+                                                                    *ngFor="let oRevenueByProperty of oArticleGroup.aRevenueByProperty; let revenuePropertyIndex = index">
+                                                                    <tr>
+                                                                        <td class="ps-9">
+                                                                            {{oRevenueByProperty.aCategory.join('|')
+                                                                            }}</td>
+                                                                        <td>{{oRevenueByProperty.nQuantity}}</td>
+                                                                        <td>{{oRevenueByProperty.nTotalRevenue.toFixed(2)
+                                                                            }}</td>
+                                                                        <td>{{oRevenueByProperty.nTotalPurchaseAmount.toFixed(2)}}
+                                                                        </td>
+                                                                        <td>{{oRevenueByProperty.nProfit.toFixed(2)}}
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </ng-container>
+                                                        </table>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" *ngIf="sDisplayMethod === 'revenuePerProperty'">
+                            <strong> {{ 'REVENUE_PER_PROPERTY' | translate}} </strong>
+
+                            <div class="card-body">
+                                <div class="table-responsive" *ngFor="let oStatistic of aStatistic; let i = index">
+                                    <table class="table table-rounded table-row-gray-300 gy-5 gs-5 text-gray-600">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <span>{{ 'ARTICLE' | translate}}</span>
+                                                    <h4 class="text-black">-</h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"QUANTITY" | translate}}</span>
+                                                    <h4 class="text-black">{{aStatistic[0]?.overall[0]?.nQuantity}}
+                                                    </h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"PRICE_WITH_VAT" | translate}}</span>
+                                                    <h4 class="text-black">
+                                                        {{aStatistic[0]?.overall[0]?.nTotalRevenue.toFixed(2)}}</h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"PURCHASE_PRICE_EX_VAT" | translate}}</span>
+                                                    <h4 class="text-black">
+                                                        {{aStatistic[0]?.overall[0]?.nTotalPurchaseAmount.toFixed(2)}}
+                                                    </h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"GROSS_PROFIT" | translate}}</span>
+                                                    <h4 class="text-black">
+                                                        {{aStatistic[0]?.overall[0]?.nProfit.toFixed(2)}}</h4>
+                                                </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <td style="padding:0" colspan="6">
+                                                <table
+                                                    class="table table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold"
+                                                    *ngFor="let oRevenueByProperty of oStatistic.individual; let articleGroupIndex = index">
+                                                    <!-- start of article-group -->
+                                                    <thead class="bg-gray-100">
+                                                        <tr class="fw-bold fs-6 text-gray-800">
+                                                            <td>
+                                                                <div
+                                                                    class="d-flex justify-content-between align-items-center">
+                                                                    {{ oRevenueByProperty?.aCategory?.length ?
+                                                                    oRevenueByProperty.aCategory.join(' | ') : '-'
+                                                                    }}
+                                                                    <div class="mx-5">
+                                                                        <i *ngIf="!oRevenueByProperty.bIsCollapseItem"
+                                                                            class="px-sm-2 cursor-pointer bi bi-chevron-down"
+                                                                            (click)="expandItem(oRevenueByProperty)">
+                                                                        </i>
+                                                                        <i *ngIf="oRevenueByProperty.bIsCollapseItem"
+                                                                            class="px-sm-2 cursor-pointer bi bi-chevron-up"
+                                                                            (click)="expandItem(oRevenueByProperty)"></i>
+                                                                    </div>
+                                                                </div>
+
+
+                                                            </td>
+                                                            <th class="w-150px">{{oRevenueByProperty.sPropertyName}}
+                                                            </th>
+                                                            <th class="w-150px">
+                                                                {{oRevenueByProperty.nTotalRevenue.toFixed(2)}}</th>
+                                                            <th class="w-150px">
+                                                                {{oRevenueByProperty.nTotalPurchaseAmount.toFixed(2)}}
+                                                            </th>
+                                                            <th class="w-150px">
+                                                                {{oRevenueByProperty.nProfit.toFixed(2)}}</th>
+                                                        </tr>
+                                                        <tr *ngIf="oRevenueByProperty.isLoading">
+                                                            <td colspan="6" class="text-center">
+                                                                <div class="spinner-border mx-auto"></div>
+                                                            </td>
+                                                        </tr>
+                                                        <ng-container *ngIf="oRevenueByProperty.bIsCollapseItem">
+                                                            <tr class="bg-white"
+                                                                *ngFor="let item of oRevenueByProperty.aTransactionItems">
+                                                                <td> {{item.sProductName || item?.sProductNumber}}
+                                                                </td>
+                                                                <td> {{ item.nQuantity }}</td>
+                                                                <td> {{ item.nRevenueAmount.toFixed(2)}}</td>
+                                                                <td> {{ item.nCostOfRevenue.toFixed(2)}}</td>
+                                                                <td>{{item.nProfitOfRevenue.toFixed(2)}}</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr
+                                                                *ngIf="!oRevenueByProperty?.aTransactionItems?.length && !oRevenueByProperty.isLoading">
+                                                                <td colspan="6" class="text-center"> {{
+                                                                    "NO_DATA_FOUND" | translate}}
+                                                                </td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </thead>
+                                                </table>
+                                            </td>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" *ngIf="sDisplayMethod === 'revenuePerArticleGroup'">
+                            <strong> {{ 'REVENUE_PER_ARTICLE_GROUP' | translate}}</strong>
+                            <div class="card-body">
+                                <div class="table-responsive" *ngFor="let oStatistic of aStatistic; let i = index">
+                                    <table class="table table-rounded table-row-gray-300 gy-5 gs-5 text-gray-600">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <span>{{ 'ARTICLE' | translate}}</span>
+                                                    <h4 class="text-black">-</h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span class="">{{"QUANTITY" | translate}}</span>
+                                                    <h4 class="text-black">
+                                                        {{aStatistic[0]?.overall[0]?.nQuantity.toFixed()}}
+                                                    </h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"PRICE_WITH_VAT" | translate}}</span>
+                                                    <h4 class="text-black">
+                                                        {{aStatistic[0]?.overall[0]?.nTotalRevenue | number
+                                                        :'1.2-2'}}</h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"PURCHASE_PRICE_EX_VAT" | translate}}</span>
+                                                    <h4 class="text-black">
+                                                        {{aStatistic[0]?.overall[0]?.nTotalPurchaseAmount | number
+                                                        :'1.2-2'}}</h4>
+                                                </th>
+                                                <th class="w-150px">
+                                                    <span>{{"GROSS_PROFIT" | translate}}</span>
+                                                    <h4 class="text-black">{{aStatistic[0]?.overall[0]?.nProfit |
+                                                        number
+                                                        :'1.2-2'}}
+                                                    </h4>
+                                                </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <td style="padding:0" colspan="6">
+                                                <table
+                                                    class="table table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold"
+                                                    *ngFor="let oArticleGroup of oStatistic.individual; let articleGroupIndex = index">
+                                                    <!-- start of articlegroup -->
+                                                    <tbody class="bg-gray-100">
+                                                        <tr class="fw-bold fs-6 text-gray-800">
+                                                            <td>
+                                                                <div
+                                                                    class="d-flex justify-content-between align-items-center">
+                                                                    <span
+                                                                        *ngIf="oArticleGroup?.oName && object.keys(oArticleGroup?.oName)?.length">
+                                                                        {{
+                                                                        oArticleGroup?.oName[translateService.currentLang]
+                                                                        || oArticleGroup.sName }}
+                                                                    </span>
+                                                                    <span
+                                                                        *ngIf="!oArticleGroup?.oName || !object.keys(oArticleGroup?.oName)?.length">
+                                                                        {{ oArticleGroup.sName }}
+                                                                    </span>
+                                                                    <div class="mx-5"
+                                                                        *ngIf="statisticFilter.eChosenStateCreationType !== 'migration'">
+                                                                        <i *ngIf="!oArticleGroup.bIsCollapseItem"
+                                                                            class="px-sm-2 cursor-pointer bi bi-chevron-down"
+                                                                            (click)="expandItem(oArticleGroup)">
+                                                                        </i>
+                                                                        <i *ngIf="oArticleGroup.bIsCollapseItem"
+                                                                            class="px-sm-2 cursor-pointer bi bi-chevron-up"
+                                                                            (click)="expandItem(oArticleGroup)"></i>
+                                                                    </div>
+                                                                </div>
+
+                                                            </td>
+                                                            <td class="w-150px">{{oArticleGroup.nQuantity}}</td>
+                                                            <td class="w-150px">{{oArticleGroup.nTotalRevenue |
+                                                                number :'1.2-2'}}</td>
+                                                            <td class="w-150px">
+                                                                {{oArticleGroup.nTotalPurchaseAmount | number
+                                                                :'1.2-2'}}</td>
+                                                            <td class="w-150px">{{oArticleGroup.nProfit | number
+                                                                :'1.2-2'}} </td>
+
+                                                        </tr>
+                                                        <tr *ngIf="oArticleGroup.isLoading">
+                                                            <td colspan="6" class="text-center">
+                                                                <div class="spinner-border mx-auto">
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <ng-container *ngIf="oArticleGroup.bIsCollapseItem">
+                                                            <tr class="bg-white"
+                                                                *ngFor="let item of oArticleGroup.aTransactionItems">
+                                                                <td>
+                                                                    <a (click)="openTransactionDetailsModal(item)"
+                                                                        class="bg-success badge cursor-pointer fs-7 p-3 mb-2"
+                                                                        *ngIf="!item?.sProductName?.includes('_CASH')">
+                                                                        {{ item.sTransactionNumber}}
+                                                                    </a>
+                                                                    <span class="ms-3">{{item.sProductName ||
+                                                                        item?.sProductNumber}}</span>
+                                                                </td>
+                                                                <td class="w-150px"> {{ item.nQuantity }}</td>
+                                                                <td class="w-150px"> {{ item.nRevenueAmount | number
+                                                                    :'1.2-2'}}</td>
+                                                                <td class="w-150px"> {{ item.nCostOfRevenue | number
+                                                                    :'1.2-2'}}</td>
+                                                                <td class="w-150px"> {{item.nProfitOfRevenue |
+                                                                    number :'1.2-2'}}</td>
+                                                                <!-- <td></td> -->
+                                                            </tr>
+                                                        </ng-container>
+                                                    </tbody>
+                                                    <!-- end of articlegroup -->
+                                                </table>
+                                            </td>
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" *ngIf="sDisplayMethod === 'aVatRates'">
+                            <strong> {{ 'VAT_RATES' | translate}} </strong>
+
+                            <div class="card-body">
+                                <div class="table-responsive" *ngFor="let oStatistic of aStatistic; let i = index">
+                                    <table class="table table-rounded table-row-gray-300 gy-5 gs-5 text-gray-600">
+                                        <thead>
+                                            <tr>
+                                                <th><span>{{ 'VAT_TYPE' | translate}}</span></th>
+                                                <th class="w-150px"><span>{{ "PRICE_WITH_VAT" |
+                                                        translate}}</span></th>
+                                                <th class="w-150px"><span>{{ "PURCHASE_PRICE_EX_VAT" |
+                                                        translate}}</span></th>
+                                                <th class="w-150px"><span>{{ "GROSS_PROFIT" |
+                                                        translate}}</span></th>
+                                                <th class="w-150px"><span>{{"VAT_AMOUNT" |
+                                                        translate}}</span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <td style="padding:0" colspan="6">
+                                                <ng-container
+                                                    *ngFor="let oVatRate of oStatistic.aVatRates; let vatRateIndex = index">
+                                                    <table class="table gy-5 gs-5 mb-0 text-gray-600 fw-bold">
+                                                        <tr>
+                                                            <td class="text-center fw-bolder bg-gray-100" colspan="5">
+                                                                {{"VAT_RATE" | translate}} - {{oVatRate?.nVat}}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <ng-container [ngTemplateOutlet]="vatRateTemplates"
+                                                                [ngTemplateOutletContext]="{ data: {sVatMethod: 'oShopPurchase', oVatRate: oVatRate} }"
+                                                                *ngIf="optionMenu === 'cash-registry'">
+                                                            </ng-container>
+                                                        </tr>
+                                                        <tr>
+                                                            <ng-container [ngTemplateOutlet]="vatRateTemplates"
+                                                                [ngTemplateOutletContext]="{ data: {sVatMethod: 'oWebShop', oVatRate: oVatRate} }"
+                                                                *ngIf="optionMenu === 'cash-registry'">
+                                                            </ng-container>
+                                                        </tr>
+                                                        <tr>
+                                                            <ng-container [ngTemplateOutlet]="vatRateTemplates"
+                                                                [ngTemplateOutletContext]="{ data: {sVatMethod: 'oDeliverySupplier', oVatRate: oVatRate} }"
+                                                                *ngIf="optionMenu === 'purchase-order' && sUserType === 'supplier'">
+                                                            </ng-container>
+                                                        </tr>
+                                                        <tr>
+                                                            <ng-container [ngTemplateOutlet]="vatRateTemplates"
+                                                                [ngTemplateOutletContext]="{ data: {sVatMethod: 'oDeliveryRetailer', oVatRate: oVatRate} }"
+                                                                *ngIf="optionMenu === 'purchase-order' && sUserType === 'retailer'">
+                                                            </ng-container>
+                                                        </tr>
+                                                        <tr>
+                                                            <ng-container [ngTemplateOutlet]="vatRateTemplates"
+                                                                [ngTemplateOutletContext]="{ data: {sVatMethod: 'oSalesOrderSupplier', oVatRate: oVatRate} }"
+                                                                *ngIf="optionMenu === 'sales-order'">
+                                                            </ng-container>
+                                                        </tr>
+                                                    </table>
+                                                </ng-container>
+                                            </td>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <!-- LOAD DATA -END -->
-
                     <!-- VAT-RATES TEMPLATE BEGIN -->
                     <ng-template let-data="data" #vatRateTemplates>
                         <!-- <p>Dear {{person.name}} , {{person.message}} </p> -->
-                        <td><span class="">{{ data?.sVatMethod }}</span></td>
-                        <td class="w-150px"><span class="">{{ data?.oVatRate[data?.sVatMethod].nTotalRevenue | number
-                                :'1.2-2' }}</span>
+                        <td><span>{{ data?.sVatMethod }}</span></td>
+                        <td class="w-150px">
+                            <span>
+                                {{ data?.oVatRate[data?.sVatMethod].nTotalRevenue.toFixed(2) }}
+                            </span>
                         </td>
-                        <td class="w-150px"><span class="">{{ data?.oVatRate[data?.sVatMethod].nPurchaseValue | number
-                                :'1.2-2' }}</span>
-                        </td>
-                        <td class="w-150px"><span class="">{{ data?.oVatRate[data?.sVatMethod].nProfit| number :'1.2-2'
-                                }}</span></td>
-                        <td class="w-150px"><span class="">{{ data?.oVatRate[data?.sVatMethod].nVatAmount }}</span></td>
+                        <td class="w-150px">{{ data?.oVatRate[data?.sVatMethod].nPurchaseValue.toFixed(2) }}</td>
+                        <td class="w-150px">{{ data?.oVatRate[data?.sVatMethod].nProfit.toFixed(2)}}</td>
+                        <td class="w-150px">{{ data?.oVatRate[data?.sVatMethod].nVatAmount.toFixed(2) }}</td>
                     </ng-template>
 
                 </div>
                 <!-- STATISTICS CODE END -->
 
                 <!-- PAYMENT START -->
-                <div class="card">
-                    <div class="container">
-                        <div class="d-flex justify-content-between">
-                            <strong> {{ 'PAYMENT_METHODS' | translate}} </strong>
-                            <ng-container
-                                *ngIf="iStatisticId && oStatisticsDocument?.bIsDayState && aPaymentMethods?.length">
-                                <button class="btn" (click)="toggleEditPaymentMode()">
-                                    <i class="fa fa-edit"></i>
-                                </button>
-                            </ng-container>
-                        </div>
-                        <p *ngIf="!aPaymentMethods?.length">{{ 'PAYMENT_METHODS_NOT_FOUND' | translate}}</p>
-                        <div *ngIf="aPaymentMethods?.length">
-                            <div class="card-body">
-                                <table
-                                    class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border">
-                                    <thead class="bg-gray-100">
-                                        <tr class="fw-bold fs-6 text-gray-800">
-                                            <th>{{ 'METHOD' | translate}}</th>
-                                            <th class="w-150px">{{ 'AMOUNT' | translate}}</th>
-                                            <th *ngIf="paymentEditMode" class="w-150px">{{ 'NEW AMOUNT' | translate}}
-                                            </th>
-                                            <th class="w-150px">{{ 'QUANTITY' | translate}}</th>
+                <section>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong> {{ 'PAYMENT_METHODS' | translate}}</strong>
+                        <ng-container
+                            *ngIf="iStatisticId && oStatisticsDocument?.bIsDayState && aPaymentMethods?.length">
+                            <button class="btn" (click)="toggleEditPaymentMode()">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                        </ng-container>
+                    </div>
+                    <p *ngIf="!aPaymentMethods?.length">{{ 'PAYMENT_METHODS_NOT_FOUND' | translate}}</p>
+                    <div *ngIf="aPaymentMethods?.length">
+                        <div class="card-body">
+                            <table class="table border gy-5 gs-5 mb-0 text-gray-600 fw-bold">
+                                <thead class="bg-light p-4">
+                                    <tr class="fw-bold fs-6 text-gray-800 line-height-2rem">
+                                        <th class="px-4">{{ 'METHOD' | translate}}</th>
+                                        <th class="px-4" style="width: 20%;">{{ 'AMOUNT' | translate}}</th>
+                                        <th *ngIf="paymentEditMode" class="px-4" style="width: 20%;">{{ 'NEW_AMOUNT' |
+                                            translate}}
+                                        </th>
+                                        <th class="px-4" style="width: 20%;">{{ 'QUANTITY' | translate}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="p-4">
+                                    <ng-container *ngFor="let oPayment of aPaymentMethods; let i = index">
+                                        <tr class="line-height-2rem">
+                                            <td class="px-4 d-flex justify-content-between">
+                                                {{oPayment.sMethod}}
+                                                <div>
+                                                    <i *ngIf="!oPayment.bIsCollapseItem"
+                                                        class="px-sm-2 cursor-pointer bi bi-chevron-down"
+                                                        (click)="expandItem(oPayment, oPayment.iStatisticsId, 'payments')">
+                                                    </i>
+                                                    <i *ngIf="oPayment.bIsCollapseItem"
+                                                        class="px-sm-2 cursor-pointer bi bi-chevron-up"
+                                                        (click)="oPayment.bIsCollapseItem = !oPayment.bIsCollapseItem"></i>
+                                                </div>
+                                            </td>
+                                            <td class="px-4">{{oPayment.nAmount.toFixed(2) }}</td>
+                                            <td class="px-4" *ngIf="paymentEditMode">
+                                                <input class="form-control" type="number"
+                                                    [(ngModel)]="oPayment.nNewAmount"
+                                                    (ngModelChange)="reCalculateTotal()">
+                                            </td>
+                                            <td class="px-4">{{oPayment.nQuantity}}</td>
                                         </tr>
-                                    </thead>
-                                    <tbody class="p-2">
-                                        <ng-container *ngFor="let oPayment of aPaymentMethods; let i = index">
-                                            <tr>
-                                                <td class="ps-9 d-flex justify-content-between">
-                                                    {{oPayment.sMethod}}
-                                                    <div class="">
-                                                        <i *ngIf="!oPayment.bIsCollapseItem" class="px-sm-2 cursor-pointer bi bi-chevron-down"
-                                                            (click)="expandItem(oPayment, oPayment.iStatisticsId, 'payments')">
-                                                        </i>
-                                                        <i *ngIf="oPayment.bIsCollapseItem" class="px-sm-2 cursor-pointer bi bi-chevron-up"
-                                                            (click)="oPayment.bIsCollapseItem = !oPayment.bIsCollapseItem"></i>
-                                                    </div>
+                                        <tr class="line-height-2rem" *ngIf="oPayment.isLoading">
+                                            <td colspan="6" class="text-center px-4">
+                                                <div class="spinner-border mx-auto"></div>
+                                            </td>
+                                        </tr>
+                                        <ng-container *ngIf="oPayment.bIsCollapseItem">
+                                            <tr class="line-height-2rem bg-gray-100" *ngFor="let item of oPayment.aItems">
+                                                <td class="px-4">
+                                                    <a (click)="openTransactionDetailsModal(item)"
+                                                        class="bg-success badge cursor-pointer fs-7 p-3 mb-2"
+                                                        *ngIf="!item.sComment.includes('_CASH')">
+                                                        {{ item.sComment}}
+                                                    </a>
+                                                    <span *ngIf="item.sComment.includes('_CASH')">
+                                                        {{ item.sComment}}
+                                                    </span>
+
+
+                                                    {{ (!item?.sComment || item.sComment === '') ? item.sMethod : ''
+                                                    }}
                                                 </td>
-                                                <td>{{oPayment.nAmount}}</td>
-                                                <td *ngIf="paymentEditMode">
-                                                    <input class="form-control" type="number" [(ngModel)]="oPayment.nNewAmount"
-                                                        (ngModelChange)="reCalculateTotal()">
-                                                </td>
-                                                <td>{{oPayment.nQuantity}}</td>
+                                                <td class="px-4"> {{ item.nAmount.toFixed(2) }}</td>
+                                                <td class="px-4"> {{ item.nQuantity }}</td>
                                             </tr>
-                                            <tr *ngIf="oPayment.isLoading">
-                                                <td colspan="6" class="text-center">
-                                                    <div class="spinner-border mx-auto">
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <ng-container *ngIf="oPayment.bIsCollapseItem">
-                                                <tr class="bg-gray-100" *ngFor="let item of oPayment.aItems">
-                                                    <td class="ps-9"> {{ item.sComment}} {{ (!item?.sComment || item.sComment === '') ? item.sMethod : '' }}</td>
-                                                    <td> {{ item.nAmount }}</td>
-                                                    <td> {{ item.nQuantity }}</td>
-                                                </tr>
-                                            </ng-container>
                                         </ng-container>
+                                    </ng-container>
+                                    <ng-container *ngIf="paymentEditMode">
+                                        <tr class="line-height-2rem" *ngFor="let oPayment of aNewSelectedPaymentMethods; let i = index">
+                                            <td class="px-4">
+                                                <div>
+                                                    <ng-select [(ngModel)]="aNewSelectedPaymentMethods[i]"
+                                                        [clearable]="false">
+                                                        <ng-option [value]="option" *ngFor="let option of payMethods">
+                                                            {{ option.sName | translate }}
+                                                        </ng-option>
+                                                    </ng-select>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td class="px-4">
+                                                <input class="form-control" type="number" [(ngModel)]="oPayment.nAmount"
+                                                    (ngModelChange)="reCalculateTotal()">
+                                            </td>
+                                        </tr>
+                                        <tr class="line-height-2rem">
+                                            <td colspan="3" class="text-start px-4">
+                                                <span class="cursor-pointer text-gray-800" (click)="addRow()"> +
+                                                    {{ "CLICK_HERE_TO_ADD_MORE" | translate}}</span>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="line-height-2rem">
+                                        <th class="text-end">{{ 'TOTAL' | translate}}</th>
+                                        <th class="w-150px">{{ nPaymentMethodTotal | number: '.2'}}</th>
                                         <ng-container *ngIf="paymentEditMode">
-                                            <tr *ngFor="let oPayment of aNewSelectedPaymentMethods; let i = index">
-                                                <td>
-                                                    <div>
-                                                        <ng-select [(ngModel)]="aNewSelectedPaymentMethods[i]" [clearable]="false">
-                                                            <ng-option [value]="option" *ngFor="let option of payMethods">
-                                                                {{ option.sName | translate }}
-                                                            </ng-option>
-                                                        </ng-select>
-                                                    </div>
-                                                </td>
-                                                <td></td>
-                                                <td>
-                                                    <input class="form-control" type="number" [(ngModel)]="oPayment.nAmount"
-                                                        (ngModelChange)="reCalculateTotal()">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="3" class="text-start">
-                                                    <span class="cursor-pointer text-gray-800" (click)="addRow()"> +
-                                                        {{ "CLICK_HERE_TO_ADD_MORE" | translate}}</span>
-                                                </td>
-                                            </tr>
+                                            <th>
+                                                <span
+                                                    [ngClass]="nNewPaymentMethodTotal === nPaymentMethodTotal ? 'valid' : 'invalid' ">{{
+                                                    nNewPaymentMethodTotal }}</span>
+                                            </th>
+                                            <th class="w-150px">
+                                                <button class="btn btn-sm btn-primary"
+                                                    (click)="saveUpdatedPayments($event)"
+                                                    [disabled]="nNewPaymentMethodTotal != nPaymentMethodTotal ? true : false">
+                                                    {{ "SAVE" |
+                                                    translate}}</button>
+                                            </th>
                                         </ng-container>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th class="text-end">{{ 'TOTAL' | translate}}</th>
-                                            <th class="w-150px">{{ nPaymentMethodTotal }}</th>
-                                            <ng-container *ngIf="paymentEditMode">
-                                                <th>
-                                                    <span
-                                                        [ngClass]="nNewPaymentMethodTotal === nPaymentMethodTotal ? 'valid' : 'invalid' ">{{
-                                                        nNewPaymentMethodTotal }}</span>
-                                                </th>
-                                                <th class="w-150px">
-                                                    <button class="btn btn-sm btn-primary"
-                                                        (click)="saveUpdatedPayments($event)"> {{ "SAVE" |
-                                                        translate}}</button>
-                                                </th>
-                                            </ng-container>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
-                </div>
+                </section>
                 <!-- PAYMENT END -->
 
                 <!-- STOCK HISTORY START -->
-                <div class="card">
-                    <div class="container">
-                        <div class="d-flex justify-content-between">
-                            <strong> {{ 'STOCK_HISTORY' | translate}} </strong>
-                        </div>
-                        <p *ngIf="!oStockPerLocation.aHistory">{{ 'STOCK_HISTORY_NOT_FOUND' | translate}}</p>
-                        <div *ngIf="oStockPerLocation.aHistory">
-                            <div class="card-body">
-                                <table
-                                    class="table table-row-bordered table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold border">
-                                    <thead class="bg-gray-100">
-                                        <tr class="fw-bold fs-6 text-gray-800">
-                                            <th>{{ 'LOCATION_NAME' | translate}}</th>
-                                            <th class="w-150px">{{ 'PURCHASE_PRICE' | translate}} -
-                                                {{oStockPerLocation.nTotalPurchasePrice | number:'1.2-2'}}</th>
-                                        </tr>
+                <section>
+                    <button class="btn btn-secondary w-100 my-4 py-3"
+                        (click)="isShowStockLocation = !isShowStockLocation">{{isShowStockLocation?('HIDE_STOCK_VALUE'|
+                        translate):('SHOW_STOCK_VALUE'| translate)}}</button>
+<div class="d-flex justify-content-between align-items-center"
+    *ngIf="oStockPerLocation.aHistory?.length && isShowStockLocation">
+    <strong> {{ 'STOCK_HISTORY' | translate}}</strong>
+</div>
+<strong *ngIf="!oStockPerLocation.aHistory && isShowStockLocation">{{ 'STOCK_HISTORY_NOT_FOUND' |
+    translate}} </strong>
+<div class="px-4 mt-3" *ngIf="oStockPerLocation.aHistory?.length && isShowStockLocation">
+    <table class="table border gy-5 gs-5 mb-0 text-gray-600 fw-bold">
+        <thead>
+                                <tr class="line-height-2rem bg-light d-flex justify-content-between align-items-center"
+                                    style="border-bottom: transparent !important;">
+                                    <th>
+                                        <span>{{ 'LOCATION_NAME' | translate}}</span>
+                                    </th>
+                                    <th style="width: 20%;">
+                                        {{ 'PURCHASE_PRICE' | translate}} -
+                                        {{oStockPerLocation.nTotalPurchasePrice |
+                                        number:'1.2-2'}}
+                                    </th>
+                                    </tr>
                                     </thead>
-                                    <tbody class="p-2">
-                                        <tr *ngFor="let oHistory of oStockPerLocation.aHistory; let i = index">
-                                            <td class="ps-9">{{oHistory.sName ? oHistory.sName : '-' }}</td>
-                                            <td>{{oHistory.nPurchasePrice | number:'1.2-2'}}</td>
+                                    <tbody>
+                                <tr class="line-height-2rem">
+                                    <td colspan="6" class="p-2">
+                                        <table class="table table-row-gray-300 gy-5 gs-5 mb-0 text-gray-600 fw-bold"
+                                            *ngFor="let oHistory of oStockPerLocation.aHistory; let historyIndex = index">
+                                            <thead class="bg-light">
+                                                <tr class="line-height-2rem">
+                                                    <th scope="col">
+                                                        <span>
+                                                            {{oHistory.sName ? oHistory.sName : '-'}}
+                                                        </span>
+                                                        <span>
+                                                            <i *ngIf="!oHistory.bIsCollapseItem" class="px-sm-2 cursor-pointer bi bi-chevron-down"
+                                                                (click)="oHistory.bIsCollapseItem = true;">
+                                                            </i>
+                                                            <i *ngIf="oHistory.bIsCollapseItem" class="px-sm-2 cursor-pointer bi bi-chevron-up"
+                                                                (click)="oHistory.bIsCollapseItem = false;">
+                                                            </i>
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col" class="w-150px">
+                                                        {{oHistory.nPurchasePrice.toFixed(2)}}
+                                                    </th>
+                                                </tr>
+                                            </thead>
+
+                                            <!-- Expand view of payment -->
+                                            <ng-container *ngIf="oHistory.aOwnerShip.length && oHistory.bIsCollapseItem">
+                                                <thead>
+                                                    <tr class="line-height-2rem bg-light">
+                                                        <th>
+                                                            <span>{{ 'OWNERSHIP' |
+                                                                translate}}</span>
+                                                        </th>
+                                                        <th class="w-150px">
+                                                            <span>{{"OWNERSHIP_PRICE" |
+                                                                translate}}</span>
+                                                        </th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody class="p-2" *ngFor="let oOwnerShip of oHistory.aOwnerShip; let ownerShipIndex = index">
+                                                    <tr class="line-height-2rem">
+                                                        <td class="ps-9">
+                                                            {{ oOwnerShip.eOwnerShip ? oOwnerShip.eOwnerShip
+                                                            : 'NA' }}
+                                                        </td>
+                                                        <td>{{oOwnerShip.nPurchasePrice}}</td>
+                                                    </tr>
+                                                    </tbody>
+                                                    </ng-container>
+                                                    <!-- Expand view of payment -->
+
+                                        </table>
+                                        </td>
                                         </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                        </tbody>
+                                        </table>
+                                        </div>
+                </section>
                 <!-- STOCK HISTORY END -->
 
                 <!-- Tushar's code START -->
@@ -1342,130 +1604,191 @@
             </div>
         </div>
     </div>
-    <ng-container *ngIf="iStatisticId">
-        <!-- COUNTING SECTION START -->
+    <!-- COUNTING SECTION START -->
+    <div class="card mt-3" *ngIf="iStatisticId">
         <div class="row">
-            <div class="card card-flush">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card-header align-items-center p-5">
-                            <div class="card-title col-md-12">
-                                <h4>{{ "COUNTING" | translate}}</h4>
-                            </div>
-                        </div>
-                        <div class="card-body p-5">
-                            <div class="counting-list mb-5">
-                                <table style="display: block;column-count: 2">
-                                    <tbody>
-                                        <tr *ngFor="let amount of aAmount">
-                                            <td class="w-50">
-                                                <label class="currency">
-                                                    {{ amount.sLabel | currency: transactionAuditPdfService.currency }} x
-                                                </label>
-                                            </td>
-                                            <td class="mx-2">
-                                                <input type="number" class="form-control p-2"
-                                                    [(ngModel)]="amount.nQuantity"
-                                                    (ngModelChange)="calculateTotalCounting()"
-                                                    [disabled]="bDisableCountings">
-                                            </td>
-                                            <td class="w-50">
-                                                <label class="currency">{{ (amount.nQuantity * amount.nValue) | currency: transactionAuditPdfService.currency}}</label>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                            </div>
-                            <ng-container *ngIf="oStatisticsDocument">
-                                <div class="d-flex flex-wrap">
-                                    <label>{{'NOTES' | translate}}</label>
-                                    <div class="flex-grow-1 ms-5">
-                                        <textarea class="form-control" rows="5" [disabled]="bDisableCountings"
-                                            [(ngModel)]="oStatisticsDocument.sComment"></textarea>
-                                    </div>
-                                </div>
-                            </ng-container>
-                        </div>
+            <div class="col-6">
+                <div class="d-flex justify-content-between align-items-center p-3 mb-2">
+                    <h4 class="card-title">{{ "COUNTING" | translate}}</h4>
+                    <div class="card-toolbar" *ngIf="bOpeningDayClosure && bAllowOpenManualCashDrawer">
+                        <div *ngIf="bOpeningDrawer" class="spinner-border me-2"></div>
+                        <button class="btn btn-primary btn-sm" [disabled]="bOpeningDrawer"
+                            (click)="openDrawer()">{{'OPEN_DRAWER' | translate}}</button>
+                    </div>
+                </div>
+                <div class="p-3">
+                    <div class="counting-list">
+                        <table style="display: block;column-count: 2">
+                            <tbody>
+                                <tr *ngFor="let amount of auditService.aAmount">
+                                    <td class="w-50">
+                                        <label class="currency">
+                                            {{ amount.sLabel | currency: auditService.currency }}
+                                            x
+                                        </label>
+                                    </td>
+                                    <td class="mx-2">
+                                        <input type="number" class="form-control p-2" [(ngModel)]="amount.nQuantity"
+                                            (ngModelChange)="calculateTotalCounting()" [disabled]="bDayStateClosed">
+                                    </td>
+                                    <td class="w-50">
+                                        <label class="currency">{{ (amount.nQuantity * amount.nValue) |
+                                            currency: auditService.currency}}</label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
                     </div>
-                    <div class="col-md-6">
-                        <div class="card-header align-items-center p-5">
-                            <div class="card-title col-md-12">
-                                <h4> {{ "EARNINGS" | translate}} </h4>
+                    <ng-container *ngIf="oStatisticsDocument">
+                        <div class="d-flex flex-wrap mt-2">
+                            <label>{{'NOTES' | translate}}</label>
+                            <div class="flex-grow-1 ms-5">
+                                <textarea class="form-control" rows="5" [disabled]="bDayStateClosed"
+                                    [(ngModel)]="oStatisticsDocument.sComment"></textarea>
                             </div>
                         </div>
-                        <div class="card-body">
+                    </ng-container>
+                </div>
 
-                            <div class="earnings-section">
-                                <div>
-                                    <label>{{ "CASH_LEFTOVER" | translate}}</label>
-                                    <label class="">{{ oCountings.nCashAtStart | currency: transactionAuditPdfService.currency }}</label>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center p-3 mb-2">
+                    <div class="card-title col-md-12">
+                        <h4> {{ "EARNINGS" | translate}} </h4>
+                    </div>
+                </div>
+                <div class="p-3">
+                    <div class="earnings-section">
+                        <div>
+                            <label>{{ "CASH_LEFTOVER" | translate}}</label>
+                            <label><!-- + ((oHelperDetails.bSaved) ? oHelperDetails.oStartAmountIncorrect.nAmount : 0) -->
+                                {{ oCountings.nCashAtStart | currency:auditService.currency }}
+                            </label>
+                        </div>
+                        <!-- COMMENTED THIS BECAUSE NOT USING BELOW FIELD CURRENTLY
+                            <div>
+                                <label>{{ "CASH_MUTATION" | translate}}</label>
+                                <label>{{ '0.00' | currency: auditService.currency }}</label>
+                            </div> 
+                        -->
+                        <div>
+                            <label>{{ "CASH_IN_TILL" | translate}}</label>
+                            <label>
+                                {{ oCountings.nCashInTill | currency: auditService.currency }}
+                            </label>
+                        </div>
+                        <div *ngIf="oHelperDetails.nAmountToAdd || oHelperDetails.nAmountToDeduct"
+                            class="ps-5 py-3 d-block">
+                            <label class="bold">{{ 'CORRECTIONS' | translate }}</label>
+
+                            <div *ngIf="oHelperDetails.oStartAmountIncorrect.bChecked">
+                                <label>{{ 'ADJUSTED_START_AMOUNT' | translate}}</label>
+                                <span class="text-end">
+                                    {{ oHelperDetails.oStartAmountIncorrect.nAmount | currency:
+                                    auditService.currency }}
+                                </span>
+                            </div>
+
+                            <ng-container *ngFor="let oReason of oHelperDetails.aReasons">
+                                <div *ngIf="oReason.nAmount">
+                                    <label>{{ oReason?.oExpense?.oExpenseType?.title | translate}}</label>
+                                    <span class="text-end">
+                                        {{ oReason.nAmount | currency: auditService.currency }}
+                                    </span>
                                 </div>
-                                <div>
-                                    <label>{{ "CASH_MUTATION" | translate}}</label>
-                                    <label class="">{{ '0.00' | currency: transactionAuditPdfService.currency }}</label>
-                                </div>
-                                <div>
-                                    <label>{{ "CASH_IN_TILL" | translate}}</label>
-                                    <label class="">
-                                        <ng-container *ngIf="bDisableCountings">
-                                            {{ oCountings.nCashInTill + (-oCountings.nCashDifference) | currency: transactionAuditPdfService.currency }}
-                                        </ng-container>
-                                        <ng-container *ngIf="!bDisableCountings">
-                                            {{ oCountings.nCashInTill | currency: transactionAuditPdfService.currency }}
-                                        </ng-container>
-                                    </label>
-                                </div>
-                                <div>
-                                    <label>{{ "CASH_COUNTED" | translate}}</label>
-                                    <input type="number" class="form-control p-2 w-30"
-                                        [(ngModel)]="oCountings.nCashCounted"
-                                        (ngModelChange)="oCountings.nCashRemain = oCountings.nCashCounted - oCountings.nSkim"
-                                        [disabled]="bDisableCountings">
-                                </div>
-                                <div>
-                                    <label>{{ "TREASURY_DIFFERENCE" | translate}}</label>
-                                    <label class="bold">
-                                        <ng-container *ngIf="bDisableCountings">
-                                            {{ oCountings.nCashDifference | currency: transactionAuditPdfService.currency }}
-                                        </ng-container>
-                                        <ng-container *ngIf="!bDisableCountings">
-                                            {{ oCountings.nCashCounted - (oCountings.nCashAtStart + oCountings.nCashInTill) | currency: transactionAuditPdfService.currency }}
-                                        </ng-container>
-                                    </label>
-                                </div>
-                                <div>
-                                    <label>{{ "SKIM" | translate}}</label>
-                                    <input type="number" class="form-control p-2 w-30" [(ngModel)]="oCountings.nSkim"
-                                        (ngModelChange)="oCountings.nCashRemain = oCountings.nCashCounted - oCountings.nSkim"
-                                        [disabled]="bDisableCountings">
-                                </div>
-                                <div>
-                                    <label>{{ "AMOUNT_TO_LEFT_IN_CASH" | translate}}</label>
-                                    <input type="number" class="form-control p-2 w-30"
-                                        [(ngModel)]="oCountings.nCashRemain"
-                                        (ngModelChange)="oCountings.nSkim = oCountings.nCashCounted - oCountings.nCashRemain"
-                                        [disabled]="bDisableCountings">
-                                </div>
-                                <br>
-                                <ng-container *ngIf="oStatisticsDocument?.bIsDayState">
-                                    <div class="d-flex justify-content-start">
-                                        <button type="button" class="btn btn-primary"
-                                            data-kt-roles-modal-action="submit" (click)="closeDayState()"
-                                            [class.disabled]="closingDayState">
-                                            <span class="indicator-label">{{ "CLOSE_DAYSTATE" | translate}}</span>
-                                        </button>
-                                        <div *ngIf="closingDayState" class="spinner-border mx-5"></div>
-                                    </div>
+                            </ng-container>
+                            <div>
+                                <label class="bold">{{'TOTAL' | translate}}</label>
+                                <label class="bold">{{ (oHelperDetails.nAmountToAdd -
+                                    oHelperDetails.nAmountToDeduct) | currency:
+                                    auditService.currency}} </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label>{{ "CASH_COUNTED" | translate}}</label>
+                            <input type="number" class="form-control p-2 w-30" [(ngModel)]="oCountings.nCashCounted"
+                                (ngModelChange)="oCountings.nCashRemain = +((oCountings.nCashCounted - oCountings.nSkim).toFixed(2))"
+                                [disabled]="bDayStateClosed">
+                        </div>
+                        <div>
+                            <label>{{ "TREASURY_DIFFERENCE" | translate}}</label>
+                            <label class="d-flex flex-column">
+                                <ng-container *ngIf="bDayStateClosed">
+                                    {{ oCountings.nCashDifference | currency: auditService.currency }}
                                 </ng-container>
+                                <ng-container *ngIf="!bDayStateClosed">
+                                    <ng-template #t [ngTemplateOutlet]="t" let-nDifference [ngTemplateOutletContext]="{ $implicit: 
+                                        +(oCountings.nCashCounted - 
+                                            (
+                                                oCountings.nCashAtStart
+                                                + oCountings.nCashInTill
+                                                + oHelperDetails.nAmountToAdd
+                                                - oHelperDetails.nAmountToDeduct
+                                            )
+                                        ).toFixed(2)}">
+                                        <span class="bold text-end">{{ nDifference | currency:
+                                            auditService.currency }}</span>
+                                        <span *ngIf="oCountings.nCashCounted > 0 && nDifference != 0"
+                                            class="badge badge-warning cursor-pointer"
+                                            (click)="openDayClosureHelpModal()">
+                                            {{ 'CLICK_TO_JUSTIFY_DIFFERENCE' | translate }}
+                                        </span>
 
-                            </div>
+                                    </ng-template>
+                                </ng-container>
+                            </label>
                         </div>
+                        <div>
+                            <label>{{ "SKIM" | translate}}</label>
+                            <input type="number" class="form-control p-2 w-30" [(ngModel)]="oCountings.nSkim"
+                                (ngModelChange)="oCountings.nCashRemain = +((oCountings.nCashCounted - oCountings.nSkim).toFixed(2))"
+                                [disabled]="bDayStateClosed">
+                        </div>
+                        <div>
+                            <label>{{ "AMOUNT_TO_LEFT_IN_CASH" | translate}}</label>
+                            <input type="number" class="form-control p-2 w-30" [(ngModel)]="oCountings.nCashRemain"
+                                (ngModelChange)="oCountings.nSkim = +((oCountings.nCashCounted - oCountings.nCashRemain).toFixed(2))"
+                                [disabled]="bDayStateClosed">
+                        </div>
+                        <br>
+
+                        <div class="d-flex justify-content-start" *ngIf="oStatisticsDocument?.bIsDayState">
+                            <div *ngIf="!oHelperDetails.bSaved" class="d-flex flex-column align-items-start">
+                                <span class="err-msg">{{'YOU_MUST_SAVE_CHANGES_BEFORE_CLOSE_DAY_STATE' |
+                                    translate }}</span>
+                                <div class="d-flex">
+                                    <button class="btn btn-primary btn-sm" (click)="saveHelperDetails()"
+                                        [disabled]="bSavingHelperDetails">
+                                        {{ 'SAVE_AND_RELOAD' | translate }}
+                                    </button>
+                                    <div *ngIf="bSavingHelperDetails" class="spinner-border mx-5"></div>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary me-2" data-kt-roles-modal-action="submit"
+                                *ngIf="oHelperDetails.bSaved" [disabled]="bStatisticLoading || closingDayState"
+                                (click)="checkAndAskForQuickCountings()">
+                                {{ "CLOSE_DAYSTATE" | translate}}
+                            </button>
+                            <div *ngIf="closingDayState" class="spinner-border mx-5"></div>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
-        <!-- COUNTING SECTION END -->
-    </ng-container>
+        <div class="row">
+            <div class="col-4 offset-8">
+                <div class="d-flex justify-content-start" *ngIf="bDayStateClosed">
+                    <button type="button" class="btn btn-secondary" data-kt-roles-modal-action="submit"
+                        [disabled]="bStatisticLoading || bReCalculateLoading" (click)="reCalculateDayClosure()">
+                        <span class="indicator-label">{{ "RE_CALCULATE_DAY_CLOSURE" | translate}}</span>
+                    </button>
+                    <div *ngIf="bReCalculateLoading" class="spinner-border mx-5"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- COUNTING SECTION END -->
 </div>

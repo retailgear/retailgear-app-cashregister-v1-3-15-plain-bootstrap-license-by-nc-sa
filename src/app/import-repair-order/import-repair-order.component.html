@@ -1,0 +1,86 @@
+<h3>{{ "REPAIR_ORDER_IMPORT" | translate}}</h3>
+
+<div class="stepper stepper-pills" id="kt_stepper_example_basic" data-kt-stepper="true" #stepperContainer>
+    <div class="stepper-nav flex-center flex-wrap mb-10">
+        <div class="stepper-item mx-2 my-4 current" data-kt-stepper-element="nav">
+            <div class="stepper-line w-40px"></div>
+            <div class="stepper-icon w-40px h-40px">
+                <i class="stepper-check fas fa-check"></i>
+                <span class="stepper-number">1</span>
+            </div>
+            <div class="stepper-label">
+                <h3 class="stepper-title">
+                    {{ "IMPORT_FILE" | translate}}
+                </h3>
+            </div>
+        </div>
+        <div class="stepper-item mx-2 my-4" data-kt-stepper-element="nav">
+            <div class="stepper-line w-40px"></div>
+            <div class="stepper-icon w-40px h-40px">
+                <i class="stepper-check fas fa-check"></i>
+                <span class="stepper-number">2</span>
+            </div>
+            <div class="stepper-label">
+                <h3 class="stepper-title">
+                    {{ "SET_REPAIR_ORDER_DETAILS" | translate}}
+                </h3>
+            </div>
+        </div>
+        <div class="stepper-item mx-2 my-4" data-kt-stepper-element="nav">
+            <div class="stepper-line w-40px"></div>
+            <div class="stepper-icon w-40px h-40px">
+                <i class="stepper-check fas fa-check"></i>
+                <span class="stepper-number">3</span>
+            </div>
+            <div class="stepper-label">
+                <h3 class="stepper-title">
+                    {{ "START_REPAIR_ORDER_IMPORT" | translate}}
+                </h3>
+            </div>
+        </div>
+    </div>
+    <form class="form mx-auto" novalidate="novalidate" id="kt_stepper_example_basic_form">
+        <div class="mb-5">
+
+            <!-- Import file -->
+            <div class="flex-column current" data-kt-stepper-element="content">
+                <import-repair-order-file [(parsedRepairOrderData)]="parsedRepairOrderData" (moveToStep)="moveToStep($event)"
+                    [(allFields)]="allFields" [(referenceObj)]="referenceObj">
+                </import-repair-order-file>
+            </div>
+            <!-- Import file -->
+
+            <!-- Repair-order Detail-->
+            <div class="flex-column" data-kt-stepper-element="content">
+                <import-repair-order-detail [parsedRepairOrderData]="parsedRepairOrderData"
+                    [(repairOrderDetailsForm)]="repairOrderDetailsForm" [(updateTemplateForm)]="updateTemplateForm"
+                    (moveToStep)="moveToStep($event)" [(allFields)]="allFields" [(referenceObj)]="referenceObj">
+                </import-repair-order-detail>
+            </div>
+            <!-- Repair-order Detail-->
+
+            <div class="flex-column" data-kt-stepper-element="content">
+                <div class="d-flex mb-3">
+                    <button class="btn btn-dark mt-3" (click)="moveToStep('previous')" [disabled]="importInprogress"> {{"BACK" | translate}} </button>
+                </div>
+                <div class="d-flex flex-column justify-content-center align-items-center">
+                    <h4 class="mb-3 fw-bolder text-uppercase" *ngIf="importInprogress">{{"PROCESSING_YOUR_FILE" | translate}}</h4>
+                    <h4 class="mb-3 fw-bolder text-uppercase" *ngIf="!importInprogress">{{"IMPORT_STATUS" | translate}}</h4>
+                    <div *ngIf="importInprogress" class="spinner-border mx-auto"></div>
+                    <div *ngIf="!importInprogress">
+                        <div class="alert" [ngClass]="bShowError? 'alert-danger':'alert-success'" role="alert">
+                           <p *ngIf="!importInprogress && bShowError" class="m-0">
+                                {{"AN_ERROR_OCCURED_WHILE_IMPORTING_DATA" | translate}}
+                           </p>
+                           <p *ngIf="!importInprogress && !bShowError" class="m-0">
+                                {{"DATA_IMPORTED_SUCCESSFULLY" | translate}}
+                           </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-stack">
+        </div>
+    </form>
+</div>

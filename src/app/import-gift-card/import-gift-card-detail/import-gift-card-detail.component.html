@@ -1,0 +1,50 @@
+<div class="row step-container mb-6" *ngIf="giftCardDetailsForm">
+    <p class="mb-4"> {{
+        "FILL_IN_GIFT_CARD_PROPERTIES_WITH_CORRESPONDING_COLUMNS_FROM_SELECTED_FIL_IF_FIELD_EMPTY_IT_IS_NOT_USED" |
+        translate}}</p>
+
+    <div class="d-flex mb-3">
+        <button class="btn btn-dark" (click)="gotoStep('previous')">
+            {{"BACK" | translate}}
+        </button>
+        <button class="btn btn-primary mx-2" (click)="gotoStep('import')" [disabled]="validateGiftCardHeaderLink()">
+            {{"NEXT_STEP" | translate}}
+        </button>
+        <button class="btn btn-secondary" (click)="getDynamicFields(true)">
+            <fa-icon [icon]="faSync"></fa-icon> &nbsp;
+            {{ "RELOAD_DEFAULT_ATTRIBUTES" | translate}}
+        </button>
+    </div>
+    <div style="background-color:#FFF" class="mt-3">
+        <h4 class="fw-bolder mb-3 mt-3 text-uppercase">{{ 'GIFT_CARD_DETAILS' | translate}}</h4>
+        <div class="row mb-4">
+            <div class="col-md-2 no-padding-left">
+                <h5>{{"FOUND_COLUMN(CSV_HEADERS)"}}</h5>
+            </div>
+            <div class="col-md-3 no-padding-left">
+                <h5>{{ "ATTRIBUTE_TO_SET" | translate}}</h5>
+            </div>
+            <div class="col-md-7 no-padding-right">
+                <h5>{{ "UPDATE_TEMPLATE" | translate}} </h5>
+            </div>
+        </div>
+        <div class="row mb-4" *ngFor="let option of headerOptions">
+            <div class="col-md-2 no-padding-left">
+                {{option}}
+            </div>
+            <div class="col-md-3 no-padding-left" *ngIf="allFields?.all?.length">
+                <ng-select class="form-control form-control-solid p-0" [clearable]="false" id="gift-card-attributes"
+                    [(ngModel)]="giftCardDetailsForm[option]" (change)="setTemplate(option, giftCardDetailsForm[option])">
+                    <ng-option *ngFor="let obj of allFields.all" [value]="obj.sColumnHeader">{{ obj.sColumnHeader | translate}}</ng-option>
+                </ng-select>
+            </div>
+            <div class="col-md-5 no-padding-left flex">
+                <ng-select class="form-control form-control-solid p-0" [clearable]="false" id="gift-card-update-template"
+                    [(ngModel)]="updateTemplateForm[giftCardDetailsForm[option]]">
+                    <ng-option *ngFor="let oActionHeader of aActionHeaders" [value]="oActionHeader.value">{{oActionHeader.key |
+                        translate}}</ng-option>
+                </ng-select>
+            </div>
+        </div>
+    </div>
+</div>

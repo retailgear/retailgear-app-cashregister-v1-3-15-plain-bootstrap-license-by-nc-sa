@@ -1,0 +1,53 @@
+.vertical-label-text {
+    left: calc(50% - 0.5rem);
+    line-height: 1;
+    padding-top: 0.5rem;
+    position: relative;
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+    white-space: nowrap;
+    -webkit-writing-mode: vertical-rl;
+    writing-mode: vertical-rl;
+}
+
+.table td:not(:last-child) {
+    border-right: 1px solid var(--bs-gray-400) !important;
+}
+
+.mt-per-35 {
+    margin-top: 35%;
+}
+
+.tscroll {
+    overflow-x: scroll;
+    margin-bottom: 10px;
+}
+
+.sticky-col {
+    position: -webkit-sticky;
+    position: sticky;
+    z-index: 10;
+}
+
+.first-col {
+    width: 30px;
+    min-width: 30px;
+    max-width: 30px;
+    left: 0px;
+}
+
+.second-col {
+    width: 200px;
+    min-width: 200px;
+    max-width: 250px;
+    left: 30px;
+}
+
+.table-head {
+    color: red;
+    white-space: initial;
+}
+
+.w-260px {
+    width: 260px;
+}

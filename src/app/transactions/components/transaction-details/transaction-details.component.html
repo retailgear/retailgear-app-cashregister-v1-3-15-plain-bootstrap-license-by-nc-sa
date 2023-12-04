@@ -1,241 +1,407 @@
-<!-- <app-supplier-product-slider [$data]="SupplierStockProductSliderData.asObservable()">
-</app-supplier-product-slider> -->
+<div class="overlay-full d-flex flex-column justify-content-center align-items-center"
+    *ngIf="paymentEditMode && !bIsDayStateOpened">
+    <div *ngIf="bDayStateChecking">
+        <div class="d-flex flex-column">
+            <h1>{{ 'PLEASE_WAIT_WHILE_CHECKING_FOR_DAY_STATE' | translate}}</h1>
+            <div class="spinner-border mx-auto"></div>
+        </div>
+    </div>
+
+    <div *ngIf="!bDayStateChecking && !bIsDayStateOpened" class="d-flex flex-column align-items-center">
+        <h1>{{ 'NO_OPEN_DAY_STATE_FOUND' | translate}}</h1>
+        <button class="btn btn-white" (click)="openDayState()" [disabled]="bIsOpeningDayState">{{ 'OPEN_CASH_REGISTRY' |
+            translate}}</button>
+        <div>
+            <button class="btn btn-dark mt-5" (click)="paymentEditMode = false">{{ 'CANCEL' | translate}}</button>
+        </div>
+    </div>
+
+</div>
 
 <div class="card shadow-sm">
-    <div class="card-header mt-5">
-        <h3>{{ "TRANSACTION_DETAIL" | translate}} | {{transaction.sNumber}}</h3>
-        <button type="button" class="btn btn-sm btn-secondary h-50" (click)="close(false)">
-            <fa-icon [icon]="faTimes"></fa-icon>
-        </button>
+    <div class="card-header d-flex justify-content-between align-items-center py-3">
+        <h3 class="m-0 fw-bolder">{{ "TRANSACTION_DETAIL" | translate}} | {{transaction.sNumber}}</h3>
+        <a class="cancel my-auto"
+            (click)="close({action: false, oData: {oCurrentCustomer: transaction.oCustomer},sInvoiceNumber:transaction.sInvoiceNumber})">
+            <i class="fa fa-times fabutton"></i>
+        </a>
     </div>
-    <div class="card-body row main m-0">
-        <div class="col-md-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <h3 class="fw-bolder mb-4">
-                    <span>{{ "CUSTOMER" | translate }}</span>
-                </h3>
-                <ng-container *ngIf="from === 'transactions'">
-                    <button class="btn btn-primary" (click)="openCustomer(transaction.oCustomer)">
-                        {{ 'VIEW' | translate }}
-                    </button>
-                </ng-container>
-            </div>
-            <div class="row fw-bold gy-1">
-                <div class="col-md-12">
-                    <div class="text-gray-900 mt-2">{{ transaction?.oCustomer?.sFirstName }} {{
-                        transaction?.oCustomer?.sPrefix}} {{ transaction?.oCustomer?.sLastName }} </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mt-2 text-muted">{{ "INVOVICE_ADDRESS" | translate}}</div>
-                    <div class="text-gray-800 mt-2">
-                        <span> {{ transaction?.oCustomer?.oInvoiceAddress?.sStreet }} {{
-                            transaction?.oCustomer?.oInvoiceAddress?.sHouseNumber }} </span>
-                        <span> {{ transaction?.oCustomer?.oInvoiceAddress?.sPostalCode }} {{
-                            transaction?.oCustomer?.oInvoiceAddress?.sCity }} </span>
-                        <span> {{ transaction?.oCustomer?.oInvoiceAddress?.sCountry }}</span>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mt-2 text-muted">{{ "SHIPPING_ADDRESS" | translate}}</div>
-                    <div class="text-gray-800 mt-2">
-                        <span> {{ transaction?.oCustomer?.oShippingAddress?.sStreet }} {{
-                            transaction?.oCustomer?.oShippingAddress?.sHouseNumber }} </span>
-                        <span> {{ transaction?.oCustomer?.oShippingAddress?.sPostalCode }} {{
-                            transaction?.oCustomer?.oShippingAddress?.sCity }} </span>
-                        <span> {{ transaction?.oCustomer?.oShippingAddress?.sCountry }}</span>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="text-gray-800 mt-2">{{ transaction?.oCustomer?.sEmail }}</div>
-                    <div class="text-gray-800 mt-2">{{ transaction?.oCustomer?.sMobile }} &nbsp; &nbsp; {{
-                        transaction?.oCustomer?.sLandLine }}</div>
-                </div>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center">
-              <h3 class="fw-bolder mb-4">
-               <span>{{"CREATER_DETAIL" | translate}} </span>  
-            </h3> 
-            </div>
-
-            <div class="row fw-bold gy-1">
-            <div class="col-md-12">
-                <div class="d-flex fs-6 ms-1 my-1">
-                    <div class="align-items-center">                                 
-                        <img alt="Logo"
-                        *ngIf="transaction?.createrDetail?.sFirstName && (!transaction?.createrDetail?.sAvatar  || transaction?.createrDetail?.sAvatar == '')"
-                        src="https://prismanote.com/public/prismanote.png" class="createrImage">
-                      <img alt="Logo" *ngIf="transaction?.createrDetail?.sAvatar" [src]="transaction?.createrDetail?.sAvatar" class="createrImage">                                                      
-                      <span> {{transaction?.createrDetail?.sFirstName || ''}} {{transaction?.createrDetail?.sLastName || ''}} </span>
-                        </div>   
-                        </div>        
-            </div>
-            </div>
-        </div>
-        <div class="col-md-8 row" *ngIf="eType === 'cash-register-revenue'">
-            <h3 class="fw-bolder mb-4">
-                <span>{{ "TRANSACTION_OVERVIEW" | translate }}</span>
-            </h3>
-            <div class="col-md-8 row fw-bold gy-1">
-                <label class="col-md-4 mt-2 text-muted">{{"RECEIPT_NUMBER" | translate}}</label>
-                <div class="col-md-8">
-                    <div class="text-gray-800 mt-2">{{ transaction.sInvoiceNumber || '' }}</div>
-                </div>
-                <label class="col-md-4 mt-2 text-muted">{{"DATE_TIME" | translate}}</label>
-                <div class="col-md-8">
-                    <div class="text-gray-800 mt-2">{{ transaction.dCreatedDate }}</div>
-                </div>
-                <!-- <label class="col-md-4 mt-2 text-muted">{{"PAY_METHOD" | translate}}</label>
-                <div class="col-md-8">
-                    <div *ngFor="let payment of transaction.aPayments">
-                        <div class="text-gray-800 mt-2">{{ payment.sMethod || '' }}</div>
-                    </div>
-
-                </div> -->
-                <label class="col-md-4 mt-2 text-muted">{{"CHANGE" | translate}}</label>
-                <div class="col-md-8">
-                    <div class="text-gray-800 mt-2">{{ 0 }}</div>
-                </div>
-                <label class="col-md-4 mt-2 text-muted">{{"REFUNDED" | translate}}</label>
-                <div class="col-md-8">
-                    <div class="text-gray-800 mt-2">{{ 0 }}</div>
-                </div>
-                <label class="col-md-4 mt-2 text-muted">{{"ASSISTED_BY" | translate}}</label>
-                <div class="col-md-8">
-                    <div class="text-gray-800 mt-2">{{ transaction?.oEmployee?.sFirstName }} {{
-                        transaction?.oEmployee?.sLastName }}</div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <button class="btn btn-sm btn-secondary w-100 d-flex">
-                    <fa-icon [icon]="faFileInvoice"></fa-icon>
-                    <label class="mx-auto">{{ "GENERAL_INVOICE" | translate}}</label>
-                </button>
-                <button [disabled]="!businessDetails?._id" class="btn btn-sm btn-secondary w-100 d-flex"
-                    (click)="downloadWithVAT()">
-                    <fa-icon [hidden]="downloadWithVATLoading" [icon]="faDownload"></fa-icon>
-                    <span *ngIf="downloadWithVATLoading">
-                        <i class="fa fa-spinner fa-spin" [hidden]="!downloadWithVATLoading" style="font-size:15px;"></i>
-                    </span>
-                    <label class="mx-auto">{{ "DOWNLOAD_WITH_VAT" | translate}}</label>
-                </button>
-                <button class="btn btn-sm btn-secondary w-100 d-flex" (click)="downloadWithVAT(true)">
-                    <fa-icon [hidden]="printWithVATLoading" [icon]="faPrint"></fa-icon>
-                    <span *ngIf="printWithVATLoading">
-                        <i class="fa fa-spinner fa-spin" [hidden]="!printWithVATLoading" style="font-size:15px;"></i>
-                    </span>
-                    <label class="mx-auto">{{ "PRINT" | translate }}</label>
-                </button>
-                <button class="btn btn-sm btn-secondary w-100 d-flex">
-                    <fa-icon [icon]="faDownload"></fa-icon>
-                    <label class="mx-auto">{{ "DOWNLOAD_WITHOUT_VAT" | translate}}</label>
-                </button>
-                <button [disabled]="!businessDetails?._id" class="btn btn-sm btn-secondary w-100 d-flex" (click)="getThermalReceipt()">
-                    <fa-icon [icon]="faReceipt"></fa-icon>
-                    <label class="mx-auto"> {{ "THERMAL_RECEIPT" | translate}}</label>
-                </button>
-                <button class="btn btn-sm btn-secondary w-100 d-flex">
-                    <fa-icon [icon]="faAt"></fa-icon>
-                    <label class="mx-auto">{{ "MAIL" | translate}}</label>
-                </button>
-                <button class="btn btn-sm btn-secondary w-100 d-flex"
-                    (click)="openTransaction(transaction, 'transaction')">
-                    <fa-icon [icon]="faUndoAlt"></fa-icon>
-                    <label class="mx-auto">{{"REFUND" | translate}}</label>
-                </button>
-                <button class="btn btn-sm btn-secondary w-100 d-flex">
-                    <fa-icon [icon]="faClipboard"></fa-icon>
-                    <label class="mx-auto">{{"VIEW_LOG" | translate}}</label>
-                </button>
-                <button class="btn btn-sm btn-secondary w-100 d-flex">
-                    <fa-icon [icon]="faTrashAlt"></fa-icon>
-                    <label class="mx-auto">{{ "DELETE" | translate}}</label>
-                </button>
-            </div>
-        </div>
-        <div class="col-md-8 row" *ngIf="eType === 'webshop-revenue' || eType === 'webshop-reservation'">
-            <h3 class="fw-bolder mb-4">
-                <span>{{ "OVERVIEW" | translate }}</span>
-            </h3>
-            <div class="col-md-8 row fw-bold gy-1">
-                <div class="col-md-12">
-                    <ng-select placeholder="Order status">
-                        <ng-option>Status one</ng-option>
-                        <ng-option>Status two</ng-option>
-                        <ng-option>Status three</ng-option>
-                        <ng-option>Status four</ng-option>
-                    </ng-select>
-                </div>
-                <label class="col-md-4 mt-5 text-muted">{{"SHIPPING_METHOD" | translate}} : </label>
-                <div class="col-md-8 mt-5">
-                    <div class="text-gray-800">{{ "COMPLETED" | translate}}</div>
-                </div>
-                <button class="btn btn-sm btn-primary w-100 d-flex mt-5">
-                    <label class="mx-auto">{{ "TRACK_AND_TRACE_ORDER" | translate}}</label>
-                </button>
-            </div>
-            <div class="col-md-4">
-                <button class="btn btn-sm btn-secondary w-100 d-flex">
-                    <fa-icon [icon]="faDownload"></fa-icon>
-                    <label class="mx-auto">{{ "RECEIPT" | translate}}</label>
-                </button>
-                <button class="btn btn-sm btn-secondary w-100 d-flex">
-                    <fa-icon [icon]="faReceipt"></fa-icon>
-                    <label class="mx-auto">{{"THERMAL_RECEIPT" | translate}}</label>
-                </button>
-                <button class="btn btn-sm btn-secondary w-100 d-flex">
-                    <!-- <fa-icon [icon]="faAt"></fa-icon> -->
-                    <label class="mx-auto"> {{ "EXCHANGE" | translate}}</label>
-                </button>
-                <button class="btn btn-sm btn-secondary w-100 d-flex" (click)="downloadWebOrder()">
-                    <fa-icon [icon]="faDownload"></fa-icon>
-                    <label class="mx-auto">{{ "DOWNLOAD_PDF" | translate}}</label>
-                </button>
-            </div>
-        </div>
-        <!-- </div> -->
+    <div class="card-body main m-0">
         <div class="row">
-            <div class="col-md-12">
-                <h3 class="fw-bolder mb-3">
-                    <span>{{ "ITEMS" | translate }}</span>
+            <div class="col-4">
+
+                <!-- CURRENT_CUSTOMER Start -->
+                <div class="alert alert-warning" role="alert" *ngIf="showSystemCustomer">
+                    <p>{{"DIFFERENT_CUSTOMER_INFORMATION" | translate}}</p>
+                    <div class="d-flex">
+                        <button class="btn btn-info btn-sm" *ngIf="!transaction?.oSystemCustomer?.bCounter" (click)="openCustomer(transaction.oSystemCustomer)">
+                            {{'VIEW'|translate}} 
+                        </button>
+                        <button class="btn btn-light-warning ms-2 btn-sm" *ngIf="!transaction?.oSystemCustomer?.bCounter" (click)="syncCustomerData(transaction.oCustomer,transaction.oSystemCustomer)">
+                            {{'SYNC_DATA'|translate}} 
+                        </button>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mt-5">
+                    <h3 class="fw-bolder mb-0">
+                        <span>{{ "CURRENT_CUSTOMER" | translate }}</span>
+                    </h3>
+                    <ng-container *ngIf="from === 'transactions' || from === 'transactions-action' ">
+                        <button class="btn btn-primary cstm-btn" [disabled]="!transaction.iActivityId" (click)="openCurrentCustomer(transaction.oCustomer)">
+                            {{'UPDATE_CURRENT_CUSTOMER'|translate}}
+                        </button>
+                        
+                        <span class="mx-2"><i *ngIf="!transaction.iActivityId" class="fa fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="{{'YOU_CAN_NOT_CHANGE_CUSTOMER_FROM_A_MIGRATED_TRANSACTION' | translate}}">
+                            </i>
+                        </span>
+                    
+                    </ng-container>
+                </div>
+                <div class="row fw-bold gy-1 mb-5 mt-3">
+                    <div class="col-md-12">
+                        <div class="text-gray-800 fw-bolder mt-3">
+                            <span *ngIf="transaction?.oCustomer?.bIsCompany"> {{transaction?.oCustomer?.sCompanyName}}</span>
+                            <span *ngIf="!transaction?.oCustomer?.bIsCompany"> {{ transaction?.oCustomer?.sFirstName }} </span>
+                            <span *ngIf="!transaction?.oCustomer?.bIsCompany"> {{ transaction?.oCustomer?.sPrefix}} </span>
+                            <span *ngIf="!transaction?.oCustomer?.bIsCompany"> {{ transaction?.oCustomer?.sLastName }} </span>
+                        </div>
+                    </div>
+                    <div class="col-md-12" *ngIf="!transaction?.oCustomer?.bIsCompany && !transaction?.oCustomer?.bCounter">
+                        <div class="mt-2" *ngIf="transaction?.oCustomer?.sCompanyName">
+                            <span class="text-muted me-5">{{ 'COMPANY_NAME' | translate}}: </span>
+                            <span class="text-gray-800">{{ transaction?.oCustomer?.sCompanyName }}</span>
+                        </div>
+                        <div class="mt-2" *ngIf="transaction?.oCustomer?.sVatNumber">
+                            <span class="text-muted me-5">{{ 'VAT_NUMBER' | translate}}: </span>
+                            <span class="text-gray-800">{{ transaction?.oCustomer?.sVatNumber }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-12" *ngIf="transaction?.oCustomer?.bIsCompany && !transaction?.oCustomer?.bCounter">
+                        <div class="mt-2" *ngIf="transaction?.oCustomer?.oContactPerson">
+                            <span class="text-muted me-5">{{ 'CONTACT_PERSON' | translate}}: </span>
+                            <span class="text-gray-800">
+                                {{ transaction?.oCustomer?.oContactPerson.sFirstName }} {{ transaction?.oCustomer?.oContactPerson.sPrefix }} {{ transaction?.oCustomer?.oContactPerson.sLastName }}
+                            </span>
+                        </div>
+                        <div class="mt-2" *ngIf="transaction?.oCustomer?.sVatNumber">
+                            <span class="text-muted me-5">{{ 'VAT_NUMBER' | translate}}: </span>
+                            <span class="text-gray-800">{{ transaction?.oCustomer?.sVatNumber }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-12" *ngIf="!transaction?.oCustomer?.bCounter">
+                        <div class="text-gray-800 mt-2"
+                            *ngIf="transaction?.oCustomer?.sEmail">
+                            <span class="text-muted me-5">{{'EMAIL' | translate}}: </span>{{transaction?.oCustomer?.sEmail}}
+                        </div>
+                        <div class="text-gray-800 mt-2" *ngIf="transaction?.oCustomer?.oPhone?.sMobile">
+                            <span class="text-muted me-5">{{'MOBILE_PHONE' | translate}}: </span>{{transaction?.oCustomer?.oPhone?.sPrefixMobile}} {{transaction?.oCustomer?.oPhone?.sMobile}}
+                        </div>
+                        <div class="text-gray-800 mt-2" *ngIf="transaction?.oCustomer?.oPhone?.sLandLine">
+                            <span class="text-muted me-5">{{'PHONE_LANDLINE' | translate}}: </span> {{transaction?.oCustomer?.oPhone?.sPrefixLandline}} {{transaction?.oCustomer?.oPhone?.sLandLine}}
+                        </div>
+                    </div>
+                    <ng-container *ngIf="!transaction?.oCustomer?.bCounter">
+                        <div class="col-md-6" *ngIf="transaction.oCustomer['invoice']">
+                            <div class="mt-2 text-muted">{{ "INVOVICE_ADDRESS" | translate}}</div>
+                            <div class="text-gray-800 mt-2">
+                                {{ transaction.oCustomer['invoice'] }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mt-2 text-muted">{{ "SHIPPING_ADDRESS" | translate}}</div>
+                            <div class="text-gray-800 mt-2" *ngIf="transaction.oCustomer['shipping']">
+                                {{ transaction.oCustomer['shipping'] }}
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+                <!-- CURRENT_CUSTOMER End -->
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="fw-bolder mb-0">
+                        <span>{{"CREATER_DETAIL" | translate}} </span>
+                    </h3>
+                </div>
+                <div class="row fw-bold gy-1">
+                    <div class="col-md-12">
+                        <div class="d-flex fs-6 ms-1 my-1">
+                            <div class="align-items-center">
+                                <img alt="Logo"
+                                    *ngIf="transaction?.createrDetail?.sFirstName && (!transaction?.createrDetail?.sAvatar  || transaction?.createrDetail?.sAvatar == '')"
+                                    src="https://prismanote.com/public/prismanote.png" class="createrImage default border border-warning">
+                                <img alt="Logo" *ngIf="transaction?.createrDetail?.sAvatar"
+                                    [src]="transaction?.createrDetail?.sAvatar" class="createrImage">
+                                <span *ngIf="!transaction?.bMigrate"> 
+                                    {{transaction?.createrDetail?.sFirstName || ''}}
+                                    {{transaction?.createrDetail?.sLastName ||''}} 
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row my-3 d-flex align-items-center">
+                    <p class="m-0"><span class="text-muted">{{"LOCATION" | translate}}:</span> {{businessLocationName || '-'}}</p>
+                </div>
+            </div>
+            <div class="col-8" *ngIf="eType === 'cash-register-revenue'">
+               
+                <div class="row">
+                    
+                    <div class="col-8 fw-bold gy-1">
+                        <div class="alert alert-warning my-2" role="alert" *ngIf="transaction.bMigrate">
+                            {{"THIS_IS_A_MIGRATED_ACTIVITY_TRANSACTION" | translate}}
+                        </div>
+                        <div class="row">
+                            <h3 class="fw-bolder mb-4">
+                                <span>{{ "TRANSACTION_OVERVIEW" | translate }}</span>
+                            </h3>
+                            <label class="col-md-4 mt-3 text-muted">{{"RECEIPT_NUMBER" | translate}}</label>
+                            <div class="col-md-8">
+                                <div class="text-gray-800 mt-3">{{ transaction.sReceiptNumber || '' }}</div>
+                            </div>
+                            <label class="col-md-4 mt-3 text-muted">{{"DATE_TIME" | translate}}</label>
+                            <div class="col-md-8">
+                                <div class="text-gray-800 mt-2">{{ transaction.dCreatedDate | date:'dd-MM-YYYY HH:mm:ss' }}
+                                </div>
+                            </div>
+                            
+                            <label class="col-md-4 mt-3 text-muted">{{"CHANGE" | translate}}</label>
+                            <div class="col-md-8">
+                                <div class="text-gray-800 mt-3">{{ changeAmount | currency: tillService.currency }}</div>
+                            </div>
+                            <label class="col-md-4 mt-3 text-muted">{{"REFUNDED" | translate}}</label>
+                            <div class="col-md-8">
+                                <div class="text-gray-800 mt-3">{{ refundedAmount | currency: tillService.currency }}</div>
+                            </div>
+                            
+                        </div>
+                        <div class="row invoice bg-gray-100 py-5" *ngIf="transaction?.sInvoiceNumber != '' &&  transaction.sInvoiceNumber != undefined">
+                            <h3 class="fw-bolder mb-4">
+                                <span>{{"INVOICE_OVERVIEW" | translate}}</span>
+                            </h3>
+                            <label class="col-md-4 mt-3 text-muted">{{"INVOICE_NUMBER" | translate}}</label>
+                            <div class="col-md-8">
+                                <div class="text-gray-800 mt-3">{{ transaction.sInvoiceNumber || '' }}</div>
+                            </div>
+                            <label class="col-md-4 mt-3 text-muted">{{"DATE_TIME" | translate}}</label>
+                            <div class="col-md-8">
+                                <div class="text-gray-800 mt-2">{{ transaction.dCreatedDate | date:'dd-MM-YYYY HH:mm:ss' }}
+                                </div>
+                            </div>
+                            
+                            <label class="col-md-4 mt-3 text-muted">{{"CHANGE" | translate}}</label>
+                            <div class="col-md-8">
+                                <div class="text-gray-800 mt-3">{{ changeAmount | currency: tillService.currency }}</div>
+                            </div>
+                            <label class="col-md-4 mt-3 text-muted">{{"REFUNDED" | translate}}</label>
+                            <div class="col-md-8">
+                                <div class="text-gray-800 mt-3">{{ refundedAmount | currency: tillService.currency }}</div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-sm btn-light btn-active-light-primary  w-100 d-flex mb-2" (click)="generatePDF(false,1);" [disabled]="transaction?.oCustomer?.bCounter">
+                            <fa-icon  [hidden]="downloadInvoiceLoading" [icon]="faFileInvoice"></fa-icon>
+                            <span *ngIf="downloadInvoiceLoading">
+                                <i class="fa fa-spinner fa-spin" [hidden]="!downloadInvoiceLoading"
+                                    style="font-size:15px;"></i>
+                            </span>
+                            <label *ngIf="!transaction?.sInvoiceNumber" class="mx-auto cursor-pointer">{{ "GENERAL_INVOICE" | translate}}</label>
+                            <label *ngIf="transaction?.sInvoiceNumber" class="mx-auto cursor-pointer">{{ "DOWNLOAD_INVOICE" | translate}}</label>
+                        </button>
+                        <button class="btn btn-sm btn-light btn-active-light-primary   w-100 d-flex mb-2"
+                            (click)="generatePDF(true, 1)" *ngIf="transaction?.sInvoiceNumber">
+                            <fa-icon [hidden]="printInvoiceLoading" [icon]="faPrint"></fa-icon>
+                            <span *ngIf="printInvoiceLoading">
+                                <i class="fa fa-spinner fa-spin" [hidden]="!printInvoiceLoading"
+                                    style="font-size:15px;"></i>
+                            </span>
+                            <label class="mx-auto cursor-pointer">{{ "PRINT_INVOICE" | translate }}</label>
+                        </button>
+                        <button class="btn btn-sm btn-light btn-active-light-primary   w-100 d-flex mb-2"
+                            [disabled]="downloadWithVATLoading || !printSettings?.length || !businessDetails?._id || loading"
+                            (click)="downloadWithVAT()">
+                            <fa-icon [hidden]="downloadWithVATLoading" [icon]="faDownload"></fa-icon>
+                            <span *ngIf="downloadWithVATLoading">
+                                <i class="fa fa-spinner fa-spin" [hidden]="!downloadWithVATLoading"
+                                    style="font-size:15px;"></i>
+                            </span>
+                            <label class="mx-auto cursor-pointer">{{ "DOWNLOAD_WITH_VAT" | translate}}</label>
+                        </button>
+                        <button class="btn btn-sm btn-light btn-active-light-primary   w-100 d-flex mb-2"
+                            (click)="downloadWithVAT(true)">
+                            <fa-icon [hidden]="printWithVATLoading" [icon]="faPrint"></fa-icon>
+                            <span *ngIf="printWithVATLoading">
+                                <i class="fa fa-spinner fa-spin" [hidden]="!printWithVATLoading"
+                                    style="font-size:15px;"></i>
+                            </span>
+                            <label class="mx-auto cursor-pointer">{{ "PRINT" | translate }}</label>
+                        </button>
+                        <button class="btn btn-sm btn-light btn-active-light-primary   w-100 d-flex mb-2">
+                            <fa-icon [icon]="faDownload"></fa-icon>
+                            <label class="mx-auto cursor-pointer">{{ "DOWNLOAD_WITHOUT_VAT" | translate}}</label>
+                        </button>
+                        <button [disabled]="!businessDetails?._id"
+                            class="btn btn-sm btn-light btn-active-light-primary   w-100 d-flex mb-2"
+                            (click)="getThermalReceipt('business-receipt')">
+                            <fa-icon [icon]="faReceipt"></fa-icon>
+                            <label class="mx-auto cursor-pointer"> {{ "THERMAL_RECEIPT" | translate}}</label>
+                        </button>
+                        <button [disabled]="!businessDetails?._id"
+                            class="btn btn-sm btn-light btn-active-light-primary   w-100 d-flex mb-2"
+                            (click)="getThermalReceipt('warranty-receipt')">
+                            <fa-icon [icon]="faReceipt"></fa-icon>
+                            <label class="mx-auto cursor-pointer"> {{ "WARRANTY_RECEIPT" | translate}}</label>
+                        </button>
+                        <button *ngIf="transaction?.oCustomer?.sEmail != '' && !transaction?.oCustomer?.bCounter" class="btn btn-sm btn-light btn-active-light-primary   w-100 d-flex mb-2"
+                            (click)="sendEmail()" >
+                            <fa-icon [icon]="faAt"></fa-icon>
+                            <label class="mx-auto cursor-pointer">{{ "MAIL" | translate}}</label>
+                        </button>
+                        <button class="btn btn-sm btn-light btn-active-light-primary   w-100 d-flex mb-2"
+                            [disabled]="!((nTotalItemPayment - nTotalItemPaidPayment) > 0)"
+                            (click)="openTransaction(transaction, 'activity')" [disabled]="transaction?.eKind == 'regular' && transaction?.bMigrate">
+                            <fa-icon [icon]="faUndoAlt"></fa-icon>
+                            <label class="mx-auto cursor-pointer">{{"REST_PAYMENT" | translate}}</label>
+                        </button>
+                        <button class="btn btn-sm btn-light btn-active-light-primary   w-100 d-flex mb-2"
+                            (click)="openTransaction(transaction, 'activity')" [disabled]="transaction?.eKind == 'regular' && transaction?.bMigrate">
+                            <fa-icon [icon]="faUndoAlt"></fa-icon>
+                            <label class="mx-auto cursor-pointer">{{"REFUND" | translate}}</label>
+                        </button>
+                        <button class="btn btn-sm btn-light btn-active-light-primary   w-100 d-flex mb-2">
+                            <fa-icon [icon]="faClipboard"></fa-icon>
+                            <label class="mx-auto cursor-pointer">{{"VIEW_LOG" | translate}}</label>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-8 row" *ngIf="eType === 'webshop-revenue' || eType === 'webshop-reservation'">
+                <h3 class="fw-bolder mb-4">
+                    <span>{{ "OVERVIEW" | translate }}</span>
                 </h3>
-                <div class="row fw-bold gy-1 d-flex flex-wrap py-5">
+                <div class="col-md-8 row fw-bold gy-1">
+                    <div class="col-md-12">
+                        <ng-select placeholder="Order status">
+                            <ng-option>Status one</ng-option>
+                            <ng-option>Status two</ng-option>
+                            <ng-option>Status three</ng-option>
+                            <ng-option>Status four</ng-option>
+                        </ng-select>
+                    </div>
+                    <label class="col-md-4 mt-5 text-muted">{{"SHIPPING_METHOD" | translate}} : </label>
+                    <div class="col-md-8 mt-5">
+                        <div class="text-gray-800">{{ "COMPLETED" | translate}}</div>
+                    </div>
+                    <button class="btn btn-sm btn-primary w-100 d-flex mt-5">
+                        <label class="mx-auto">{{ "TRACK_AND_TRACE_ORDER" | translate}}</label>
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-sm btn-secondary w-100 d-flex">
+                        <fa-icon [icon]="faDownload"></fa-icon>
+                        <label class="mx-auto">{{ "RECEIPT" | translate}}</label>
+                    </button>
+                    <button class="btn btn-sm btn-secondary w-100 d-flex">
+                        <fa-icon [icon]="faReceipt"></fa-icon>
+                        <label class="mx-auto">{{"THERMAL_RECEIPT" | translate}}</label>
+                    </button>
+                    <button class="btn btn-sm btn-secondary w-100 d-flex">
+                        <!-- <fa-icon [icon]="faAt"></fa-icon> -->
+                        <label class="mx-auto"> {{ "EXCHANGE" | translate}}</label>
+                    </button>
+                    <button class="btn btn-sm btn-secondary w-100 d-flex" (click)="downloadWebOrder()">
+                        <fa-icon [icon]="faDownload"></fa-icon>
+                        <label class="mx-auto">{{ "DOWNLOAD_PDF" | translate}}</label>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex align-items-center my-3">
+                    <h3 class="fw-bolder mb-0 me-auto">
+                        <span>{{ "ITEMS" | translate }}</span>
+                    </h3>
+                    <button class="ms-3 btn btn-secondary btn-sm" (click)="printLabel('no-product')">
+                        {{"PRINT_LABEL_WITHOUT_PRODUCT" | translate}}
+                    </button>
+                </div>
+               
+                <div class="row fw-bold gy-1 d-flex flex-wrap py-5" *ngIf="transaction.aTransactionItems.length">
                     <div class="flex-equal me-5">
-                        <table class="table table-hover table-rounded table-striped border gy-7 gs-7">
+                        <table class="table table-hover table-rounded table-striped border gy-3 gs-7"
+                            *ngIf="transaction?.bCompletedProcessing">
                             <thead>
                                 <tr class="fw-bold fs-6 text-gray-400">
                                     <td class="text-muted">{{'IMAGE' | translate}}</td>
+                                    <td class="text-muted">{{'TYPE' | translate}}</td>
                                     <td class="text-muted">{{'PRODUCT' | translate}}</td>
                                     <td class="text-muted">{{'PRICE' | translate}}</td>
                                     <td class="text-muted">{{'QUANTITY' | translate}}</td>
-                                    <td class="text-muted" *ngIf="transaction.totalDiscount > 0">{{'DISCOUNT_PER_ITEM' | translate}}</td>
+                                    <td class="text-muted" *ngIf="transaction.totalDiscount > 0">{{'DISCOUNT_PER_ITEM' |
+                                        translate}}
+                                    </td>
+                                    <td class="text-muted" *ngIf="transaction.totalGiftcardDiscount > 0">
+                                        {{'GIFTCARD_DISCOUNT' | translate}}
+                                    </td>
                                     <ng-container *ngIf="transaction.totalRedeemedLoyaltyPoints > 0">
                                         <td class="text-muted">{{'LOYALTY_POINTS_REDEEMED' | translate}}</td>
                                     </ng-container>
-                                    <td class="text-muted"> {{'SAVING_POINTS' | translate}}</td>
+                                    <td class="text-muted"
+                                        *ngIf="tillService.oSavingPointSettings.bEnabled && !transaction?.oCustomer?.bCounter">
+                                        {{'SAVING_POINTS' | translate}}</td>
                                     <td class="text-muted">{{'TAX' | translate}}</td>
-                                    <td class="text-muted">{{'TOTAL_PRICE' | translate}}</td>
+                                    <td class="text-muted">{{'PAID_AMOUNT' | translate}}</td>
+                                    <td></td>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let item of transaction.aTransactionItems">
-                                    <td>
+                                    <td (click)="openProductInfo(item)" class="cursor-pointer" id="kt_supplier_stock_product_toggle">
                                         <img src="{{ item.aImage[0] || imagePlaceHolder}}"
                                             (error)="item.aImage[0]=imagePlaceHolder" class="product_image">
                                     </td>
-                                    <td>
+                                    <td class="w-110px">
+                                        <span class="badge badge-info" style="text-transform: capitalize;">
+                                            {{item.eKind}}
+                                        </span>
+                                    </td>
+                                    <td (click)="openProductInfo(item)" class="cursor-pointer" id="kt_supplier_stock_product_toggle">
                                         <div>
-                                            {{ item.sArticleGroupName }} {{ item.sProductNumber }} <br />
-                                            <!-- {{ item.sProductName }}   -->
-                                            <span *ngIf="item.sDescription">{{ item.sDescription}} <br /></span>
-                                            <span *ngIf="item?.totalPaymentAmount != item?.nPriceIncVatAfterDiscount">
-                                                {{ 'ORIGINAL_AMOUNT_INC_DISC' | translate }}: {{ item.nPriceIncVatAfterDiscount }} <br />
+                                            <p class="m-0" *ngIf="!item.sProductName">
+                                                {{ item.sArticleGroupName }} {{item.sProductNumber }}
+                                            </p>
+                                            <p class="m-0" *ngIf="item.sProductName">
+                                                {{ item.sProductName}}
+                                                <br>
+                                                <span class="fw-semibold small" *ngIf="item.sProductNumber">
+                                                    {{"PRODUCT_NUMBER" | translate}}: {{item.sProductNumber}}
+                                                </span>
+                                            </p>
+                                            <p class="m-0 text-muted" *ngIf="item.sArticleNumber">
+                                                ({{item.sArticleNumber}})
+                                            </p>
+                                            <span *ngIf="item.sDescription" class="custom-truncate">
+                                                {{ item.sDescription}}
+                                                <br>
                                             </span>
-                                            
+                                            <span *ngIf="item?.bPrepayment">
+                                                {{ 'ORIGINAL_AMOUNT_INC_DISC' | translate }}: {{ item.nPriceIncVatAfterDiscount}}
+                                                <br />
+                                            </span>
+                                            <span *ngIf="item?.oType?.bRefund" class="fw-bolder">({{'REFUNDED' | translate}})</span>
+
                                             <div *ngIf="item.related?.length">
                                                 {{ "ALREADY_PAID" | translate}}:<br />
-                                                {{item.sTransactionNumber}} | {{item.nPaymentAmount}} ({{"THIS_RECEIPT" | translate }})<br />
-                                                <span *ngFor="let obj of item.related">{{obj.sTransactionNumber}} | {{obj.nRevenueAmount }}<br /></span>
+                                                {{item.sTransactionNumber}} | {{item.totalPaymentAmount }}
+                                                ({{"THIS_RECEIPT" |
+                                                translate }})<br />
+                                                <ng-container *ngFor="let obj of item.related">
+                                                    <span *ngIf="obj.totalPaymentAmount > 0">{{obj.sTransactionNumber}} | {{obj.totalPaymentAmount }}<br /></span>
+                                                </ng-container>
                                             </div>
                                         </div>
                                         <div *ngIf="item?.aProductVariant?.length > 0">
@@ -253,54 +419,60 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>{{item.nPriceIncVatAfterDiscount | currency: tillService.currency}}</td>
-                                    <td>{{item.nQuantity}}</td>
-                                    <td *ngIf="item.nDiscountToShow > 0">
-                                        <span *ngIf="item.bDiscountOnPercentage">
-                                            {{ item.nDiscount }}% ({{item.nDiscountToShow * item.nQuantity | currency: tillService.currency}})
+                                    <td>
+                                        <span *ngIf="item.nDiscountToShow || item?.bShowGiftcardDiscountField || item?.bShowLoyaltyPointsDiscountField">
+                                            <s>({{(item.nPriceIncVat) | currency: tillService.currency}})</s>
                                         </span>
-                                        <span *ngIf="!item.bDiscountOnPercentage">
-                                            {{ item.nDiscountToShow * item.nQuantity | currency: tillService.currency}}
-                                        </span>
+                                        {{item.nPriceIncVatAfterDiscount | currency: tillService.currency}}
                                     </td>
-                                    <ng-container *ngIf="item.nRedeemedLoyaltyPoints > 0">
-                                        <td>{{ item.nRedeemedLoyaltyPoints }} </td>
-                                    </ng-container>
-                                    <td>{{item.nSavingsPoints}} </td>
-                                    <td>{{item.nVatRate}} % ({{item.vat || 0 | currency: tillService.currency }})</td>
+                                    <td>{{item.nQuantity}}</td>
+                                    <!-- <td *ngIf="item.nDiscountToShow <= 0"> {{ "0.00" | currency: tillService.currency}}
+                                    </td> -->
+                                    <td *ngIf="item.nDiscountToShow > 0 || transaction.totalDiscount > 0">
+                                        <span *ngIf="item.bDiscountOnPercentage">
+                                            {{ item.nDiscount }}% ({{item.nDiscountToShow | currency:tillService.currency}})
+                                        </span>
+                                        <span *ngIf="!item.bDiscountOnPercentage">{{ item.nDiscountToShow | currency: tillService.currency}}</span>
+                                    </td>
+                                    <td *ngIf="item.bShowGiftcardDiscountField || transaction.totalGiftcardDiscount > 0">{{ (item?.nGiftcardDiscount || 0) | currency: tillService.currency}}</td>
+                                    <td *ngIf="item?.bShowLoyaltyPointsDiscountField || transaction.totalRedeemedLoyaltyPoints > 0">{{ item?.nRedeemedPointsPerQty || 0  }} </td>
+                                    <td *ngIf="tillService.oSavingPointSettings.bEnabled && !transaction?.oCustomer?.bCounter">{{item?.nSavingsPoints || 0}} </td>
+                                    <td>{{item.nVatRate}} % ({{(item.vat || 0) | currency: tillService.currency }})</td>
                                     <td>
                                         <div class="d-flex align-items-center justify-content-between">
-                                            <div>
-                                                <span *ngIf="item.nDiscountToShow > 0">
-                                                    <s>({{(item.nPriceIncVat * item.nQuantity) | currency: tillService.currency}})</s>
-                                                </span>
-                                                 {{item.totalPaymentAmount || 0 | currency: tillService.currency}}</div>
-                                            <ng-container *ngIf="from != 'activity-details'">
-                                                <div class="mx-2">
-                                                    <div class="d-flex align-items-center">
-                                                        <button class="btn btn-primary btn-sm"
-                                                            (click)="showActivityItem(item,$event)">
-                                                            <i class="fa fa-eye"></i>
-                                                        </button>
-                                                        <div *ngIf="item.bFetchingActivityItem"
-                                                            class="spinner-border mx-2"></div>
-                                                    </div>
-                                                </div>
-                                            </ng-container>
+                                            <div>{{(item.totalPaymentAmount || 0) | currency: tillService.currency}}</div>
                                         </div>
-
+                                    </td>
+                                    <td>
+                                        <ng-container *ngIf="from != 'activity-details' && from != 'audit'">
+                                            <div class="d-flex align-items-center justify-content-end">
+                                                <div *ngIf="item.bFetchingActivityItem" class="spinner-border mx-2"></div>
+                                                <button class="btn btn-info btn-sm"
+                                                    (click)="showActivityItem(item,$event)" [disabled]="item?.eKind == 'regular' && item?.bMigrate">
+                                                    <i class="fa fa-eye"></i>
+                                                </button>
+                                                <button class="ms-3 btn btn-secondary btn-sm" *ngIf="item?.oType?.bRefund && item.sArticleNumber" (click)="printLabel(item)">
+                                                    <i class="fa fa-print"></i>
+                                                </button>
+                                            </div>
+                                        </ng-container>
                                     </td>
                                 </tr>
                                 <tr class="fw-bolder">
                                     <td></td>
+                                    <td></td>
                                     <td>{{ 'TOTAL' | translate }}</td>
                                     <td>{{ transaction.totalAfterDisc | currency: tillService.currency }}</td>
                                     <td>{{ transaction.nTotalQty }}</td>
-                                    <td *ngIf="transaction.totalDiscount > 0">{{ transaction.totalDiscount | currency: tillService.currency }}</td>
-                                    <ng-container *ngIf="transaction.totalRedeemedLoyaltyPoints > 0">
+                                    <td *ngIf="transaction?.totalDiscount">{{ transaction.totalDiscount |
+                                        currency:tillService.currency }}</td>
+                                    <td *ngIf="transaction?.totalGiftcardDiscount">{{ transaction.totalGiftcardDiscount
+                                        | currency:tillService.currency }}</td>
+                                    <ng-container *ngIf="transaction?.totalRedeemedLoyaltyPoints">
                                         <td>{{transaction.totalRedeemedLoyaltyPoints}}</td>
                                     </ng-container>
-                                    <td>{{ transaction.totalSavingPoints }}</td>
+                                    <td *ngIf="tillService.oSavingPointSettings.bEnabled && !transaction?.oCustomer?.bCounter">{{
+                                        transaction.totalSavingPoints }}</td>
                                     <td>{{ transaction.totalVat | currency: tillService.currency }}</td>
                                     <td>{{ transaction.total | currency: tillService.currency}}</td>
                                 </tr>
@@ -308,29 +480,123 @@
                         </table>
                     </div>
                 </div>
-                <div class="d-flex">
-                    <h5 *ngIf='!transaction?.aTransactionItems?.length && !loading' style="text-align: center;">{{
+                <div class="d-flex" *ngIf='!transaction?.aTransactionItems?.length && !loading && !transaction?.bCompletedProcessing'>
+                    <h5 style="text-align: center;">{{
                         'NO_DATA_FOUND' | translate }}</h5>
-                    <div *ngIf="loading" class="spinner-border mx-auto"></div>
+                    <div *ngIf="loading || !transaction?.bCompletedProcessing" class="spinner-border mx-auto"></div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div [ngClass]="paymentEditMode ? 'col-8' : 'col-6'">
                 <h3 class="fw-bolder mb-3">
                     <span>{{ "PAYMENTS" | translate }}</span>
+                    <ng-container *ngIf="transaction.aPayments?.length && from == 'transactions'">
+                        <button class="btn" (click)="toggleEditPaymentMode()">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                    </ng-container>
+                </h3>
+                <div class="row fw-bold gy-1 d-flex flex-wrap py-5">
+                    <div class="flex-equal me-5">
+                        <table class="table table-hover table-rounded table-striped border gy-3 gs-7">
+                            <thead>
+                                <tr class="fw-bold fs-6 text-gray-400">
+                                    <td class="text-muted">{{'METHOD' | translate}}</td>
+                                    <td class="text-muted">{{'REMARKS' | translate}}</td>
+                                    <td class="text-muted">{{'AMOUNT' | translate}}</td>
+                                    <th *ngIf="paymentEditMode" class="w-150px">{{ 'NEW_AMOUNT' | translate}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of transaction.aPayments">
+                                    <td>
+                                        {{ item.sMethod | translate}} <br />
+                                        ({{ item.dCreatedDate | date:'dd-MM-YYYY hh:mm' }})
+                                    </td>
+                                    <td>{{ ((item?.sRemarks) ? item.sRemarks : '' ) | translate}}</td>
+                                    <td>{{(item?.nAmount || 0) | currency: tillService.currency}}</td>
+                                    <td *ngIf="paymentEditMode">
+                                        <div *ngIf="!item.bIgnore">
+                                            <input class="form-control" type="number" [(ngModel)]="item.nNewAmount"
+                                                (ngModelChange)="reCalculateTotal()">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <ng-container *ngIf="paymentEditMode">
+                                    <tr *ngFor="let oPayment of aNewSelectedPaymentMethods; let i = index">
+                                        <td>
+                                            <div>
+                                                <ng-select [(ngModel)]="aNewSelectedPaymentMethods[i]" (ngModelChange)="aNewSelectedPaymentMethods[i].nAmount = 0"
+                                                    [clearable]="false">
+                                                    <ng-option [value]="option" *ngFor="let option of payMethods">
+                                                        {{ option.sName | translate }}
+                                                    </ng-option>
+                                                </ng-select>
+                                            </div>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="d-flex align-items-center">
+                                            <div>
+                                                <input class="form-control" type="number" [(ngModel)]="oPayment.nAmount"
+                                                    (ngModelChange)="reCalculateTotal()">
+                                            </div>
+                                            <div>
+                                                <button class="btn p-0 ms-2"
+                                                    (click)="aNewSelectedPaymentMethods.splice(i,1)">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="text-start">
+                                            <span class="cursor-pointer text-gray-800" (click)="addRow()"> +
+                                                {{ "CLICK_HERE_TO_ADD_MORE" | translate}}</span>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-end">{{ 'TOTAL' | translate}}</th>
+                                    <th class="w-150px">{{ transaction.nPaymentMethodTotal | currency: tillService.currency }}</th>
+                                    <ng-container *ngIf="paymentEditMode">
+                                        <th>
+                                            <span
+                                                [ngClass]="transaction.nNewPaymentMethodTotal === transaction.nPaymentMethodTotal ? 'valid' : 'invalid' ">
+                                                {{ transaction.nNewPaymentMethodTotal }}</span>
+                                        </th>
+                                    </ng-container>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <button *ngIf="paymentEditMode" class="btn btn-sm btn-primary"
+                            (click)="saveUpdatedPayments($event)"
+                            [disabled]="transaction.nNewPaymentMethodTotal !== transaction.nPaymentMethodTotal"> {{ "SAVE" | translate}}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4" *ngIf="transaction.aCardPayments?.length">
+                <h3 class="fw-bolder mb-3">
+                    <span>{{ "CARD_PAYMENT_DETAILS" | translate }}</span>
                 </h3>
                 <div class="row fw-bold gy-1 d-flex flex-wrap py-5">
                     <div class="flex-equal me-5">
                         <table class="table table-hover table-rounded table-striped border gs-7">
                             <thead>
                                 <tr class="fw-bold fs-6 text-gray-400">
-                                    <td class="text-muted">{{'METHOD' | translate}}</td>
+                                    <td class="text-muted">{{'PROVIDER' | translate}}</td>
+                                    <td class="text-muted">{{'CARD_NAME' | translate}}</td>
+                                    <td class="text-muted">{{'TRANSACTION_ID' | translate}}</td>
                                     <td class="text-muted">{{'AMOUNT' | translate}}</td>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let item of transaction.aPayments">
-                                    <td>{{item.sMethod}} <br/> ({{ item.dCreatedDate }})</td>
-                                    <td>{{item.nAmount || 0}}</td>
+                                <tr *ngFor="let item of transaction.aCardPayments">
+                                    <td>{{ (item?.oPayNL) ? 'PayNL' : 'CCV' }}</td>
+                                    <td>{{ item?.sCardName }}</td>
+                                    <td>{{ (item?.oPayNL) ? item.oPayNL.sTransactionId : ''}}</td>
+                                    <td>{{ (item?.nAmount || 0) | currency: tillService.currency}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -343,3 +609,4 @@
         <button class="btn btn-secondary cancel ml-auto" (click)="close(false)">{{"TEXT_CANCEL" | translate}}</button>
     </div>
 </div>
+<ng-template #slider></ng-template>

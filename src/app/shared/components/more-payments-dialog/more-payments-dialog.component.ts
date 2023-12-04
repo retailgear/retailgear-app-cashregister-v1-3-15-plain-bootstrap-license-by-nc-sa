@@ -6,7 +6,7 @@ import { DialogComponent } from '../../service/dialog';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ToastService } from '../toast';
 import { CreateArticleGroupService } from '../../service/create-article-groups.service';
-import { TransactionItem } from 'src/app/till/models/transaction-item.model';
+import { TransactionItem } from '../../../till/models/transaction-item.model';
 
 @Component({
   selector: 'app-more-payments-dialog',
@@ -28,12 +28,8 @@ export class MorePaymentsDialogComponent implements OnInit {
   allPaymentMethods: Array<any> = [];
   constructor(
     private viewContainerRef: ViewContainerRef,
-    private apiService: ApiService,
-    private toastrService: ToastService,
-    private createArticleGroupService: CreateArticleGroupService,
-    private fb: FormBuilder,
   ) {
-    const _injector = this.viewContainerRef.injector;;
+    const _injector = this.viewContainerRef.injector;
     this.dialogRef = _injector.get<DialogComponent>(DialogComponent);
   }
 

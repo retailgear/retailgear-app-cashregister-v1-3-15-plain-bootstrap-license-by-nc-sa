@@ -1,45 +1,45 @@
-<div class="accordion-item">
-  <h2 class="accordion-header">
-    <button class="accordion-button fs-4 fw-bold pe-0 ps-4" type="button" data-bs-toggle="collapse"
-      data-bs-target="#kt_accordion_1_body_1" aria-expanded="true" aria-controls="kt_accordion_1_body_1">
-      <section class="row  product-row mb-3 align-items-center w-100">
+<!-- <div class="accordion-item"> -->
+  <div class="accordion-header">
+    <button class="accordion-button fs-4 fw-bold p-3 collapsed" type="button" data-bs-toggle="collapse"
+      data-bs-target="#kt_accordion_1_body_1" aria-expanded="false" aria-controls="kt_accordion_1_body_1">
+      <section class="row  product-row align-items-center w-100">
         <div class="col-12">
-          <div class="row">
-            <div class="col-1">{{item.quantity}}</div>
-            <div class="col-4 text-truncate">{{item.name}} - {{item.sGiftCardNumber}}</div>
-            <div class="col">{{item.price | currency: tillService.currency}}</div>
-            <div class="col"></div>
-            <div class="col">{{item.tax}}%</div>
-            <div class="col">{{item.price | currency: tillService.currency}}</div>
-            <div class="col"></div>
+          <div class="row fs-5">
+            <div class="col-1 fs-6">
+              <svg width="15" height="15" class="m-1">
+                <rect width="15" height="15"
+                  [ngStyle]="{fill: (item.oType.bRefund) ? '#f7422e' : '#4ab69c' }"
+                  style="stroke-width:1;stroke:rgb(0,0,0)" />
+                {{ "YOUR_BROWSER_DOES_NOT_SUPPORT_INLINE_SVG" | translate }}
+              </svg>
+              {{item.quantity}}</div>
+            <div class="col-4 fs-6">{{item.name}} - {{item.sGiftCardNumber}}</div>
+            <div class="col">{{item.price | currencyFormat: tillService.currency:tillService.separator}}</div>
+            <div class="col">
+              <span *ngIf="item.bDiscountOnPercentage">{{item.nDiscount}}%</span>
+              <span *ngIf="!item.bDiscountOnPercentage">{{item.nDiscount | currencyFormat:
+                tillService.currency:tillService.separator}}</span>
+            </div>
+            <div class="col" *ngIf="item.bShowGiftcardDiscountField">{{item.nGiftcardDiscount| currencyFormat:
+              tillService.currency:tillService.separator}}</div>
+            <div class="col" *ngIf="item.bShowLoyaltyPointsDiscountField">{{item.nRedeemedLoyaltyPoints | currencyFormat:
+              tillService.currency:tillService.separator}}</div>
+            <div class="col">{{ item.tax }}%</div>
+            <div class="col">{{item.amountToBePaid | currencyFormat: tillService.currency:tillService.separator}}</div>
+            <div class="col">{{ item.paymentAmount | currencyFormat: tillService.currency:tillService.separator }}</div>
           </div>
         </div>
       </section>
     </button>
-  </h2>
-  <div id="kt_accordion_1_body_1" class="accordion-collapse collapse show" aria-labelledby="kt_accordion_1_header_1"
+  </div>
+  <div id="kt_accordion_1_body_1" class="accordion-collapse collapse" [ngClass]="{'show' : tillService.settings?.bShowForm}" aria-labelledby="kt_accordion_1_header_1"
     data-bs-parent="#kt_accordion_1">
     <div class="accordion-body px-3 py-4">
-      <section class="row product-row ">
-        <div class="col-3">
-          <div class="row">
-            <div class="col-12">
-              <button class="btn btn-bg-light btn-active-color-primary mb-2 w-100" (click)="create()"
-                [disabled]="!item.nonEditable && numberIcon === faBan">
-                {{ "PRINT" | translate}} <fa-icon [icon]="faPrint"></fa-icon>
-              </button>
-            </div>
-            <div class="col-12">
-              <button class="btn btn-bg-light btn-active-color-primary mb-2 w-100" (click)="duplicate()">{{ "DUPLICATE"
-                | translate}}
-                <fa-icon [icon]="faClone">
-                </fa-icon>
-              </button>
-            </div>
-          </div>
-        </div>
+      
+      <div class="row mb-4">
 
-        <div class="col-3">
+        <div class="col-4">
+          <label class="form-contrl-label mb-3" for="giftCardNumber">{{ "GIFT_CARD_NUMBER" | translate}}</label>:
           <div class="input-group b-5">
             <input type="text" class="form-control" name="number" id="number" [(ngModel)]="item.sGiftCardNumber"
               (blur)="checkNumber()" [disabled]="item.nonEditable">
@@ -52,46 +52,60 @@
           </div>
         </div>
 
+        <div class="col-2">
+          <label class="form-contrl-label mb-3" for="number">{{ "VALUE" | translate}}</label>:
+          <input type="number" class="form-control" [(ngModel)]="item.price"
+            [disabled]="item.nonEditable" (ngModelChange)="updatePayments($event)">
+        </div>
+        
         <div class="col-3">
-          <div class="form-floating mb-7">
-            <input type="number" class="form-control" name="number" id="value" [(ngModel)]="item.price"
-              [disabled]="item.nonEditable" (change)="changeInPrice()">
-            <label for="number">{{ "VALUE" | translate}}</label>
-          </div>
-          <p>{{ "VAT_HANDLING" | translate}}</p>
-          <div class="form-check form-check-custom form-check-solid">
-            <input class="form-check-input" type="radio" [(ngModel)]="item.bGiftcardTaxHandling" value="true"
-              id="vatPaid1" />
-            <label class="form-check-label" for="vatPaid1">
-              {{ "PAY_TAXES_WHEN_CREATE" | translate}}
-            </label>
-          </div>
-          <div class="form-check form-check-custom form-check-solid">
-            <input class="form-check-input" type="radio" [(ngModel)]="item.bGiftcardTaxHandling" value="false"
-              id="vatPaid2" />
-            <label class="form-check-label" for="vatPaid2">
-              {{ "PAY_TAXES_WHEN_REDEEM" | translate}}
+          <label class="form-contrl-label mb-3" for="taxRate">{{"TAX" | translate}}</label>:
+          <ng-select name="taxRate" id="taxRate" class="form-select" [(ngModel)]="item.tax">
+            <ng-option *ngFor="let rate of taxes" [value]="rate.nRate">{{rate.sName}}</ng-option>
+          </ng-select>
+        </div>
+        
+        <div class="col-3">
+          <div class="form-group mb-4">
+            <label class="form-control-label mb-3">{{ "FOR_REFUND" | translate}}</label>:
+            <label class="form-check form-switch form-check-custom form-check-solid mb-3 mb-lg-0">
+              <input type="checkbox" class="form-check-input" [(ngModel)]="item.isExclude" (change)="updatePayments()">
             </label>
           </div>
         </div>
 
-        <div class="col-3">
-          <div class="form-floating till-padding">
-            <ng-select name="taxRate" id="taxRate" class="form-select" [(ngModel)]="item.tax">
-              <ng-option *ngFor="let rate of taxes" [value]="rate.nRate">{{rate.sName}}</ng-option>
-            </ng-select>
-            <label for="taxRate">{{"TAX" | translate}}</label>
-          </div>
-        </div>
-        <div class="col-1">
-          <!-- <button class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px" (click)="create()"
+      </div>
+
+      <div class="row d-flex align-items-center">
+        <div class="col-2 col-sm-3">
+          <button class="btn btn-secondary mb-2 w-100" (click)="create()"
             [disabled]="!item.nonEditable && numberIcon === faBan">
-            <span class="svg-icon svg-icon-1qx me-0">
-              <fa-icon [icon]="faPrint"></fa-icon>
-            </span>
-          </button> -->
+            {{ "PRINT" | translate}} <fa-icon [icon]="faPrint"></fa-icon>
+          </button>
         </div>
-      </section>
+
+        <div class="col-2 col-sm-3">
+          <button class="btn btn-secondary mb-2 w-100" (click)="duplicate()">{{ "DUPLICATE"
+            | translate}}
+            <fa-icon [icon]="faClone">
+            </fa-icon>
+          </button>
+        </div>
+
+        <div class="col-7 my-5 col-sm-6" *ngIf="tillService.oSavingPointSettings.bEnabled">
+          
+          <span *ngIf="tillService.oSavingPointSettings.aExcludedArticleGroups.includes(item.iArticleGroupId)">
+            <strong>{{ 'THIS_ARTICLE_GROUP_HAS_BEEN_EXCLUDED_FROM_EARNING_LOYALTY_POINTS'| translate }}</strong>
+          </span>
+          <span *ngIf="!tillService.oSavingPointSettings.aExcludedArticleGroups.includes(item.iArticleGroupId)">
+            {{ 'GET'| translate }}
+            <strong>{{ item.nSavingsPoints || 0 }} </strong>
+            {{ 'LOYALTY_POINTS' | translate }}
+          </span>
+          
+        </div>
+      </div>
+
     </div>
   </div>
-</div>
+<!-- </div> -->

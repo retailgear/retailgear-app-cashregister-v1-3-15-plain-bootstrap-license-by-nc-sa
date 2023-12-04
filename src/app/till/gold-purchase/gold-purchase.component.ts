@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { faTimes, faPlus, faMinus, faArrowDown, faArrowUp, faUpload } from '@fortawesome/free-solid-svg-icons'
-import { ImageUploadComponent } from 'src/app/shared/components/image-upload/image-upload.component';
-import { ToastService } from 'src/app/shared/components/toast';
-import { ApiService } from 'src/app/shared/service/api.service';
-import { CreateArticleGroupService } from 'src/app/shared/service/create-article-groups.service';
-import { DialogService } from 'src/app/shared/service/dialog';
-import { PriceService } from 'src/app/shared/service/price.service';
-import { TillService } from 'src/app/shared/service/till.service';
+import { ImageUploadComponent } from '../../shared/components/image-upload/image-upload.component';
+import { ToastService } from '../../shared/components/toast';
+import { ApiService } from '../../shared/service/api.service';
+import { CreateArticleGroupService } from '../../shared/service/create-article-groups.service';
+import { DialogService } from '../../shared/service/dialog';
+import { PriceService } from '../../shared/service/price.service';
+import { TillService } from '../../shared/service/till.service';
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
   selector: '[till-goldpurchase]',
@@ -25,7 +25,7 @@ export class GoldPurchaseComponent implements OnInit {
   faArrowDown = faArrowDown;
   faArrowUp = faArrowUp;
   faUpload = faUpload;
-  goldFor = [{ type: 'goods', name: 'giftcard' },
+  aGoldFor = [{ type: 'goods', name: 'giftcard' },
   { type: 'goods', name: 'repair' },
   { type: 'goods', name: 'order' },
   { type: 'goods', name: 'stock' },
@@ -34,17 +34,8 @@ export class GoldPurchaseComponent implements OnInit {
   // goldFor = ['giftcard', 'repair', 'order', 'stock', 'cash', 'bankpayment'];
   propertyOptions: Array<any> = [];
   selectedProperties: Array<any> = [];
-  articleGroups: Array<any> = [];
-  articleGroupDetails: any = {
-    iBusinessId: "",
-    sCategory: "",
-    sSubCategory: "",
-    oName: {},
-    bShowInOverview: false,
-    bShowOnWebsite: false,
-    bInventory: false,
-    aProperty: []
-  };
+  articleGroup:any;
+
   brand: any = null;
   brandsList: Array<any> = [];
   filteredBrands: Array<any> = [];
@@ -68,7 +59,7 @@ export class GoldPurchaseComponent implements OnInit {
     this.item.nPurchasePrice = this.item.price / 1.21;
   }
   deleteItem(): void {
-    this.itemChanged.emit('delete')
+    this.itemChanged.emit({type: 'delete'})
   }
   getDiscount(item: any): string {
     return this.priceService.getDiscount(item.nDiscount)
@@ -92,43 +83,41 @@ export class GoldPurchaseComponent implements OnInit {
     }
   }
 
-  assignArticleGroupMetadata(articlegroup: any) {
-    this.item.iArticleGroupId = articlegroup._id;
-    this.item.oArticleGroupMetaData.oName = articlegroup.oName;
-    this.item.oArticleGroupMetaData.sCategory = articlegroup.sCategory;
-    this.item.oArticleGroupMetaData.sSubCategory = articlegroup.sSubCategory;
+  notAllowedCommaAndSemiColon(event: any) {
+    let keyCode = (event.which) ? event.which : event.keyCode
+    if (keyCode == 59 || keyCode == 44) return false; /* 44=comma & 59= semicolon */
+    else return true;
   }
 
-  assignArticleGroup(value: string) {
-    const goldFor = this.goldFor.find(o => o.name === value);
-    this.item.oGoldFor = goldFor;
-    const artGroup = this.articleGroups.find((o: any) => o.sSubCategory === this.item.oGoldFor.name);
-    if (!artGroup) {
-      this.createArticleGroup();
-    } else {
-      this.assignArticleGroupMetadata(artGroup);
-    }
+  assignArticleGroupMetadata() {
+    this.item.iArticleGroupId = this.articleGroup._id;
+    this.item.oArticleGroupMetaData.oName = this.articleGroup.oName;
+    this.item.oArticleGroupMetaData.sCategory = this.articleGroup.sCategory;
+    this.item.oArticleGroupMetaData.sSubCategory = this.articleGroup.sSubCategory;
   }
+
+  // assignArticleGroup(value: string) {
+  //   const goldFor = this.goldFor.find(o => o.name === value);
+  //   this.item.oGoldFor = goldFor;
+  //   this.checkArticleGroups();//.find((o: any) => o.sSubCategory === this.item.oGoldFor.name);
+  //   this.assignArticleGroupMetadata(this.articleGroup);
+    
+  // }
 
   checkArticleGroups() {
-    this.createArticleGroupService.checkArticleGroups('Gold purchase')
-      .subscribe((res: any) => {
-        if (1 > res.data.length) {
-          this.createArticleGroup();
-        } else {
-          this.articleGroups = res.data[0].result;
-          this.assignArticleGroup(this.item.oGoldFor.name);
-        }
-      }, err => {
-        this.toastrService.show({ type: 'danger', text: err.message });
-      });
+    this.createArticleGroupService.checkArticleGroups('gold-purchase', this.item.oGoldFor.name).subscribe((res: any) => {
+      this.articleGroup = res.data;
+      this.assignArticleGroupMetadata();
+    }, err => {
+      this.toastrService.show({ type: 'danger', text: err.message });
+    });
   }
 
-  async createArticleGroup() {
-    const articleBody = { name: 'Gold purchase', sCategory: 'Gold purchase', sSubCategory: this.item.oGoldFor.name };
-    const result: any = await this.createArticleGroupService.createArticleGroup(articleBody);
-    this.assignArticleGroupMetadata(result.data);
-  }
+  // async createArticleGroup() {
+  //   const articleBody = { name: 'gold-purchase', sCategory: 'gold-purchase', eDefaultArticleGroup: 'gold-purchase', sSubCategory: this.item.oGoldFor.name };
+  //   const result: any = await this.createArticleGroupService.createArticleGroup(articleBody);
+  //   this.assignArticleGroupMetadata(result.data);
+  // }
 
   constisEqualsJson(obj1: any, obj2: any) {
     const keys1 = Object.keys(obj1);
@@ -156,9 +145,11 @@ export class GoldPurchaseComponent implements OnInit {
   removeImage(index: number): void {
     this.item.aImage.splice(index, 1);
   }
-  changeTotalAmount() {
+  changeTotalAmount(price?:any) {
+    if(price) this.item.price = price;
     this.item.paymentAmount = -1 * this.item.quantity * this.item.price;
     this.item.nPurchasePrice = this.item.price / 1.21;
+    this.itemChanged.emit({ type: 'item', data: this.item });
   }
   changeTypeArray() {
     if (!this.item.oType.refund) {

@@ -1,0 +1,15 @@
+.center-row-abs {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.card-header {
+  .card-title {
+    span {
+      font-weight: 500;
+    }
+  }
+}

@@ -1,17 +1,59 @@
-<div class="container">
+<!-- <div class="container-fluid">
   <div class="row">
-      <div class="col-md-6">
-        <button class="btn btn-md btn-primary" routerLink="/till">Cash Register</button>
-        <br>
-        <br>
-        <button class="btn btn-md btn-primary" routerLink="/statistics">Statistics</button>
-        <br>
-        <br>
-        <button class="btn btn-md btn-primary" routerLink="print">Print</button>
-        <br>
-        <br>
-        <button class="btn btn-md btn-primary" routerLink="barcode">Barcode</button>
-
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" routerLink="/home">{{'HOME' | translate}}</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item" *ngFor="let menu of aHeaderMenu">
+              <a class="nav-link" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active" [routerLink]="menu.path">{{
+                menu.title | translate }}</a>
+            </li>
+          </ul>
+        </div>
       </div>
+    </nav>
   </div>
-</div>
+</div> -->
+
+<header class="p-3 mb-3 border-bottom">
+  <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+    <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+      <li class="nav-item" *ngFor="let menu of aHeaderMenu">
+      <div class="dropdown mx-3" *ngIf="menu.dropdown && menu.dropdown.length; else href">
+        <button class="btn btn-link dropdown-toggle p-0 mt-2 text-decoration-none" type="button" data-bs-toggle="dropdown"
+          aria-expanded="false">
+          {{ menu.title | translate }}
+        </button>
+        <ul class="dropdown-menu">
+          <li *ngFor="let subMenu of menu.dropdown"><a class="dropdown-item" [routerLinkActiveOptions]="{exact: true}"
+              routerLinkActive="active" [routerLink]="subMenu.path">{{subMenu.title |
+              translate}}</a></li>
+        </ul>
+      </div>
+      <ng-template #href>
+        <a class="nav-link" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active" [routerLink]="menu.path">{{
+          menu.title | translate }}</a>
+        </ng-template>
+
+      </li>
+    </ul>
+
+    <div class="dropdown text-end">
+      <select class="form-select" aria-label="Default select example" name="language" [(ngModel)]="selectedLanguage"
+        (change)="onChangeLanguage($event)">
+        <option selected disabled>Select Language</option>
+        <ng-container *ngFor="let lang of languageList">
+          <option [value]="lang.lang_code">{{lang.lang}}</option>
+        </ng-container>
+      </select>
+    </div>
+<button class="btn btn-primary ms-2" (click)="logout()">LogOut</button>
+  </div>
+</header>
+
+<router-outlet></router-outlet>

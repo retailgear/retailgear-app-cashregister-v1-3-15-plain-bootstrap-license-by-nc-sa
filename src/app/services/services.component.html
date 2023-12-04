@@ -5,19 +5,28 @@
         <fa-icon [icon]="faSearch" class="text-gray-500 position-absolute top-50 translate-middle ms-6"></fa-icon>
         <!--end::Svg Icon-->
         <input type="text" class="form-control form-control-solid ps-10" [(ngModel)]="requestParams.searchValue"
-          (keyup.enter)="loadTransaction()" name="search" value="" placeholder="{{ 'SEARCH' | translate }}" />
+          (keyup.enter)="loadTransaction();" name="search" value="" placeholder="{{ 'SEARCH' | translate }}" />
       </div>
       <div class="d-flex align-items-center">
-        <button type="submit" class="btn btn-primary me-5" (click)="loadTransaction()">{{ 'SEARCH' | translate
+        <button type="submit" class="btn btn-primary me-5" (click)="loadTransaction();">{{ 'SEARCH' | translate
           }}</button>
-        <a id="kt_horizontal_search_advanced_link" class="btn btn-link" data-toggle="collapse"
-          data-target="#kt_advanced_search_form" aria-expanded="true" aria-controls="kt_advanced_search_form"
-          (click)="showAdvanceSearch = !showAdvanceSearch">{{ 'ADVANCED_SEARCH' | translate }}</a>
+          <div class="d-flex align-items-center">
+            <button class="btn btn-secondary" (click)="resetFilters()">
+              <i class='fas fa-sync-alt'></i>
+            </button>
+          </div>
+          <div class="d-flex align-items-center ads_search">
+            <button type="button" (click)="showAdvanceSearch = !showAdvanceSearch" class="btn btn-info me-5">
+              <i class="fa fa-filter"></i>
+            </button>
+          </div>
       </div>
-      <div class="d-flex align-items-right ms-auto">
+      
+      <!-- <div class="d-flex align-items-right ms-auto">
         <button class="btn btn-primary" (click)="goToCashRegister()">{{ 'NEW' | translate }}</button>
-      </div>
+      </div> -->
     </div>
+   
     <div class="collapse row" id="kt_advanced_search_form" data-kt-search-minimize="on"
       [ngClass]="{'show' : showAdvanceSearch}">
       <div class="col-12">
@@ -66,7 +75,7 @@
                 <label class="fs-6 form-label fw-bolder text-dark" *ngIf="isFor == 'activity'"> {{ 'ACTIVITY_STATUS' | translate }}</label>
                 <ng-select class="form-control form-control-solid p-0" [multiple]="true"
                   [(ngModel)]="requestParams.selectedTransactionStatuses" [clearable]="false">
-                  <ng-option *ngFor="let status of requestParams.transactionStatuses" [value]="status">{{status}}
+                  <ng-option *ngFor="let status of transactionStatuses" [value]="status.value">{{status.key | translate}}
                   </ng-option>
                 </ng-select>
               </div>
@@ -164,71 +173,97 @@
       </div>
     </div>
     <!-- <div class="mt-3 mb-6"></div> -->
-    <table class="table table-hover table-rounded table-striped gy-7 gs-7">
-      <thead>
-        <tr class="fw-bold fs-6 text-gray-400 text-uppercase border-gray-200">
-          <th scope="col" *ngFor="let th of tableHeaders"
-            [ngClass]="{'fw-bolder': th.selected, 'cursor-pointer': !th.disabled, 'pe-none': th.disabled}"
-            (click)="setSortOption(th)">
-            {{ th.key | translate}}
-            <fa-icon *ngIf="th.selected" [icon]=" th.sort ==='asc' ? faArrowDown : faArrowUp"></fa-icon>
-          </th>
-          <!-- <th scope="col"></th> -->
-        </tr>
-      </thead>
-      <tbody class="fw-bold text-gray-600">
-        <tr *ngFor="let activity of activities | paginate: paginationConfig, let i = index;">
-          <td>{{activity?.sNumber}}</td>
-          <td>{{activity?.sReceiptNumber || '-'}}</td>
-          <td>{{getTypes(activity.activityitems)}}</td>
-          <td scope="row">{{activity?.dCreatedDate | date: 'yyyy-MM-dd HH:mm'}}</td>
-          <td scope="row">{{activity?.dEstimatedDate | date: 'yyyy-MM-dd HH:mm'}}</td>
-          <td>{{activity?.eActivityItemStatus || '-'}}</td>
-          <td>{{activity?.sBusinessPartnerName || '-'}}</td>
-          <!-- <td>{{'-'}}</td> -->
-          <td>{{activity?.oCustomer?.sFirstName}} {{activity?.oCustomer?.sLastName || '-'}}</td>
-
-          <td>
-            <div class="btn-group">
-              <span class="btn btn-primary fs-bold px-6" (click)="openActivities(activity)">
-                <span class="indicator-label">{{ "VIEW" | translate}}</span>
-              </span>
-              <span class="btn btn-primary btn-icon fs-bold" role="button">
-                <div class="btn btn-icon" data-kt-menu-trigger="hover" data-kt-menu-attach="parent"
-                  data-kt-menu-placement="bottom-end" data-kt-menu-flip="bottom">
-                  <span class="svg-icon svg-icon-2 m-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M11.4343 12.7344L7.25 8.55005C6.83579 8.13583 6.16421 8.13584 5.75 8.55005C5.33579 8.96426 5.33579 9.63583 5.75 10.05L11.2929 15.5929C11.6834 15.9835 12.3166 15.9835 12.7071 15.5929L18.25 10.05C18.6642 9.63584 18.6642 8.96426 18.25 8.55005C17.8358 8.13584 17.1642 8.13584 16.75 8.55005L12.5657 12.7344C12.2533 13.0468 11.7467 13.0468 11.4343 12.7344Z"
-                        fill="black"></path>
-                    </svg>
-                  </span>
+    <div class="table-responsive">
+      <table class="table table-hover table-rounded table-striped gy-7 gs-7">
+        <thead>
+          <tr class="fw-bold fs-6 text-gray-400 text-uppercase border-gray-200">
+            <th scope="col" *ngFor="let th of tableHeaders"
+              [ngClass]="{'fw-bolder': th.selected, 'cursor-pointer': !th.disabled, 'pe-none': th.disabled}"
+              (click)="setSortOption(th)">
+              {{ th.key | translate}}
+              <fa-icon *ngIf="th.selected" [icon]=" th.sort ==='asc' ? faArrowDown : faArrowUp"></fa-icon>
+            </th>
+            <!-- <th scope="col"></th> -->
+          </tr>
+        </thead>
+        <tbody class="fw-bold text-gray-600">
+          <tr *ngFor="let activity of activities | paginate: paginationConfig, let i = index;">
+            <td>{{activity?.sNumber}}</td>
+            <td>
+              <ng-container *ngIf="activity?.aTransactionMetaData?.length ; then aTransactionMetaData ; else metaDataNotFound">
+              </ng-container>
+              <ng-template #aTransactionMetaData>
+                <span *ngFor="let oTransaction of activity?.aTransactionMetaData">
+                  <span *ngIf="oTransaction?.sNumber"> {{oTransaction?.sNumber}} </span> <br>
+                </span>
+              </ng-template>
+              <ng-template #metaDataNotFound>
+                <span>-</span>
+              </ng-template>
+            </td>
+            <td>{{activity.sBagNumbers}}</td>
+            <td>{{getTypes(activity.activityitems)}}</td>
+            <td scope="row">{{activity?.dCreatedDate | date: 'yyyy-MM-dd HH:mm'}}</td>
+            <td scope="row">{{activity?.dEstimatedDate | date: 'yyyy-MM-dd HH:mm'}}</td>
+            <td>
+              <div *ngFor="let status of transactionStatuses">
+                <div *ngIf="activity.eActivityItemStatus == status.value">
+                  {{status.key | translate}}
                 </div>
-                <div
-                  class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-200px py-4"
-                  data-kt-menu="true">
-                  <div class="menu-item px-3 text-center" *ngFor="let tMenu of transactionMenu">
-                    <div class="menu-link px-3" (click)="clickMenuOpt(tMenu.key, activity._id)">{{ tMenu.key |
-                      translate}}</div>
+              </div>
+            </td>
+            <td>{{activity?.sBusinessPartnerName || '-'}}</td>
+            <!-- <td>{{'-'}}</td> -->
+            <td>
+              <span *ngIf="!activity?.oCustomer?.bIsCompany">{{activity?.oCustomer?.sFirstName}}
+                {{activity?.oCustomer?.sLastName || '-'}}</span>
+              <span *ngIf="activity?.oCustomer?.bIsCompany">{{activity?.oCustomer?.sCompanyName || "-"}}</span>
+            </td>
+    
+            <td>
+              <div class="btn-group">
+                <span class="btn btn-secondary fs-bold px-6" (click)="openActivities(activity)"
+                  [class.disabled]="!businessDetails?._id">
+                  <span class="indicator-label">{{ "VIEW" | translate}}</span>
+                </span>
+                <span class="btn btn-secondary btn-icon fs-bold" role="button">
+                  <div class="btn btn-icon" data-kt-menu-trigger="hover" data-kt-menu-attach="parent"
+                    data-kt-menu-placement="bottom-end" data-kt-menu-flip="bottom">
+                    <span class="svg-icon svg-icon-2 m-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M11.4343 12.7344L7.25 8.55005C6.83579 8.13583 6.16421 8.13584 5.75 8.55005C5.33579 8.96426 5.33579 9.63583 5.75 10.05L11.2929 15.5929C11.6834 15.9835 12.3166 15.9835 12.7071 15.5929L18.25 10.05C18.6642 9.63584 18.6642 8.96426 18.25 8.55005C17.8358 8.13584 17.1642 8.13584 16.75 8.55005L12.5657 12.7344C12.2533 13.0468 11.7467 13.0468 11.4343 12.7344Z"
+                          fill="black"></path>
+                      </svg>
+                    </span>
                   </div>
-                </div>
-              </span>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+                  <div
+                    class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-200px py-4"
+                    data-kt-menu="true">
+                    <div class="menu-item px-3 text-center" *ngFor="let tMenu of transactionMenu">
+                      <div class="menu-link px-3" (click)="clickMenuOpt(tMenu.key, activity._id)">{{ tMenu.key |
+                        translate}}</div>
+                    </div>
+                  </div>
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <div class="d-flex">
       <h5 *ngIf='!activities?.length && !showLoader' style="text-align: center;"> {{ "NO_DATA_FOUND" | translate}} !
       </h5>
       <div *ngIf="showLoader" class="spinner-border mx-auto"></div>
     </div>
-    <div class="row">
+    <div class="row" *ngIf='activities?.length'>
       <div class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
         <div class="dataTables_length" id="kt_ecommerce_sales_table_length">
           <label>
-            <select class="form-select form-select-sm form-select-solid" [(ngModel)]="pageCount"
-              (change)="changeItemsPerPage(pageCount)">
+            <select class="form-select form-select-sm form-select-solid" [(ngModel)]="paginationConfig.itemsPerPage"
+            (change)="changeItemsPerPage()">
               <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{ pageNum }}</option>
             </select>
           </label>

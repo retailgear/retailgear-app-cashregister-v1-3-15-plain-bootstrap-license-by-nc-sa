@@ -1,0 +1,46 @@
+<div class="card">
+    <div class="card-header" style="margin-top: 20px;">
+        <h4>{{ 'SELECT PRINTER' | translate}}</h4>
+        <div>
+            <button type="button" class="btn btn-sm btn-light" (click)="close(false)">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-5">
+        <div class="row align-items-center">
+            <div class="col-4"><label>{{ 'SELECT_PRINTER' | translate }}</label></div>
+            <div class="col-6">
+                <ng-select [groupBy]="groupByFn" [clearable]="false" class="mt-2" [items]="printersList" bindLabel="name"
+                    [(ngModel)]="oSelectedPrinter" (ngModelChange)="selectedPrinterChange()">
+                </ng-select>
+            </div>
+        </div>
+        
+        <div class="row align-items-center">
+            <div class="col-4"><label>{{ 'SELECT_PAPER' | translate }}</label></div>
+            <div class="col-6">
+                <ng-select class="mt-2" [items]="aPapers" [(ngModel)]="sPrinterPageFormat"></ng-select>
+            </div>
+        </div>
+        
+        <div class="row align-items-center">
+            <div class="col-4"><label>{{ 'PAPER_TRAY' | translate }}</label></div>
+            <div class="col-6">
+                <ng-select class="mt-2" [items]="aPaperTray" [(ngModel)]="sPaperTray"></ng-select>
+            </div>
+        </div>
+        
+        <div class="row align-items-center">
+            <div class="col-4"><label>{{ 'ROTATION' | translate }}</label></div>
+            <div class="col-6">
+                <ng-select class="mt-2" [items]="aRotation" [(ngModel)]="nRotation"></ng-select>
+            </div>
+        </div>
+        
+    </div>
+    <div class="card-footer justify-content-end d-flex p-5">
+        <button class="btn btn-primary me-2" (click)="close(true)">{{ 'SAVE' | translate}}</button>
+        <button class="btn btn-secondary" (click)="close(false)">{{ 'CANCEL' | translate}}</button>
+    </div>
+</div>

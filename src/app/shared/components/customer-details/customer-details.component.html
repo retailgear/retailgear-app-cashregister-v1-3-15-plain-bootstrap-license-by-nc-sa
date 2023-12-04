@@ -1,25 +1,46 @@
 <div class="card shadow-sm">
-    <div class="card-header align-items-center py-5">
+    <div class="card-header d-flex align-items-center justify-content-between py-3">
         <h4 class="card-title" *ngIf="mode === 'create'">{{"NEW_CUSTOMER" | translate}}</h4>
         <h4 class="card-title" *ngIf="mode === 'details'">{{"CUSTOMER_DETAILS" | translate}}</h4>
-        <div *ngIf="mode === 'details'" class="card-toolbar flex-row-fluid justify-content-end gap-5">
-            <button class="btn btn-secondary" (click)="editProfile = !editProfile">{{ ((editProfile)? "CANCEL":"EDIT" )| translate}}</button>
-            <button class="btn btn-primary" *ngIf="editProfile" (click)="EditOrCreateCustomer()">{{"SAVE" |
-                translate}}</button>
-                <button class="btn btn-secondary cancel my-auto" *ngIf="!editProfile" (click)="close(false)">{{"CANCEL" | translate}}</button>
-                <a class="cancel my-auto"  *ngIf="editProfile" (click)="close(false)">
-                <i class="fa fa-times"></i>
-             </a>
-            <!-- <button type="button" class="btn btn-sm" (click)="close(false)">
-                <fa-icon [icon]="faTimes"></fa-icon>
-            </button> -->
+        <div class="top-lable d-flex align-items-center">
+            <ng-container *ngIf="customer?.bIsMerged && customer?.eStatus=='d'">
+                <span class="badge badge-light-warning">{{"MERGED" | translate}}</span>
+            </ng-container>
+            <ng-container *ngIf="customer?.bIsImported">
+                <span class="badge badge-primary">{{"IMPORTED" | translate}}</span>
+            </ng-container>
+            <ng-container *ngIf="customer?.eStatus=='d' && (!customer?.bIsMerged || customer.bIsMerged ==undefined)">
+                <span class="badge badge-danger"> {{"DELETED" | translate}}</span>
+            </ng-container>
         </div>
-        <div *ngIf="mode === 'create'" class="card-toolbar flex-row-fluid justify-content-end gap-5">
+        <div *ngIf="mode === 'details'" class="card-toolbar d-flex align-items-center justify-content-end">
+            <button class="btn btn-secondary mx-2" *ngIf="bIsCurrentCustomer"
+                (click)="close({ bChangeCustomer: true })">
+                {{"CHANGE_CUSTOMER" | translate}}
+            </button>
+            <div *ngIf="!editProfile" class="d-flex align-items-center">
+                <button class="cancel btn btn-danger" (click)="deleteCustomer(customer)">{{"DELETE" |
+                    translate}}</button>
+                <button class="cancel btn btn-warning mx-2"
+                    (click)="mergeCustomer(customer,customer._id,null,'MERGE')">{{"MERGE" | translate}}</button>
+            </div>
+            <button class="btn btn-secondary" (click)="editProfile = !editProfile">{{ ((editProfile)? "CANCEL":"EDIT" )|
+                translate}}
+            </button>
+            <button class="btn btn-primary mx-2" *ngIf="editProfile" (click)="EditOrCreateCustomer()">{{"SAVE" |
+                translate}}
+            </button>
+            <a class="cancel my-auto mx-2" (click)="close(false)">
+                <!--*ngIf="editProfile"-->
+                <i class="fa fa-times fabutton" style="font-size: 2rem;"></i>
+            </a>
+        </div>
+        <div *ngIf="mode === 'create'" class="card-toolbar flex-row-fluid d-flex justify-content-end">
 
-            <button class="btn btn-primary" (click)="EditOrCreateCustomer()">{{"CREATE" |
+            <button class="btn btn-primary mx-2" (click)="EditOrCreateCustomer()">{{"CREATE" |
                 translate}}</button>
             <a class="cancel my-auto" (click)="close(false)">
-                <i class="fa fa-times"></i>
+                <i class="fa fa-times fabutton"></i>
             </a>
             <!-- <button type="button" class="btn btn-sm" (click)="close(false)">
                 <fa-icon [icon]="faTimes"></fa-icon>
@@ -33,16 +54,38 @@
                     <div class="d-flex">
                         <div class="flex-grow-1">
                             <div class="d-flex align-items-center mb-5">
-                                <i class="fa fa-user fs-1"></i>
+                                <i [class]="customer?.bIsCompany ? 'fa fa-building fs-1' : 'fa fa-user fs-1'"></i>
                                 <h2 class="fw-bolder mx-5 mb-0">
-                                    <span>{{ customer.sSalutation }} {{ customer.sFirstname }} {{ customer.sLastName
-                                        }} <span *ngIf="customer.nClientId">({{customer.nClientId}})</span></span>
+                                    <span *ngIf="!customer?.bIsCompany" style="text-transform: capitalize;">{{
+                                        customer.sSalutation | translate }} {{ customer.sFirstName }} {{
+                                        customer.sLastName}} </span>
+                                    <span *ngIf="customer?.bIsCompany"
+                                        style="text-transform: capitalize;">{{customer.sCompanyName}}</span>
+                                    <span *ngIf="customer?.nClientId">({{nClientId}}) <i *ngIf="nClientId != '-'"
+                                            class="fa fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="{{customer.nClientId}}"></i></span>
                                 </h2>
                             </div>
                             <div class="d-flex justify-content-between align-items-start" *ngIf="!editProfile">
-
-                                <div class="">
-                                    <h4 class="text-gray-700 fw-bolder mb-2">{{'About' | translate}}</h4>
+                                <!-- <div class="col-2">
+                                    <div class="d-flex flex-column mb-3">
+                                        <div>
+                                            <h4 class="text-gray-700 fw-bolder mb-2">{{'PICTURE' | translate}}</h4>
+                                            <div class="d-flex flex-column mb-5">
+                                                <div class="d-flex">
+                                                    <div class="image-input" data-kt-image-input="true">
+                                                        <div class="image-input-wrapper w-100px h-100px">
+                                                            <img src="{{ customer.sImage? customer.sImage : '../assets/images/no-photo-available.jpg'  }}"
+                                                                width="100px" height="100px" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> -->
+                                <div class="col-2">
+                                    <h4 class="text-gray-700 fw-bolder mb-2">{{'ABOUT' | translate}}</h4>
                                     <div class="d-flex flex-column mb-5">
                                         <div class="d-flex">
                                             <span>{{'RECEIVE_NEWSLETTER' | translate}}</span>
@@ -54,150 +97,254 @@
                                                 <i class="fas fa-times-circle"></i>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="d-flex flex-column mb-5">
-                                        <div *ngIf="customer?.iEmployeeId">
-                                        <h5 class="text-gray-700 fw-bolder mb-2" > {{ 'CREATER_DETAIL' | translate}} </h5>
-                                        <div class="d-flex fs-6 ms-1 my-1">
-                                            <div class="align-items-center">                                 
-                                                <img alt="Logo"
-                                                *ngIf="customer?.createrDetail?.sFirstName && (!customer?.createrDetail?.sAvatar  || customer?.createrDetail?.sAvatar == '')"
-                                                src="https://prismanote.com/public/prismanote.png" class="createrImage">
-                                              <img alt="Logo" *ngIf="customer?.createrDetail?.sAvatar" [src]="customer.createrDetail.sAvatar" class="createrImage">                                                      
-                                              <span> {{customer?.createrDetail?.sFirstName || '-'}} {{customer?.createrDetail?.sLastName || ''}} </span>
-                                                </div>   
-                                                </div>     
-                                        </div>
-                                        <div *ngIf="!customer?.iEmployeeId && customer?.bIsMigrated == true">
-                                            <h5 class="text-gray-700 fw-bolder mb-2"> {{'MIGRATED_CUSTOMER' | translate}}</h5>
-                                        </div> 
-                                    </div>
-                                </div>
-                                <div class="">
-                                    <h4 class="text-gray-700 fw-bolder mb-2">{{'CONTACT' | translate}}</h4>
-                                    <div class="d-flex flex-column block-buttons">
-                                        <p>
-                                            <a *ngIf="customer.sEmail" href="mailto:{{customer.sEmail}}"
-                                                class="text-gray-800 text-hover-primary btn btn-light">
-                                                <i class="fa fa-envelope"></i>
-                                                {{customer.sEmail}}</a>
-                                        </p>
-                                        <p>
-                                            <a href="https://wa.me/{{customer.oPhone.sMobile}}" *ngIf="customer.oPhone.bWhatsApp" target="_blank"
-                                                class="text-gray-800 text-hover-primary btn btn-light">
-                                                <i class="fab fa-whatsapp ms-1" 
-                                                    style="color: #1CB39B;"></i>
-                                                {{customer.oPhone.sMobile}}</a>
-                                        </p>
-                                        <p>
-                                            <span class="text-muted me-5">{{'PHONE_LANDLINE' | translate}} :</span>
-                                            <span> {{ customer.oPhone.sLandLine }}</span>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="">
-                                    <h4 class="text-gray-700 fw-bolder mb-2">{{'SHIPPING_ADDRESS' | translate}}</h4>
-                                    <div class="" *ngIf="customer.oShippingAddress">
-                                        <p>
-                                            {{ customer.oShippingAddress.sHouseNumber }}
-                                            {{ customer.oShippingAddress.sStreet }}<br>
-                                            {{ customer.oShippingAddress.sPostalCode }}
-                                            {{ customer.oShippingAddress.sCity }}
-                                        </p>
-                                    </div>
-                                </div>
 
-                                <div class="">
-                                    <h4 class="text-gray-700 fw-bolder mb-2">{{'INVOICE_ADDRESS' | translate}}</h4>
-                                    <div class="" *ngIf="customer.oInvoiceAddress">
-                                        <p>
-                                            {{ customer.oInvoiceAddress.sHouseNumber }} -
-                                            {{ customer.oInvoiceAddress.sStreet }},<br>
-                                            {{ customer.oInvoiceAddress.sPostalCode }},
-                                            {{ customer.oInvoiceAddress.sCity }}
-                                        </p>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div *ngIf="!editProfile" class="row mb-6">
-                        <label class="col-lg-3 col-form-label fw-bold fs-6">{{'NOTES' | translate}}</label>
-                        <div class="col-lg-9">
-                            <div class="row">
-                                <div class="col-lg-12 fv-row">
-                                    <textarea cols="30" rows="3" type="text" #customerNote
-                                        class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 w-100"
-                                        id="businessEmail" [(ngModel)]="customer.sNote" (ngModelChange)="customerNotesChanged($event)" name="businessEmail"
-                                        placeholder="{{'NOTES' | translate}}"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- <div *ngIf="!editProfile" class="mb-3">
-                        
-                        <label for="note">{{'NOTES' | translate}}</label>
-                        <textarea name="note" id="note" cols="30" rows="6" class="form-control" disabled
-                            ></textarea>
-                                </div> -->
-
-                    <!-- <p *ngIf="customer.note" class="text-gray-800 text-italic">{{customer.note}}</p>
-                    <div class="d-flex flex-wrap py-5">
-                        <div class="flex-equal me-5">
-    
-                        </div>
-                    </div> -->
-                </div>
-            </div>
-            <ng-container *ngIf="!editProfile">
-
-                <div class="row mb-5">
-                    <div class="col-9">
-                        <div *ngIf="bTransactionsLoader" style="text-align: center;">
-                            <div class="spinner-border h-50px w-50px mx-auto"></div>
-                        </div>
-                        <div *ngIf="!bTransactionsLoader" id="activities-chart">
-                            <apx-chart [series]="activitiesChartOptions.series" [chart]="activitiesChartOptions.chart"
-                                [labels]="activitiesChartOptions.labels"
-                                [responsive]="activitiesChartOptions.responsive"
-                                [legend]="activitiesChartOptions.legend" [title]="activitiesChartOptions.title"
-                                [colors]="activitiesChartOptions.colors">
-                            </apx-chart>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div>
-                            
-
-                            <div class="card panel-card">
-                                <div class="card-header">
-                                    <h3 class="card-title"> {{"SAVING_POINTS" | translate}}</h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row mb-7">
-                                        <label class="col-7">{{"SAVED_POINTS" | translate}}</label>
-                                        <label class="col-5">{{ customer.nLoyaltyPoints }}</label>
-                                    </div>
-                                    <div class="row mb-7">
-                                        <label class="col-7">{{"VALUE_OF_SAVING_POINTS" | translate}}</label>
-                                        <label class="col-5">{{ customer.nLoyaltyPointsValue | currency: 'EUR'}}
-                                            <!-- <span class="mx-3">
-                                                <i class="fa fa-info-circle"></i>
-                                            </span> -->
-                                        </label>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <label class="col-12">{{"ADD_OR_REDUCE_SAVING_POINTS" | translate}}</label>
-                                        <div class="col-12">
-                                            <div class="d-flex">
-                                                <input type="text" class="form-control">
-                                                <button class="btn btn-secondary">{{"SAVE" | translate}}</button>
+                                    <div class="d-flex flex-column mb-3">
+                                        <div>
+                                            <h5 class="text-gray-700 fw-bolder mb-2">{{'CUSTOMER_GROUP' | translate}}
+                                            </h5>
+                                            <div class="row mt-2">
+                                                <div class="col-12 d-flex flex-wrap">
+                                                    <p *ngFor="let selectedGroups of aSelectedGroups ; let index = index"
+                                                        class="group-text-align me-3">
+                                                        <span class="badge rounded-pill bg-light text-dark">
+                                                            {{selectedGroups}}
+                                                        </span>
+                                                    </p>
+                                                    <p *ngIf="aSelectedGroups.length == 0">
+                                                        <span class="badge rounded-pill bg-light text-dark">
+                                                            {{"NO_GROUPS" | translate}}
+                                                        </span>
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row mb-7">
+                                    <div class="d-flex flex-column mb-5">
+                                        <div *ngIf="customer?.iEmployeeId">
+                                            <h5 class="text-gray-700 fw-bolder mb-2"> {{ 'CREATER_DETAIL' | translate}}
+                                            </h5>
+                                            <div class="d-flex fs-6 ms-1 my-1">
+                                                <div class="align-items-center">
+                                                    <img alt="Logo"
+                                                        *ngIf="customer?.createrDetail?.sFirstName && (!customer?.createrDetail?.sAvatar  || customer?.createrDetail?.sAvatar == '')"
+                                                        src="https://prismanote.com/public/prismanote.png"
+                                                        class="createrImage">
+                                                    <img alt="Logo" *ngIf="customer?.createrDetail?.sAvatar"
+                                                        [src]="customer.createrDetail.sAvatar" class="createrImage">
+                                                    <span> {{customer?.createrDetail?.sFirstName || '-'}}
+                                                        {{customer?.createrDetail?.sLastName || ''}} </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="!customer?.iEmployeeId && customer?.bIsMigrated == true">
+                                            <h5 class="text-gray-700 fw-bolder mb-2"> {{'MIGRATED_CUSTOMER' |
+                                                translate}}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <h4 class="text-gray-700 fw-bolder mb-2">{{'CONTACT' | translate}}</h4>
+                                    <div
+                                        *ngIf="!customer.sEmail && !customer.oPhone.sMobile && !customer.oPhone.sLandLine && (!customer.bIsCompany && !(customer.oContactPerson.sFirstName || customer.oContactPerson.sPrefix || customer.oContactPerson.sLastName))">
+                                        <p class="text-gray-800 fw-bolder p-4 bg-light rounded">
+                                            {{"NO_CONTACT_INFORMATION" | translate}}
+                                        </p>
+                                    </div>
+                                    <div class="d-flex flex-column block-buttons">
+                                        <div>
+                                            <a *ngIf="customer.sEmail" href="mailto:{{customer.sEmail}}"
+                                                class="text-gray-800 text-hover-primary btn btn-light d-flex align-items-center justify-content-center">
+                                                <i class="fa fa-envelope me-3"></i>
+                                                {{customer.sEmail}}
+                                            </a>
+                                        </div>
+                                        <div class="my-3">
+                                            <a href="https://wa.me/{{customer.oPhone.sPrefixMobile}}{{removeSpaces(customer.oPhone.sMobile)}}"
+                                                *ngIf="customer.oPhone.bWhatsApp && customer.oPhone.sPrefixMobile"
+                                                target="_blank"
+                                                class="text-gray-800 text-hover-primary btn btn-light d-flex align-items-center justify-content-center">
+                                                <i class="fab fa-whatsapp me-3" style="color: #1CB39B;"></i>
+                                                {{customer.oPhone.sPrefixMobile}} {{customer.oPhone.sMobile}}
+                                            </a>
+                                        </div>
+                                        <p
+                                            *ngIf="!(customer.oPhone.bWhatsApp && customer.oPhone.sPrefixMobile) && customer.oPhone.sMobile">
+                                            <span class="text-muted me-5">{{'PHONE_MOBILE' | translate}}:</span><br>
+                                            <span> {{customer.oPhone.sPrefixMobile}} {{ customer.oPhone.sMobile
+                                                }}</span>
+                                        </p>
+                                        <p *ngIf="customer.oPhone.sLandLine">
+                                            <span class="text-muted me-5">{{'PHONE_LANDLINE' | translate}}:</span><br>
+                                            <span>{{ customer.oPhone.sPrefixLandline }} {{ customer.oPhone.sLandLine
+                                                }}</span>
+                                        </p>
+                                        <p
+                                            *ngIf="customer.bIsCompany && (customer.oContactPerson.sFirstName || customer.oContactPerson.sPrefix || customer.oContactPerson.sLastName)">
+                                            <span class="text-muted me-5">{{'CONTACT_PERSON' | translate}}:</span><br>
+                                            <span> {{ customer.oContactPerson.sFirstName }} {{
+                                                customer.oContactPerson.sPrefix }} {{ customer.oContactPerson.sLastName
+                                                }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <h4 class="text-gray-700 fw-bolder mb-2">{{'SHIPPING_ADDRESS' | translate}}</h4>
+                                    <div class="" *ngIf="customer.oShippingAddress">
+                                        <p class="m-0">
+                                            {{customer?.shippingAddress}}
+                                        </p>
+                                        <!-- <p class="m-0" *ngIf="!bNormalOrder">
+                                            <span
+                                                *ngIf="customer.oShippingAddress.sStreet || customer.oShippingAddress.sHouseNumber || customer.oShippingAddress.sHouseNumberSuffix">
+                                                {{ customer.oShippingAddress.sHouseNumber}}<span
+                                                    class="text-uppercase">{{
+                                                    customer.oShippingAddress.sHouseNumberSuffix }}</span>
+                                                {{ customer.oShippingAddress.sStreet }},
+                                                <br>
+                                            </span>
+                                            <span
+                                                *ngIf="customer?.oShippingAddress?.sCity || customer?.oShippingAddress?.sState">
+                                                {{ customer.oShippingAddress.sCity }}, {{
+                                                customer.oShippingAddress.sState || ' - '}} <br>
+                                            </span>
+                                            <span *ngIf="customer?.oShippingAddress?.sPostalCode"
+                                                class="text-uppercase">
+                                                {{ customer.oShippingAddress.sPostalCode}}<br>
+                                            </span>
+                                            {{ customer.oShippingAddress.sCountry }}
+                                        </p> -->
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <h4 class="text-gray-700 fw-bolder mb-2">{{'INVOICE_ADDRESS' | translate}}</h4>
+                                    <div class="" *ngIf="customer.oInvoiceAddress">
+                                        <p class="m-0">
+                                            {{customer?.invoiceAddress}}
+                                        </p>
+                                        <!-- <p class="m-0" *ngIf="!bNormalOrder">
+                                            <span
+                                                *ngIf="customer.oInvoiceAddress.sStreet || customer.oInvoiceAddress.sHouseNumber || customer.oInvoiceAddress.sHouseNumberSuffix ">
+                                                {{customer.oInvoiceAddress.sHouseNumber}}<span
+                                                    style="text-transform: uppercase;">{{
+                                                    customer.oInvoiceAddress.sHouseNumberSuffix }}</span>
+                                                {{ customer.oInvoiceAddress.sStreet}},
+                                                <br>
+                                            </span>
+                                            <span
+                                                *ngIf="customer?.oInvoiceAddress?.sCity || customer?.oInvoiceAddress?.sState">
+                                                {{ customer.oInvoiceAddress.sCity }}, {{ customer.oInvoiceAddress.sState
+                                                || ' - '}}<br>
+                                            </span>
+                                            <span *ngIf="customer.oInvoiceAddress.sPostalCode"
+                                                style="text-transform: uppercase;">
+                                                {{ customer.oInvoiceAddress.sPostalCode}} <br>
+                                            </span>
+                                            {{customer.oInvoiceAddress.sCountry}}
+                                        </p> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-6" *ngIf="!editProfile">
+                        <div *ngIf="customer?.dDateOfBirth || customer?.sCompanyName || customer?.nPaymentTermDays || customer?.sVatNumber"
+                            class="col-9 d-flex flex-wrap">
+                            <div class="col-3" *ngIf="customer?.dDateOfBirth">
+                                <label class="col-form-label text-gray-700  fw-bolder fs-6 mb-2">{{'DATE_OF_BIRTH' |
+                                    translate}} </label>
+                                <p class="fs-6 mb-2">{{(customer?.dDateOfBirth | date:'yyyy-MM-dd')}} </p>
+                            </div>
+                            <div class="col-3" *ngIf="customer?.sCompanyName">
+                                <label class="col-form-label text-gray-700  fw-bolder fs-6 mb-2">{{'COMPANY_NAME' |
+                                    translate}} </label>
+                                <p class="fs-6 mb-2">{{customer?.sCompanyName}}</p>
+                            </div>
+                            <div class="col-3" *ngIf="customer?.nPaymentTermDays">
+                                <label
+                                    class="col-form-label text-gray-700  fw-bolder fs-6 mb-2">{{'PAYMENT_TERM_IN_DAYS' |
+                                    translate}} </label>
+                                <p class="fs-6 mb-2">{{customer?.nPaymentTermDays}}</p>
+                            </div>
+                            <div class="col-3" *ngIf="customer?.sVatNumber">
+                                <label class="col-form-label text-gray-700  fw-bolder fs-6 mb-2">{{'VAT_NUMBER' |
+                                    translate}} </label>
+                                <p class="fs-6 mb-2">{{customer?.sVatNumber}}</p>
+                            </div>
+                            <!-- <div class="col-3" *ngIf="customer?.oIdentity?.documentName">
+                                <label class="col-form-label text-gray-700  fw-bolder fs-6 mb-2">{{'DOCUMENT_NAME' |
+                                    translate}} </label>
+                                <p class="fs-6 mb-2">{{customer?.oIdentity?.documentName}}</p>
+                            </div>
+                            <div class="col-3" *ngIf="customer?.oIdentity?.documentNumber">
+                                <label class="col-form-label text-gray-700 fw-bolder fs-6 mb-2">{{'DOCUMENT_NUMBER' |
+                                    translate}} </label>
+                                <p class="fs-6 mb-2">{{customer?.oIdentity?.documentNumber}} </p>
+                            </div> -->
+                        </div>
+
+                        <div class="col-3">
+                            <!-- UNCOMMENT THIS FOR DOCUMENTS AND IMAGES OF CUSTOMER -->
+                            <!-- <div class="w-100">
+                                <label class="col-form-label text-gray-700  fw-bolder fs-6 mb-2">{{'DOCUMENTS_AND_IMAGES' | translate}} </label>
+                                <button class="btn btn-info btn-sm" (click)="openImageModal('details')">
+                                    {{"SHOW_DOCUMENT_AND_IMAGES" | translate}}
+                                </button>
+                            </div> -->
+                        </div>
+                    </div>
+
+                    <div *ngIf="!editProfile" class="row mb-6">
+                        <div class="col-9">
+                            <label class="col-lg-12 text-gray-700  fw-bolder fs-6 mb-3 p-0">{{'NOTES' |
+                                translate}}</label>
+                            <div class="col-lg-12">
+                                <div class="row">
+                                    <div class="col-lg-12 fv-row">
+                                        <textarea cols="30" rows="8" type="text" #customerNote
+                                            class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 w-100"
+                                            id="businessEmail" [(ngModel)]="customer.sNote"
+                                            (ngModelChange)="customerNotesChanged($event)" name="businessEmail"
+                                            placeholder="{{'NOTES' | translate}}"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-3">
+                            <div>
+                                <div class="card panel-card">
+                                    <div class="card-header p-3">
+                                        <h3 class="card-title m-0">{{"SAVING_POINTS" | translate}}</h3>
+                                    </div>
+                                    <div class="card-body" *ngIf="!tillService.oSavingPointSettings?.bEnabled">
+                                        {{"LOYALTY_PROGRAM_NOT_ACTIVATED" | translate}}
+                                    </div>
+                                    <div class="card-body p-3 py-5" *ngIf="tillService.oSavingPointSettings?.bEnabled">
+                                        <p class="mb-3">
+                                            <span class="fw-bolder">{{"SAVED_POINTS" | translate}}</span>: {{
+                                            customer.nLoyaltyPoints }}
+                                        </p>
+                                        <p class="mb-3">
+                                            <span class="fw-bolder">{{"VALUE_OF_SAVING_POINTS" | translate}}</span>: {{
+                                            customer.nLoyaltyPointsValue | currency: tillService.currency}}
+                                        </p>
+                                        <div class="row mb-2">
+                                            <label class="fw-bolder mb-2">{{"ADD_OR_REDUCE_SAVING_POINTS" |
+                                                translate}}</label>
+
+                                            <div class="d-flex">
+                                                <input type="number"
+                                                    [attr.min]="customer.nLoyaltyPoints > 0 ? -customer.nLoyaltyPoints : 0"
+                                                    class="form-control w-50" name="loyalityPoints"
+                                                    [(ngModel)]="customerLoyalityPoints">
+                                                <button class="ms-3 btn btn-primary" [disabled]="pointsAdded"
+                                                    (click)="addLoyalityPoints()">{{"SAVE" | translate}}</button>
+                                            </div>
+                                        </div>
                                         <label
-                                            class="col-12 form-check form-check-sm form-check-custom form-check-solid me-5">
+                                            class="col-12 form-check form-check-sm form-check-custom form-check-solid">
                                             <input class="form-check-input" type="checkbox" value="1" />
                                             <span class="form-check-label">{{"SAVING_POINTS_NEVER_EXPIRED" |
                                                 translate}}</span>
@@ -208,183 +355,328 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <ng-container *ngIf="!editProfile">
                 <div class="row">
                     <div class="col-12">
-                        <app-pn-tabs class="tab-content" addClass="nav-fill" addChildLinkClass="text-gray-600"
-                            (activeTabChanged)="activeTabsChanged($event)">
-                            <div class="tab-gap"></div>
+                        <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6 justify-content-between">
+                            <li class="nav-item cursor-pointer" *ngFor="let tab of tabs">
+                                <button class="nav-link" [ngClass]="{active:tab.index === currentTab}"
+                                    (click)="onTabChange(tab.index)"><strong>{{tab.name | translate}}</strong>
+                                </button>
+                                <!-- <div class="tab-gap"></div> -->
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <ng-container [ngSwitch]="currentTab">
+                                <div *ngSwitchCase="0"
+                                    class="tab-pane fade show active overflow-scrol pb-5 border-bottom"
+                                    style="height: 60vh; overflow-x: hidden;">
+                                    <table class="table table-hover table-rounded table-striped border gs-7">
+                                        <thead>
+                                            <tr class="fw-bold fs-6 text-gray-800 border-bottom-2 border-gray-200">
+                                                <ng-container *ngFor="let th of aTransctionTableHeaders">
+                                                    <th scope="col"
+                                                        [ngClass]="{'fw-bolder': th.selected, 'cursor-pointer': !th.disabled, 'pe-none': th.disabled}"
+                                                        (click)="setSortOption(th)">
+                                                        {{ th.key | translate}}
+                                                    </th>
 
-                            <app-pn-tab tabTitle="{{ tabTitles[0] | translate}}" #purchases>
-                                <table class="table table-hover table-rounded table-striped border gs-7">
-                                    <thead>
-                                        <tr class="fw-bold fs-6 text-gray-800 border-bottom-2 border-gray-200">
-                                            <ng-container *ngFor="let th of aTransctionTableHeaders">
-                                                <th scope="col"
+                                                </ng-container>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let transaction of aTransactions | paginate: purchasePaginationConfig, let i = index;"
+                                                data-bs-toggle="tooltip" data-bs-placement="top">
+                                                <td>{{transaction.dCreatedDate | date:'MMM dd, yyyy, HH:mm:ss'}}</td>
+                                                <td>{{transaction.sNumber || '-'}}</td>
+                                                <td>{{transaction.sReceiptNumber || '-'}}</td>
+                                                <td>{{transaction.eType || '-'}}</td>
+                                                <td>{{(transaction.sTotal || 0) | currency: tillService.currency}}</td>
+                                                <ng-container>
+                                                    <!--*ngIf="from === 'customer'"-->
+                                                    <td>
+                                                        <button class="btn btn-info"
+                                                            (click)="showTransaction(transaction)">
+                                                            <i class="fa fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </ng-container>
+                                            </tr>
+                                            <tr *ngIf="bTransactionsLoader">
+                                                <td colspan="6" class="text-center">
+                                                    <div class="spinner-border mx-auto"></div>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf="!bTransactionsLoader && !aTransactions?.length">
+                                                <td colspan="6" class="text-center">
+                                                    {{ "NO_DATA_FOUND" | translate}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="row" *ngIf="aTransactions?.length">
+                                        <div
+                                            class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
+                                            <div class="dataTables_length" id="kt_purchases_table_length">
+                                                <label>
+                                                    <select name="kt_purchases_table_length"
+                                                        aria-controls="kt_purchases_table"
+                                                        class="form-select form-select-sm form-select-solid"
+                                                        [(ngModel)]="purchaseRequestParams.limit"
+                                                        (change)="changeItemsPerPage(purchaseRequestParams.limit , 'purchases')">
+                                                        <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{
+                                                            pageNum }}
+                                                        </option>
+                                                    </select>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="col-sm-12 col-md-9 d-flex align-items-center justify-content-center justify-content-md-end">
+
+                                            <pagination-controls id="purchases_paginate"
+                                                (pageChange)="pageChanged($event ,'purchases')"
+                                                (pageBoundsCorrection)="pageChanged($event , 'purchases')"
+                                                [maxSize]="setPaginateSize" [previousLabel]="'PREVIOUS' | translate"
+                                                [nextLabel]="'NEXT' | translate"
+                                                screenReaderPaginationLabel="Pagination"
+                                                [screenReaderPageLabel]="'PAGE' | translate">
+                                            </pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngSwitchCase="1"
+                                    class="tab-pane fade show active overflow-scrol pb-5 border-bottom"
+                                    style="height: 60vh; overflow-x: hidden;">
+                                    <table class="table table-hover table-rounded table-striped border gs-7">
+                                        <thead>
+                                            <tr class="fw-bold fs-6 text-gray-800 border-bottom-2 border-gray-200">
+                                                <ng-container *ngFor="let th of aTransctionItemTableHeaders">
+                                                    <th scope="col"
+                                                        [ngClass]="{'fw-bolder': th.selected, 'cursor-pointer': !th.disabled, 'pe-none': th.disabled}"
+                                                        (click)="setTransactionItemSortOption(th)">
+                                                        {{ th.key | translate }}
+                                                    </th>
+
+                                                </ng-container>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let transactionitem of aTransactionItems | paginate: transactionItemPaginationConfig, let i = index;"
+                                                data-bs-toggle="tooltip" data-bs-placement="top">
+                                                <td>{{transactionitem.dCreatedDate | date:'MMM dd, yyyy, HH:mm:ss'}}
+                                                </td>
+                                                <td>
+                                                    <p class="m-0">
+                                                        {{transactionitem.sProductNumber || '-'}}
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0">
+                                                        {{ transactionitem.sProductName || '-'}} <span
+                                                            *ngIf="transactionitem.sArticleGroupName">- {{
+                                                            transactionitem.sArticleGroupName}} </span><br>
+                                                        <span
+                                                            *ngIf="transactionitem.sArticleNumber">({{transactionitem.sArticleNumber}})</span>
+                                                    </p>
+                                                </td>
+                                                <td>{{(transactionitem.nPriceIncVat | currency: tillService.currency) ||
+                                                    0}}</td>
+                                                <ng-container>
+                                                    <!--*ngIf="from === 'customer'"-->
+                                                    <td>
+                                                        <button class="btn btn-info"
+                                                            (click)="showActivityItem(transactionitem,$event)">
+                                                            <i class="fa fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </ng-container>
+                                            </tr>
+                                            <tr *ngIf="bTransactionItemLoader">
+                                                <td colspan="6" class="text-center">
+                                                    <div class="spinner-border mx-auto"></div>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf="!bTransactionItemLoader && !aTransactionItems?.length">
+                                                <td colspan="6" class="text-center">
+                                                    {{ "NO_DATA_FOUND" | translate}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="row" *ngIf="aTransactionItems?.length">
+                                        <div
+                                            class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
+                                            <div class="dataTables_length" id="kt_purchases_table_length">
+                                                <label>
+                                                    <select name="kt_purchases_table_length"
+                                                        aria-controls="kt_purchases_table"
+                                                        class="form-select form-select-sm form-select-solid"
+                                                        [(ngModel)]="transactionItemRequestParams.limit"
+                                                        (change)="changeItemsPerPage(transactionItemRequestParams.limit , 'TransactionItems')">
+                                                        <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{
+                                                            pageNum }}
+                                                        </option>
+                                                    </select>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="col-sm-12 col-md-9 d-flex align-items-center justify-content-center justify-content-md-end">
+
+                                            <pagination-controls id="transaction_item_paginate"
+                                                (pageChange)="pageChanged($event ,'TransactionItems')"
+                                                (pageBoundsCorrection)="pageChanged($event , 'TransactionItems')"
+                                                [maxSize]="setPaginateSize" [previousLabel]="'PREVIOUS' | translate"
+                                                [nextLabel]="'NEXT' | translate"
+                                                screenReaderPaginationLabel="Pagination"
+                                                [screenReaderPageLabel]="'PAGE' | translate">
+                                            </pagination-controls>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngSwitchCase="2"
+                                    class="tab-pane fade show active overflow-scrol pb-5 border-bottom"
+                                    style="height: 60vh; overflow-x: hidden;">
+                                    <table class="table table-hover table-rounded table-striped border gs-7">
+                                        <thead>
+                                            <tr class="fw-bold fs-6 text-gray-800 border-bottom-2 border-gray-200">
+                                                <th scope="col" *ngFor="let th of aActivityTableHeaders"
                                                     [ngClass]="{'fw-bolder': th.selected, 'cursor-pointer': !th.disabled, 'pe-none': th.disabled}"
                                                     (click)="setSortOption(th)">
-                                                    {{ th.key }}
+                                                    {{ th.key | translate}}
                                                 </th>
-                                            </ng-container>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="let transaction of aTransactions | paginate: purchasePaginationConfig, let i = index;"
-                                            data-bs-toggle="tooltip" data-bs-placement="top">
-                                            <td>{{transaction.dCreatedDate | date: 'medium'}}</td>
-                                            <td>{{transaction.sNumber}}</td>
-                                            <td>{{transaction.sReceiptNumber}}</td>
-                                            <td>{{transaction.eType}}</td>
-                                            <td>{{transaction.sTotal || 0}}</td>
-                                            <ng-container *ngIf="from === 'customer'">
-                                                <td>
-                                                    <button class="btn btn-primary"
-                                                        (click)="showTransaction(transaction)">
-                                                        {{ 'VIEW' | translate }}
-                                                    </button>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                *ngFor="let activity of aActivities | paginate: activitiesPaginationConfig , let i = index;">
+                                                <td>{{activity?.sNumber}}</td>
+                                                <td>{{activity?.sBagNumber || '-'}}</td>
+                                                <td>{{getTypes(activity.activityitems)}}</td>
+                                                <td scope="row">
+                                                    {{activity?.dCreatedDate | date:'MMM dd,yyyy,HH:mm:ss'}}
                                                 </td>
-                                            </ng-container>
-                                        </tr>
-                                        <tr *ngIf="bTransactionsLoader">
-                                            <td colspan="5" class="text-center">
-                                                <div class="spinner-border mx-auto"></div>
-                                            </td>
-                                        </tr>
-                                        <tr *ngIf="!bTransactionsLoader && !aTransactions?.length">
-                                            <td colspan="5" class="text-center">
-                                                {{ "NO_DATA_FOUND" | translate}}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <div class="row">
-                                    <div
-                                        class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
-                                        <div class="dataTables_length" id="kt_purchases_table_length">
-                                            <label>
-                                                <select name="kt_purchases_table_length"
-                                                    aria-controls="kt_purchases_table"
-                                                    class="form-select form-select-sm form-select-solid"
-                                                    [(ngModel)]="purchaseRequestParams.limit"
-                                                    (change)="changeItemsPerPage(purchaseRequestParams.limit , 'purchases')">
-                                                    <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{
-                                                        pageNum }}
-                                                    </option>
-                                                </select>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="col-sm-12 col-md-9 d-flex align-items-center justify-content-center justify-content-md-end">
-                                      
-                                        <pagination-controls id="purchases_paginate"  (pageChange)="pageChanged($event ,'purchases')"
-                                        (pageBoundsCorrection)="pageChanged($event , 'purchases')" [maxSize]="setPaginateSize"
-                                        [previousLabel]="'PREVIOUS' | translate" [nextLabel]="'NEXT' | translate"
-                                        screenReaderPaginationLabel="Pagination" [screenReaderPageLabel]="'PAGE' | translate">
-                                    </pagination-controls>
-                                        <!-- <pagination-controls (pageChange)="pageChanged($event)"
-                                            (pageBoundsCorrection)="pageChanged($event)" [maxSize]="setPaginateSize"
-                                            [previousLabel]="'PREVIOUS' | translate" [nextLabel]="'NEXT' | translate"
-                                            screenReaderPaginationLabel="Pagination"
-                                            [screenReaderPageLabel]="'PAGE' | translate">
-                                        </pagination-controls> -->
-                                    </div>
-                                </div>
-                            </app-pn-tab>
-                            <app-pn-tab tabTitle="{{ tabTitles[1] | translate}}" #activities>
-                                <table class="table table-hover table-rounded table-striped border gs-7">
-                                    <thead>
-                                        <tr class="fw-bold fs-6 text-gray-800 border-bottom-2 border-gray-200">
-                                            <th scope="col" *ngFor="let th of aActivityTableHeaders"
-                                                [ngClass]="{'fw-bolder': th.selected, 'cursor-pointer': !th.disabled, 'pe-none': th.disabled}"
-                                                (click)="setSortOption(th)">
-                                                {{ th.key }}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="let activity of aActivities | paginate: activitiesPaginationConfig , let i = index;">
-                                            <td class="mw-200">{{activity?.sNumber}}</td>
-                                            <td>{{activity?.sBagNumber || '-'}}</td>
-                                            <td>{{getTypes(activity.activityitems)}}</td>
-                                            <td scope="row">{{activity?.dCreatedDate | date: 'yyyy-MM-dd HH:mm'}}</td>
-                                            <td scope="row">{{activity?.dEstimatedDate | date: 'yyyy-MM-dd HH:mm'}}</td>
-                                            <td>{{activity?.eActivityItemStatus || '-'}}</td>
-                                            <td>{{activity?.sBusinessPartnerName || '-'}}</td>
-                                        </tr>
-                                        <tr *ngIf="bActivitiesLoader">
-                                            <td colspan="7" class="text-center">
-                                                <div class="spinner-border mx-auto"></div>
-                                            </td>
-                                        </tr>
-                                        <tr *ngIf="!bActivitiesLoader && !aActivities?.length">
-                                            <td colspan="7" class="text-center">
-                                                {{ "NO_DATA_FOUND" | translate}}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                                <td scope="row">
+                                                    {{activity?.dEstimatedDate | date:'MMM dd,yyyy,HH:mm:ss'}}
+                                                </td>
+                                                <td>
+                                                    <div *ngFor="let status of repairStatuses">
+                                                        <div *ngIf="activity.eActivityItemStatus == status.value">
+                                                            {{status.key | translate}}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>{{activity?.sBusinessPartnerName || '-'}}</td>
+                                                <ng-container>
+                                                    <!--*ngIf="from === 'customer'"-->
+                                                    <td>
+                                                        <button class="btn btn-info" (click)="openActivities(activity)">
+                                                            <i class="fa fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </ng-container>
+                                            </tr>
+                                            <tr *ngIf="bActivitiesLoader">
+                                                <td colspan="8" class="text-center">
+                                                    <div class="spinner-border mx-auto"></div>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf="!bActivitiesLoader && !aActivities?.length">
+                                                <td colspan="8" class="text-center">
+                                                    {{ "NO_DATA_FOUND" | translate}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
 
-                                <div class="row">
-                                    <div
-                                        class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
-                                        <div class="dataTables_length" id="kt_activities_table_length">
-                                            <label>
-                                                <select name="kt_activities_table_length"
-                                                    aria-controls="kt_activities_table"
-                                                    class="form-select form-select-sm form-select-solid"
-                                                    [(ngModel)]="activitiesRequestParams.limit"
-                                                    (change)="changeItemsPerPage(activitiesRequestParams.limit , 'activities')">
-                                                    <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{
-                                                        pageNum }}
-                                                    </option>
-                                                </select>
-                                            </label>
+                                    <div class="row" *ngIf="aActivities?.length">
+                                        <div
+                                            class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
+                                            <div class="dataTables_length" id="kt_activities_table_length">
+                                                <label>
+                                                    <select name="kt_activities_table_length"
+                                                        aria-controls="kt_activities_table"
+                                                        class="form-select form-select-sm form-select-solid"
+                                                        [(ngModel)]="activitiesRequestParams.limit"
+                                                        (change)="changeItemsPerPage(activitiesRequestParams.limit , 'activities')">
+                                                        <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{
+                                                            pageNum }}
+                                                        </option>
+                                                    </select>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="col-sm-12 col-md-9 d-flex align-items-center justify-content-center justify-content-md-end">
+                                            <pagination-controls id="activities_paginate"
+                                                (pageChange)="pageChanged($event , 'activities')"
+                                                (pageBoundsCorrection)="pageChanged($event , 'activities')"
+                                                [maxSize]="setPaginateSize" [previousLabel]="'PREVIOUS' | translate"
+                                                [nextLabel]="'NEXT' | translate"
+                                                screenReaderPaginationLabel="Pagination"
+                                                [screenReaderPageLabel]="'PAGE' | translate">
+                                            </pagination-controls>
+
                                         </div>
                                     </div>
-                                    <div
-                                        class="col-sm-12 col-md-9 d-flex align-items-center justify-content-center justify-content-md-end">              
-                                        <pagination-controls id="activities_paginate" (pageChange)="pageChanged($event , 'activities')" (pageBoundsCorrection)="pageChanged($event , 'activities')"
-                                            [maxSize]="setPaginateSize" [previousLabel]="'PREVIOUS' | translate" [nextLabel]="'NEXT' | translate"
-                                            screenReaderPaginationLabel="Pagination" [screenReaderPageLabel]="'PAGE' | translate">
-                                        </pagination-controls>
-                                    
-                                    </div>
                                 </div>
-                            </app-pn-tab>
-                            <app-pn-tab tabTitle="{{ tabTitles[2] | translate}}" #activityItems>
-                                <table class="table table-hover table-rounded table-striped border gs-7">
-                                    <thead>
-                                        <tr class="fw-bold fs-6 text-gray-800 border-bottom-2 border-gray-200">
-                                            <th scope="col" *ngFor="let th of aActivityItemsTableHeaders"
-                                                [ngClass]="{'fw-bolder': th.selected, 'cursor-pointer': !th.disabled, 'pe-none': th.disabled}"
-                                                (click)="setSortOption(th)">
-                                                {{ th.key }}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="let activity of aActivityItems | paginate: itemsPaginationConfig , let i = index;">
-                                            <td>{{activity?.sNumber}}</td>
-                                            <td>{{activity?.sBagNumber || '-'}}</td>
-                                            <td>{{activity?.oType?.eTransactionType}}</td>
-                                            <td scope="row">{{activity?.dCreatedDate | date: 'yyyy-MM-dd HH:mm'}}</td>
-                                            <td scope="row">{{activity?.dEstimatedDate | date: 'yyyy-MM-dd HH:mm'}}</td>
-                                            <td>{{activity?.eActivityItemStatus || '-'}}</td>
-                                            <td>{{activity?.sBusinessPartnerName || '-'}}</td>
-                                        </tr>
-                                        <tr *ngIf="bActivityItemsLoader">
-                                            <td colspan="7" class="text-center">
-                                                <div class="spinner-border mx-auto"></div>
-                                            </td>
-                                        </tr>
-                                        <tr *ngIf="!bActivityItemsLoader && !aActivityItems?.length">
-                                            <td colspan="7" class="text-center">
-                                                {{ "NO_DATA_FOUND" | translate}}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                    <div class="row">
+                                <div *ngSwitchCase="3"
+                                    class="tab-pane fade show active overflow-scrol  pb-5 border-bottom"
+                                    style="height: 60vh; overflow-x: hidden;">
+                                    <table class="table table-hover table-rounded table-striped border gs-7">
+                                        <thead>
+                                            <tr class="fw-bold fs-6 text-gray-800 border-bottom-2 border-gray-200">
+                                                <th scope="col" *ngFor="let th of aActivityItemsTableHeaders"
+                                                    [ngClass]="{'fw-bolder': th.selected, 'cursor-pointer': !th.disabled, 'pe-none': th.disabled}"
+                                                    (click)="setSortOption(th)">
+                                                    {{ th.key | translate}}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                *ngFor="let activity of aActivityItems | paginate: itemsPaginationConfig , let i = index;">
+                                                <td>{{activity?.sNumber}}</td>
+                                                <td>{{activity?.sBagNumber || '-'}}</td>
+                                                <td>{{activity?.oType?.eTransactionType}}</td>
+                                                <td scope="row">{{activity?.dCreatedDate | date:'MMM dd,
+                                                    yyyy,HH:mm:ss'}}</td>
+                                                <td scope="row">{{activity?.dEstimatedDate | date:'MMM dd,
+                                                    yyyy,HH:mm:ss'}}</td>
+                                                <td>
+                                                    <div *ngFor="let status of repairStatuses">
+                                                        <div *ngIf="activity.eActivityItemStatus == status.value">
+                                                            {{status.key | translate}}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>{{activity?.sBusinessPartnerName || '-'}}</td>
+                                                <ng-container>
+                                                    <!--*ngIf="from === 'customer'"-->
+                                                    <td>
+                                                        <button class="btn btn-info"
+                                                            (click)="openActivityItems(activity)">
+                                                            <i class="fa fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </ng-container>
+                                            </tr>
+                                            <tr *ngIf="bActivityItemsLoader">
+                                                <td colspan="7" class="text-center">
+                                                    <div class="spinner-border mx-auto"></div>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf="!bActivityItemsLoader && !aActivityItems?.length">
+                                                <td colspan="7" class="text-center">
+                                                    {{ "NO_DATA_FOUND" | translate}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="row" *ngIf="aActivityItems?.length">
                                         <div
                                             class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
                                             <div class="dataTables_length" id="kt_ecommerce_sales_table_length">
@@ -401,128 +693,156 @@
                                                 </label>
                                             </div>
                                         </div>
-                                        <div  class="col-sm-12 col-md-9 d-flex align-items-center justify-content-center justify-content-md-end">
-                                          
-                                            <pagination-controls id= "items_paginate" (pageChange)="pageChanged($event , 'activityItems')" (pageBoundsCorrection)="pageChanged($event , 'activityItems')"
-                                                [maxSize]="setPaginateSize" [previousLabel]="'PREVIOUS' | translate" [nextLabel]="'NEXT' | translate"
-                                                screenReaderPaginationLabel="Pagination" [screenReaderPageLabel]="'PAGE' | translate">
+                                        <div
+                                            class="col-sm-12 col-md-9 d-flex align-items-center justify-content-center justify-content-md-end">
+
+                                            <pagination-controls id="items_paginate"
+                                                (pageChange)="pageChanged($event , 'activityItems')"
+                                                (pageBoundsCorrection)="pageChanged($event , 'activityItems')"
+                                                [maxSize]="setPaginateSize" [previousLabel]="'PREVIOUS' | translate"
+                                                [nextLabel]="'NEXT' | translate"
+                                                screenReaderPaginationLabel="Pagination"
+                                                [screenReaderPageLabel]="'PAGE' | translate">
                                             </pagination-controls>
-                                        
-                                        </div>
-                                    </div>
-                            </app-pn-tab>
-                            <app-pn-tab tabTitle="{{ tabTitles[3] | translate}}" #statistics>
-                                <div class="row mb-5">
-                                    <div id="statistics-chart" class="col-12">
-                                        <ng-container
-                                            *ngIf="aStatisticsChartData.length && !aStatisticsChartDataLoading;">
-                                            <apx-chart [series]="statisticsChartOptions.series"
-                                                [chart]="statisticsChartOptions.chart"
-                                                [dataLabels]="statisticsChartOptions.dataLabels"
-                                                [plotOptions]="statisticsChartOptions.plotOptions"
-                                                [yaxis]="statisticsChartOptions.yaxis"
-                                                [xaxis]="statisticsChartOptions.xaxis"
-                                                [colors]="statisticsChartOptions.colors"
-                                                [tooltip]="statisticsChartOptions.tooltip">
-                                            </apx-chart>
-                                        </ng-container>
-                                        <ng-container
-                                            *ngIf="!aStatisticsChartData.length && aStatisticsChartDataLoading">
-                                            <div class="d-flex my-20">
-                                                <div class="spinner-border mx-auto"></div>
-                                            </div>
-                                        </ng-container>
-                                        <ng-container
-                                            *ngIf="!aStatisticsChartData.length && !aStatisticsChartDataLoading">
-                                            <div class="d-flex my-20">
-                                                <div class="mx-auto">{{ "NO_DATA_FOUND" | translate}} </div>
-                                            </div>
-                                        </ng-container>
-                                    </div>
-                                </div>
-                                <div class="row mb-5">
-                                    <div class="col-4">
-                                        <div class="card panel-card mb-3">
-                                            <div class="card-header">
-                                                <h3 class="card-title"> {{ "ORDER_VALUE" | translate}}</h3>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row mb-7">
-                                                    <label class="col-6">{{ "TOTAL_TURNOVER_INC_VAT" |translate}}</label>
-                                                    <label class="col-6">{{ nTotalTurnOver | currency: 'EUR'}}</label>
-                                                </div>
-                                                <div class="row mb-7">
-                                                    <label class="col-6">{{ "AVERAGE_ORDER_VALUE_INC_VAT" |translate }}</label>
-                                                    <label class="col-6">{{ nAvgOrderValueIncVat | currency: 'EUR'}}</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="col-3">
-                                        <table class="table table-hover table-rounded table-striped border gs-7">
-                                            <thead>
-                                                <tr class="fw-bold fs-6 text-gray-800 border-bottom-2 border-gray-200">
-                                                    <th>{{ 'EMPLOYEE_NAME' |translate }}</th>
-                                                    <th>{{ 'REVENUE' | translate }}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr *ngFor="let oEmployeeStatistic of aEmployeeStatistic">
-                                                    <td>{{oEmployeeStatistic?.sName}}</td>
-                                                    <td>{{oEmployeeStatistic?.nTotalRevenue}}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="col-5">
-                                        <div id="paymentMethodsChart">
-
-                                            <apx-chart [series]="paymentMethodsChartOptions.series"
-                                                [chart]="paymentMethodsChartOptions.chart"
-                                                [labels]="paymentMethodsChartOptions.labels"
-                                                [responsive]="paymentMethodsChartOptions.responsive"
-                                                [legend]="paymentMethodsChartOptions.legend"
-                                                [title]="paymentMethodsChartOptions.title">
-                                            </apx-chart>
 
                                         </div>
                                     </div>
                                 </div>
-                            </app-pn-tab>
-                            <app-pn-tab tabTitle="{{ tabTitles[4] | translate}}" #general>
-                                {{ "GENERAL" |translate }}
-                            </app-pn-tab>
-                        </app-pn-tabs>
+                                <div *ngSwitchCase="4"
+                                    class="tab-pane fade show active overflow-scrol pb-5 border-bottom"
+                                    style="height: 60vh; overflow-x: hidden;">
+                                    <div class="row mb-5">
+                                        <div id="statistics-chart" class="col-12">
+                                            <ng-container
+                                                *ngIf="aStatisticsChartData.length && !aStatisticsChartDataLoading;">
+                                                <apx-chart [series]="statisticsChartOptions.series"
+                                                    [chart]="statisticsChartOptions.chart"
+                                                    [dataLabels]="statisticsChartOptions.dataLabels"
+                                                    [plotOptions]="statisticsChartOptions.plotOptions"
+                                                    [yaxis]="statisticsChartOptions.yaxis"
+                                                    [xaxis]="statisticsChartOptions.xaxis"
+                                                    [colors]="statisticsChartOptions.colors"
+                                                    [tooltip]="statisticsChartOptions.tooltip">
+                                                </apx-chart>
+                                            </ng-container>
+                                            <ng-container
+                                                *ngIf="!aStatisticsChartData.length && aStatisticsChartDataLoading">
+                                                <div class="d-flex my-20">
+                                                    <div class="spinner-border mx-auto"></div>
+                                                </div>
+                                            </ng-container>
+                                            <ng-container
+                                                *ngIf="!aStatisticsChartData.length && !aStatisticsChartDataLoading">
+                                                <div class="d-flex my-20">
+                                                    <div class="mx-auto">{{ "NO_DATA_FOUND" | translate}} </div>
+                                                </div>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-5">
+                                        <div class="col-4">
+                                            <div class="card panel-card mb-3">
+                                                <div class="card-header">
+                                                    <h3 class="card-title"> {{ "ORDER_VALUE" | translate}}</h3>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row mb-7">
+                                                        <label class="col-6">{{ "TOTAL_TURNOVER_INC_VAT"
+                                                            |translate}}</label>
+                                                        <label class="col-6">{{ nTotalTurnOver | currency:
+                                                            'EUR'}}</label>
+                                                    </div>
+                                                    <div class="row mb-7">
+                                                        <label class="col-6">{{ "AVERAGE_ORDER_VALUE_INC_VAT" |translate
+                                                            }}</label>
+                                                        <label class="col-6">{{ nAvgOrderValueIncVat | currency:
+                                                            'EUR'}}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="col-3">
+                                            <table class="table table-hover table-rounded table-striped border gs-7">
+                                                <thead>
+                                                    <tr
+                                                        class="fw-bold fs-6 text-gray-800 border-bottom-2 border-gray-200">
+                                                        <th>{{ 'EMPLOYEE_NAME' |translate }}</th>
+                                                        <th>{{ 'REVENUE' | translate }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let oEmployeeStatistic of aEmployeeStatistic">
+                                                        <td>{{oEmployeeStatistic?.sName}}</td>
+                                                        <td>{{oEmployeeStatistic?.nTotalRevenue}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-5">
+                                            <div id="paymentMethodsChart" *ngIf="paymentMethodsChartOptions">
+
+                                                <apx-chart [series]="paymentMethodsChartOptions.series"
+                                                    [chart]="paymentMethodsChartOptions.chart"
+                                                    [labels]="paymentMethodsChartOptions.labels"
+                                                    [responsive]="paymentMethodsChartOptions.responsive"
+                                                    [legend]="paymentMethodsChartOptions.legend"
+                                                    [title]="paymentMethodsChartOptions.title">
+                                                </apx-chart>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngSwitchCase="5"
+                                    class="tab-pane fade show active overflow-scrol pb-5 border-bottom"
+                                    style="height: 60vh; overflow-x: hidden;">
+                                    {{ "GENERAL" |translate }}
+                                </div>
+
+
+                            </ng-container>
+                        </div>
                     </div>
                 </div>
 
-            </ng-container>
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <div *ngIf="bTransactionsLoader" style="text-align: center;">
+                            <div class="spinner-border h-50px w-50px mx-auto"></div>
+                        </div>
+                        <div *ngIf="!bTransactionsLoader && activitiesChartOptions" id="activities-chart">
+                            <apx-chart [series]="activitiesChartOptions?.series" [chart]="activitiesChartOptions?.chart"
+                                [labels]="activitiesChartOptions?.labels"
+                                [responsive]="activitiesChartOptions?.responsive"
+                                [legend]="activitiesChartOptions?.legend" [title]="activitiesChartOptions?.title"
+                                [colors]="activitiesChartOptions?.colors">
+                            </apx-chart>
+                        </div>
+                    </div>
 
-            <!-- <div class="row my-3">
-                <div class="d-flex flex-row-fluid justify-content-end gap-5">
-                    <button class="btn btn-secondary" (click)="editProfile = !editProfile"><span>{{'MORE_DETAILS' |
-                            translate}}</span></button>
-                    <button class="btn btn-secondary" (click)="showStatistics = !showStatistics"><span>{{'STATISTICS' |
-                            translate}}</span></button>
                 </div>
-            </div> -->
+            </ng-container>
         </ng-container>
         <ng-container *ngIf="mode === 'create' || (mode === 'details' && editProfile)">
             <div class="row">
                 <div class="col-8">
-                    <div class="row mb-3">
+                    <div class="row d-flex align-items-center mb-3" *ngIf="!customer?.bIsCompany">
                         <div class="col-2">
-                            <ng-select [(ngModel)]="customer.sSalutation" id="sSalutation" [clearable]="false">
-                                <ng-option *ngFor="let salutation of salutations" [value]="salutation">{{salutation}}
+                            <ng-select [ngModel]="customer.sSalutation | translate" id="sSalutation" [clearable]="false"
+                                (ngModelChange)="customerType($event)">
+                                <ng-option value="">-</ng-option>
+                                <ng-option *ngFor="let salutation of salutations" [value]="salutation">
+                                    {{salutation.value | translate}}
                                 </ng-option>
                             </ng-select>
                         </div>
                         <div class="col-4">
                             <div>
-                                <input class="form-control capitalize-first" id="sFirstName" placeholder="{{'FIRST_NAME' | translate}}"
-                                    [(ngModel)]="customer.sFirstName" (ngModelChange)="convertFirstNameUpper($event)" />
+                                <input class="form-control capitalize-first" id="sFirstName"
+                                    placeholder="{{'FIRST_NAME' | translate}}" [(ngModel)]="customer.sFirstName"
+                                    (ngModelChange)="convertFirstLetterUpper($event , 'sFirstName')" />
                             </div>
                         </div>
                         <div class="col-2">
@@ -532,30 +852,120 @@
                             </div>
                         </div>
                         <div class="col-4">
-                            <div><input class="form-control capitalize-first" id="sLastName" placeholder="{{'LAST_NAME' | translate}}"
-                                    [(ngModel)]="customer.sLastName" (ngModelChange)="convertLastNameUpper($event)" required /></div>
+                            <div><input class="form-control capitalize-first" id="sLastName"
+                                    placeholder="{{'LAST_NAME' | translate}}" [(ngModel)]="customer.sLastName"
+                                    (ngModelChange)="convertFirstLetterUpper($event , 'sLastName')" required /></div>
                         </div>
                     </div>
+
+                    <div class="row mb-3 d-flex align-items-center" *ngIf="customer?.bIsCompany">
+                        <div class="col-2">
+                            <ng-select [(ngModel)]="customer.sSalutation" id="sSalutation" [clearable]="false"
+                                (ngModelChange)="customerType($event)">
+                                <ng-option value="">-</ng-option>
+                                <ng-option *ngFor="let salutation of salutations" [value]="salutation">
+                                    {{salutation.value | translate}}
+                                </ng-option>
+                            </ng-select>
+                        </div>
+                        <div class="col-10">
+                            <input class="form-control" id="sCompanyName" [(ngModel)]="customer.sCompanyName"
+                                placeholder="{{'COMPANY_NAME' | translate}}"
+                                (ngModelChange)="convertFirstLetterUpper($event , 'sCompanyName')" />
+                        </div>
+
+                    </div>
+
+                    <div class="row mb-2" *ngIf="customer?.bIsCompany">
+                        <div class="col-12">
+                            <label for="contactDetail">{{'CONTACT_PERSON' | translate}}</label>
+                        </div>
+                    </div>
+                    <div class="row mb-3" *ngIf="customer?.bIsCompany">
+                        <div class="col-5">
+                            <div>
+                                <input class="form-control" placeholder="{{'FIRST_NAME' | translate}}"
+                                    [(ngModel)]="customer.oContactPerson.sFirstName" />
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div>
+                                <input class="form-control" placeholder="{{'INSERT' | translate}}"
+                                    [(ngModel)]="customer.oContactPerson.sPrefix" />
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div><input class="form-control" placeholder="{{'LAST_NAME' | translate}}"
+                                    [(ngModel)]="customer.oContactPerson.sLastName" />
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="row mb-3" *ngIf="customer?.bIsCompany">
+
+                        <div class="col-6">
+                            <!-- <label for="nPaymentTermDays">{{'PAYMENT_TERM_IN_DAYS' | translate}}</label> -->
+                            <input class="form-control" id="nPaymentTermDays"
+                                placeholder="{{'PAYMENT_TERM_IN_DAYS' | translate}}"
+                                [(ngModel)]="customer.nPaymentTermDays" />
+                        </div>
+
+                        <div class="col-6">
+                            <!-- <label for="sVatNumber">{{'VAT_NUMBER' | translate}}</label> -->
+                            <input class="form-control" placeholder="{{'VAT_NUMBER' | translate}}"
+                                [(ngModel)]="customer.sVatNumber" />
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-6">
-                            <div class="mb-3">
-                                <input class="form-control" id="sEmail" placeholder="{{'EMAIL' | translate}}"
-                                    [(ngModel)]="customer.sEmail" />
+                            <div class="row">
+                                <div class="col-4">
+                                    <ng-select class="form-control form-control-solid p-0"
+                                        [(ngModel)]="customer.oPhone.sPrefixMobile" [clearable]="false" placeholder="">
+                                        <ng-option *ngFor="let countryPhoneCode of aCountryPhoneCodes"
+                                            [value]="countryPhoneCode.value">
+                                            <div class="fflag fflag-{{countryPhoneCode.key}} ff-md ff-wave ff-app me-2">
+                                            </div>{{countryPhoneCode.value}}
+                                        </ng-option>
+                                    </ng-select>
+                                </div>
+                                <div class="col-8 custom-number">
+                                    <input class="form-control" type="text" id="sMobile"
+                                        placeholder="{{'PHONE_MOBILE' | translate}}"
+                                        [(ngModel)]="customer.oPhone.sMobile" />
+                                </div>
                             </div>
-
                         </div>
                         <div class="col-6">
-                            <div class="mb-3">
-                                <input class="form-control" id="sMobile" placeholder="{{'PHONE_MOBILE' | translate}}"
-                                    [(ngModel)]="customer.oPhone.sMobile" />
+                            <div class="row">
+                                <div class="col-4">
+                                    <ng-select class="form-control form-control-solid p-0"
+                                        [(ngModel)]="customer.oPhone.sPrefixLandline" [clearable]="false"
+                                        placeholder="">
+                                        <ng-option *ngFor="let countryPhoneCode of aCountryPhoneCodes"
+                                            [value]="countryPhoneCode.value">
+                                            <div class="fflag fflag-{{countryPhoneCode.key}} ff-md ff-wave ff-app me-2">
+                                            </div>{{countryPhoneCode.value}}
+                                        </ng-option>
+                                    </ng-select>
+                                </div>
+                                <div class="col-8 custom-number">
+                                    <input class="form-control" type="text" id="sLandLine"
+                                        placeholder="{{'PHONE_LANDLINE' | translate}}"
+                                        [(ngModel)]="customer.oPhone.sLandLine" />
+                                </div>
                             </div>
                         </div>
+
                     </div>
                     <div class="row mt-3">
 
                         <div class="col-4">
-                            <input class="form-control" id="sLandLine" placeholder="{{'PHONE_LANDLINE' | translate}}"
-                                [(ngModel)]="customer.oPhone.sLandLine" />
+                            <input class="form-control" id="sEmail" placeholder="{{'EMAIL' | translate}}"
+                                [(ngModel)]="customer.sEmail" />
                         </div>
                         <div class="d-flex col-4">
                             <label class="form-check form-switch form-check-custom form-check-solid">
@@ -571,7 +981,7 @@
                             </label>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mt-3">
                         <div class="col-12">
                             <label for="sGender">{{'GENDER' | translate}}</label>
                             <div class="row g-9 mb-3" id="sGender" data-kt-buttons="true"
@@ -579,7 +989,8 @@
                                 <div class="col-4 col-lg-12 col-xxl-4">
                                     <label
                                         class="btn btn-outline btn-outline-dashed btn-outline-default active d-flex text-start p-3"
-                                        data-kt-button="true" [ngClass]="{'active': customer.sGender === 'male'}">
+                                        data-kt-button="true"
+                                        [ngClass]="{'active': customer.sGender === 'male' , 'disabled':customer?.bIsCompany}">
                                         <span
                                             class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
                                             <input class="form-check-input" type="radio" name="eGender" value="male"
@@ -593,7 +1004,8 @@
                                 <div class="col-4 col-lg-12 col-xxl-4">
                                     <label
                                         class="btn btn-outline btn-outline-dashed btn-outline-default d-flex text-start p-3"
-                                        data-kt-button="true" [ngClass]="{'active': customer.sGender === 'female'}">
+                                        data-kt-button="true"
+                                        [ngClass]="{'active': customer.sGender === 'female' , 'disabled':customer?.bIsCompany}">
                                         <span
                                             class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
                                             <input class="form-check-input" type="radio" name="eGender" value="female"
@@ -623,38 +1035,48 @@
                     </div>
                     <div class="row">
                         <div class="col-12 mt-6">
-                            <div class="d-flex justify-content-between align-items-center mb-6">
-                                <h3>{{'INVOICE_ADDRESS' | translate}}</h3>
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h3 class="m-0">{{'INVOICE_ADDRESS' | translate}}</h3>
                                 <div>
-                                    <button (click)="CopyInvoiceAddressToShipping()"
-                                        class="btn btn-sm btn-secondary">{{'COPY_TO_SHIPPING_ADDRESS' |
-                                        translate}}</button>
-                                    <!-- <mark>todo: make this button copy all invoice details to shipping details</mark> -->
+                                    <button class="btn btn-sm btn-secondary" (click)="copyInvoiceAddressToShipping()">
+                                        {{'COPY_TO_SHIPPING_ADDRESS' | translate}}
+                                    </button>
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <div class="col-7">
+                                <div class="col-7" [ngClass]="bNormalOrder ? 'order-1' : 'order-3'">
                                     <input class="form-control" placeholder="{{'STREET' | translate}}"
-                                        [(ngModel)]="customer.oInvoiceAddress.sStreet" />
+                                        [(ngModel)]="customer.oInvoiceAddress.sStreet"
+                                        (ngModelChange)="convertFirstLetterUpper($event , 'oInvoiceAddress.sStreet')"
+                                        (keydown)="onlyLetters($event)" />
                                 </div>
-
-                                <div class="col-3">
-                                    <input class="form-control" placeholder="{{'HOUSE_NUMBER' | translate}}"
+                                <div class="col-3 custom-number" [ngClass]="bNormalOrder ? 'order-2' : 'order-1'">
+                                    <input class="form-control" type="text" placeholder="{{'HOUSE_NUMBER' | translate}}"
                                         [(ngModel)]="customer.oInvoiceAddress.sHouseNumber" />
                                 </div>
-                                <div class="col-2">
+                                <div class="col-2" [ngClass]="bNormalOrder ? 'order-3' : 'order-2'">
                                     <input class="form-control" placeholder="{{'HOUSE_NUMBER_SUFFIX' | translate}}"
-                                        [(ngModel)]="customer.oInvoiceAddress.sAddition" />
+                                        [(ngModel)]="customer.oInvoiceAddress.sHouseNumberSuffix"
+                                        (keydown)="onlyLetters($event)" />
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <div class="col-4">
+                                <div class="col-4" [ngClass]="bNormalOrder ? 'order-1' : 'order-3'">
                                     <input class="form-control" placeholder="{{'PSOTAL_CODE' | translate}}"
-                                        [(ngModel)]="customer.oInvoiceAddress.sPostalCode" (ngModelChange)="customer.oInvoiceAddress.sPostalCode = $event.toUpperCase()" />
+                                        [(ngModel)]="customer.oInvoiceAddress.sPostalCode"
+                                        (ngModelChange)="customer.oInvoiceAddress.sPostalCode = $event.toUpperCase()" />
                                 </div>
-                                <div class="col-8">
+                                <div class="col-4" [ngClass]="bNormalOrder ? 'order-2' : 'order-1'">
                                     <input class="form-control" placeholder="{{'CITY' | translate}}"
-                                        [(ngModel)]="customer.oInvoiceAddress.sCity" />
+                                        [(ngModel)]="customer.oInvoiceAddress.sCity"
+                                        (ngModelChange)="convertFirstLetterUpper($event , 'oInvoiceAddress.sCity')"
+                                        (keydown)="onlyLetters($event)" />
+                                </div>
+                                <div class="col-4" [ngClass]="bNormalOrder ? 'order-3' : 'order-2'">
+                                    <input class="form-control" placeholder="{{'STATE' | translate}}"
+                                        [(ngModel)]="customer.oInvoiceAddress.sState"
+                                        (ngModelChange)="convertFirstLetterUpper($event , 'oInvoiceAddress.sState')"
+                                        (keydown)="onlyLetters($event)" />
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -669,31 +1091,56 @@
 
                         </div>
                         <div class="col-12 mt-6">
-                            <h3>{{'SHIPPING_ADDRESS' | translate}}</h3>
+                            <h3 class="m-0 mb-6">{{'SHIPPING_ADDRESS' | translate}}</h3>
 
                             <div class="row mb-3">
-                                <div class="col-7">
-                                    <input class="form-control" placeholder="{{'STREET' | translate}}"
-                                        [(ngModel)]="customer.oShippingAddress.sStreet" />
+                                <div class="col-7" [ngClass]="bNormalOrder ? 'order-1' : 'order-3'">
+                                    <input *ngIf="(mode === 'details' && editProfile)" class="form-control"
+                                        placeholder="{{'STREET' | translate}}"
+                                        [(ngModel)]="customer.oShippingAddress.sStreet"
+                                        (ngModelChange)="convertFirstLetterUpper($event , 'oShippingAddress.sStreet')" />
+                                    <input *ngIf="mode === 'create'" class="form-control"
+                                        placeholder="{{'STREET' | translate}}"
+                                        [(ngModel)]="customer.oShippingAddress.sStreet"
+                                        (ngModelChange)="convertFirstLetterUpper($event , 'oShippingAddress.sStreet')"
+                                        (keydown)="onlyLetters($event)" />
                                 </div>
 
-                                <div class="col-3">
-                                    <input class="form-control" placeholder="{{'HOUSE_NUMBER' | translate}}"
+                                <div class="col-3 custom-number" [ngClass]="bNormalOrder ? 'order-2' : 'order-1'">
+                                    <input *ngIf="(mode === 'details' && editProfile)" class="form-control"
+                                        placeholder="{{'HOUSE_NUMBER' | translate}}"
+                                        [(ngModel)]="customer.oShippingAddress.sHouseNumber" />
+                                    <input *ngIf="mode === 'create'" class="form-control" type="text"
+                                        placeholder="{{'HOUSE_NUMBER' | translate}}"
                                         [(ngModel)]="customer.oShippingAddress.sHouseNumber" />
                                 </div>
-                                <div class="col-2">
-                                    <input class="form-control" placeholder="{{'HOUSE_NUMBER_SUFFIX' | translate}}"
-                                        [(ngModel)]="customer.oShippingAddress.sAddition" />
+                                <div class="col-2" [ngClass]="bNormalOrder ? 'order-3' : 'order-2'">
+                                    <input *ngIf="(mode === 'details' && editProfile)" class="form-control"
+                                        placeholder="{{'HOUSE_NUMBER_SUFFIX' | translate}}"
+                                        [(ngModel)]="customer.oShippingAddress.sHouseNumberSuffix" />
+                                    <input *ngIf="mode === 'create'" class="form-control"
+                                        placeholder="{{'HOUSE_NUMBER_SUFFIX' | translate}}"
+                                        [(ngModel)]="customer.oShippingAddress.sHouseNumberSuffix"
+                                        (keydown)="onlyLetters($event)" />
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <div class="col-4">
+                                <div class="col-4" [ngClass]="bNormalOrder ? 'order-1' : 'order-3'">
                                     <input class="form-control" placeholder="{{'POSTAL_CODE' | translate}}"
-                                        [(ngModel)]="customer.oShippingAddress.sPostalCode" (ngModelChange)="customer.oShippingAddress.sPostalCode = $event.toUpperCase()" />
+                                        [(ngModel)]="customer.oShippingAddress.sPostalCode"
+                                        (ngModelChange)="customer.oShippingAddress.sPostalCode = $event.toUpperCase()" />
                                 </div>
-                                <div class="col-8">
+                                <div class="col-4" [ngClass]="bNormalOrder ? 'order-2' : 'order-1'">
                                     <input class="form-control" placeholder="{{'CITY' | translate}}"
-                                        [(ngModel)]="customer.oShippingAddress.sCity" />
+                                        [(ngModel)]="customer.oShippingAddress.sCity"
+                                        (ngModelChange)="convertFirstLetterUpper($event , 'oShippingAddress.sCity')"
+                                        (keydown)="onlyLetters($event)" />
+                                </div>
+                                <div class="col-4" [ngClass]="bNormalOrder ? 'order-3' : 'order-2'">
+                                    <input class="form-control" placeholder="{{'STATE' | translate}}"
+                                        [(ngModel)]="customer.oShippingAddress.sState"
+                                        (ngModelChange)="convertFirstLetterUpper($event , 'oShippingAddress.sState')"
+                                        (keydown)="onlyLetters($event)" />
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -712,12 +1159,13 @@
                 </div>
 
                 <div class="col-4">
+
                     <div class="mb-3">
                         <label for="note">{{'NOTES' | translate}}</label>
-                        <textarea  name="note" id="note" cols="30" rows="6" class="form-control"
+                        <textarea name="note" id="note" cols="30" rows="6" class="form-control"
                             [(ngModel)]="customer.sNote"></textarea>
                     </div>
-                    <div class="mb-6">
+                    <div class="mb-3">
                         <label for="dDateOfBirth">{{'DATE_OF_BIRTH' | translate}}</label>
                         <div class="input-group date" id="dDateOfBirth" data-target-input="nearest">
                             <input type="date" class="form-control datetimepicker-input"
@@ -725,65 +1173,109 @@
                                 (ngModelChange)="customer.dDateOfBirth = $event" />
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <div class="col-12 me-4 customers-fields">
+                            <label class="fw-bolder text-muted" for="customersGroup">{{'CUSTOMER_GROUP' | translate}}
+                            </label>
+                            <ng-select class="form-control form-control-solid p-0" [multiple]="true" [clearable]="false"
+                                [(ngModel)]="this.customer.aGroups">
+                                <ng-option *ngFor="let group of customerGroupList" [value]="group._id">{{group.sName}}
+                                </ng-option>
+                            </ng-select>
+                        </div>
+                    </div>
 
+                    <!--UNCOMMENT THIS FOR DOCUMENT AND IMAGES UPLOAD-->
+                    <!-- <div class="mb-3">
+                        <label class="fw-bolder text-muted">{{'DOCUMENTS_AND_IMAGES' | translate}}
+                        </label>
+                        <button class="btn btn-sm w-100 mt-3" (click)="openImageModal('editCreate')" [ngClass]="!oTemp && !customer._id? 'btn-info' : 'btn-light-info'"> 
+                            <span *ngIf="!oTemp && !customer._id">
+                                {{ "UPLOAD_DOCUMENT_AND_IMAGES" | translate}}
+                            </span>
+                            <span *ngIf="oTemp || customer._id">
+                                {{ "SHOW_DOCUMENT_AND_IMAGES" | translate}}
+                            </span>
+                        </button> 
+                    </div>-->
+                    <!-- <div class="d-flex justify-content-between flex-wrap" *ngIf="aImage.length">
+                        <div class="px-1 py-2" *ngFor="let image of aImage; let i = index" (mouseover)="showDeleteBtn = true"
+                        (mouseout)="showDeleteBtn = false">
+                          <div class="image-input" data-kt-image-input="true"
+                            style="background-image: url('assets/media/svg/avatars/blank.svg')">
+                            <div class="image-input-wrapper w-100px h-100px" (click)="openImage(i)"
+                              style="background-image: url(assets/media/avatars/300-1.jpg)">
+                              <img src="{{ image }}" width="100px" height="100px" />
+                            </div>
+              
+                            <div>
+                              <button class="btn btn-icon btn-circle btn-active-color-primary w-20px h-20px bg-body shadow"
+                                data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Remove image" (click)="removeImage(i)">
+                                <i class="bi bi-x fs-2" (click)="removeImage(i)"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                    </div> -->
 
-                    <div class="mb-3" *ngIf="customer?.oIdentity?.documentName">
+                    <!-- DOCUMENT SECTION -->
+                    <!-- <div class="mb-3">
                         <label for="documentName">{{'DOCUMENT_NAME' | translate}}</label>
-                        <ng-select id="documentName" [(ngModel)]="customer.oIdentity.documentName" [clearable]="false">
+                        <ng-select id="documentName" class="form-control form-control-solid p-0"
+                            [(ngModel)]="customer.oIdentity.documentName" [clearable]="false">
                             <ng-option *ngFor="let type of documentTypes" [value]="type">{{type}}</ng-option>
                         </ng-select>
                     </div>
-                    <div class="mb-6" *ngIf="customer?.oIdentity?.documentNumber">
+                    <div class="mb-6">
                         <input class="form-control" placeholder="{{'DOCUMENT_NUMBER' | translate}}"
                             [(ngModel)]="customer.oIdentity.documentNumber" />
-                    </div>
+                    </div> -->
+                    <div class="" *ngIf="!customer?.bIsCompany && customer?.sCompanyName">
+                        <h3 class="my-3">{{'COMPANY_DETAILS' | translate}}</h3>
+                        <div class="mb-3">
+                            <label for="sCompanyName">{{'COMPANY_NAME' | translate}}</label>
+                            <input class="form-control mb-3" id="sCompanyName" [(ngModel)]="customer.sCompanyName"
+                                (ngModelChange)="convertFirstLetterUpper($event , 'sCompanyName')" />
+                        </div>
 
-                    <h3>{{'COMPANY_DETAILS' | translate}}</h3>
+                        <div class="mb-3 row">
+                            <label class="col-12" for="contactDetail">{{'CONTACT_PERSON' | translate}}</label>
+                            <div class="col-5">
+                                <div>
+                                    <input class="form-control" placeholder="{{'FIRST_NAME' | translate}}"
+                                        [(ngModel)]="customer.oContactPerson.sFirstName" />
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div>
+                                    <input class="form-control" placeholder="{{'INSERT' | translate}}"
+                                        [(ngModel)]="customer.oContactPerson.sPrefix" />
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <div><input class="form-control" placeholder="{{'LAST_NAME' | translate}}"
+                                        [(ngModel)]="customer.oContactPerson.sLastName" />
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="sCompanyName">{{'COMPANY_NAME' | translate}}</label>
-                        <input class="form-control mb-6" id="sCompanyName" [(ngModel)]="customer.sCompanyName" />
-                    </div>
+                        <div class="mb-3">
+                            <label for="nPaymentTermDays">{{'PAYMENT_TERM_IN_DAYS' | translate}}</label>
+                            <input class="form-control" id="nPaymentTermDays" [(ngModel)]="customer.nPaymentTermDays" />
+                        </div>
 
+                        <div class="mb-3">
+                            <label for="sVatNumber">{{'VAT_NUMBER' | translate}}</label>
+                            <input class="form-control" [(ngModel)]="customer.sVatNumber" />
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="nPaymentTermDays">{{'PAYMENT_TERM_IN_DAYS' | translate}}</label>
-                        <input class="form-control" id="nPaymentTermDays" [(ngModel)]="customer.nPaymentTermDays" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="sVatNumber">{{'VAT_NUMBER' | translate}}</label>
-                        <input class="form-control" [(ngModel)]="customer.sVatNumber" />
-                    </div>
-
-                    <div class="mb-3" *ngIf="customer?.sCocNumber">
-                        <label for="sCocNumber">{{'COC_NUMBER' | translate}}</label>
-                        <input class="form-control" [(ngModel)]="customer.sCocNumber" />
+                        <div class="mb-3" *ngIf="customer?.sCocNumber">
+                            <label for="sCocNumber">{{'COC_NUMBER' | translate}}</label>
+                            <input class="form-control" [(ngModel)]="customer.sCocNumber" />
+                        </div>
                     </div>
                 </div>
             </div>
         </ng-container>
-
     </div>
-    <div class="card-footer">
-        <div class="row">
-            <div class="d-flex justify-content-right">
-                <button class="btn btn-secondary" (click)="close(true)">{{"CANCEL" | translate}}</button>
-            </div>
-        </div>
-    </div>
-    <!-- <div class="card-footer" *ngIf="mode === 'details' && showStatistics">
-        <div class="row">
-            <div class="col-4">
-                <h3 class="fw-bolder">{{"TURNOVER" | translate}}</h3>
-            </div>
-            <div class="col-4">
-                <h3 class="fw-bolder">{{"RECENT_SALES" | translate}}</h3>
-            </div>
-            <div class="col-4">
-                <h3 class="fw-bolder">{{"RECENT_SERVICES" | translate}}</h3>
-            </div>
-        </div>
-    </div> -->
-
 </div>

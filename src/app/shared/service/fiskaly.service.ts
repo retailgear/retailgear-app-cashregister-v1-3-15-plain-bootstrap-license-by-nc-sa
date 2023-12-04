@@ -1,52 +1,51 @@
-import { Injectable } from '@angular/core';
-import { retry } from 'rxjs/operators';
-import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { v4 as uuidv4 } from 'uuid';
+import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
+import { retry } from 'rxjs/operators';
+import { v4 as uuidv4 } from 'uuid';
 
-import { ApiService } from './api.service';
-import { StringService } from './string.service';
 import { environment } from '../../../environments/environment';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FiskalyService {
   fiskalyURL = environment.fiskalyURL;
+  iBusinessId = localStorage.getItem('currentBusiness');
+  iLocationId = localStorage.getItem('currentLocation');
+  iWorkstationId = localStorage.getItem('currentWorkstation');
+  tssId: any;
+  fiskalyAuth: any;
+  client: any;
+
   constructor(
     private apiService: ApiService,
-    private stringService: StringService,
     private httpClient: HttpClient) { }
 
 
   async loginToFiskaly() {
-    const iBusinessId = localStorage.getItem('currentBusiness');
-    const result = await this.apiService.postNew('fiskaly', '/api/v1/fiskaly/login', {iBusinessId}).toPromise();
-    localStorage.setItem('fiskalyAuth', JSON.stringify(result));
-    return result;
+    this.fiskalyAuth = await this.apiService.postNew('fiskaly', '/api/v1/fiskaly/login', { iBusinessId: this.iBusinessId }).toPromise();
+  }
+
+  setTss(id: any) {
+    this.tssId = id;
   }
 
   async startTransaction() {
-    console.log("-----------service fiskaly----------------");
-    let fiskalyAuth: any = localStorage.getItem('fiskalyAuth');
-    if (!fiskalyAuth) {
-      fiskalyAuth = await this.loginToFiskaly();
-    }
-    fiskalyAuth = JSON.parse(fiskalyAuth);
+    if (!this.fiskalyAuth) await this.loginToFiskaly();
+
     const guid = uuidv4();
-    let tssId = await this.fetchTSS();
-    if (!tssId) {
-      return;
-    }
-    const clientId = await this.getClientId(tssId);
+    if (!this.tssId) this.fetchTSS();
+
+    const clientId = await this.getClientId();
     const body = {
       'state': 'ACTIVE',
       'client_id': clientId
     };
-    const finalUrl = `${this.fiskalyURL}/tss/${tssId}/tx/${guid}?tx_revision=1`;
+    const finalUrl = `${this.fiskalyURL}/tss/${this.tssId}/tx/${guid}?tx_revision=1`;
     let httpHeaders = {
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${fiskalyAuth.access_token}` }
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.fiskalyAuth.access_token}` }
     }
     return await this.httpClient.put<any>(finalUrl, body, httpHeaders)
       .pipe(retry(1)).toPromise();
@@ -63,10 +62,14 @@ export class FiskalyService {
   transactionItemObject(transactionItems: any) {
     const amounts_per_vat_rate: any = [];
     transactionItems.forEach((element: any) => {
-      const amount = (element.priceInclVat || element.price) - ((element.priceInclVat || element.price) / (1 + (element.tax / 100))) * element.quantity;
+      let vat_amount = '0.00';
+      let amount = (element.priceInclVat || element.price) - ((element.priceInclVat || element.price) / (1 + (element.tax / 100))) * element.quantity;
+      if (amount) {
+        vat_amount = String(this.roundToXDigits(amount));
+      }
       amounts_per_vat_rate.push({
         vat_rate: 'NORMAL',
-        amount: String(this.roundToXDigits(amount)),
+        amount: vat_amount,
       });
     });
     return amounts_per_vat_rate;
@@ -108,99 +111,93 @@ export class FiskalyService {
     }
     return schema;
   }
+
   async updateFiskalyTransaction(transactionItems: any, payments: any, state: string) {
-    let fiskalyAuth: any = localStorage.getItem('fiskalyAuth');
-    if (!fiskalyAuth) {
-      fiskalyAuth = await this.loginToFiskaly();
-    }
-    let tssId = await this.fetchTSS();
-    if (!tssId) {
-      return;
-    };
-    fiskalyAuth = JSON.parse(fiskalyAuth);
+    if (!this.fiskalyAuth) await this.loginToFiskaly();
+
+
+    if (!this.tssId) this.fetchTSS();
 
     const schema = this.createSchema(transactionItems);
-    let fiskalyTransaction: any = localStorage.getItem('fiskalyTransaction');
+    const fiskalyTransaction: any = JSON.parse(localStorage.getItem('fiskalyTransaction') || '');
     if (state === 'FINISHED') {
       const paymentObj = this.paymentObject(payments);
       schema.standard_v1.receipt.amounts_per_payment_type = paymentObj;
     }
-    fiskalyTransaction = JSON.parse(fiskalyTransaction);
-    const clientId = await this.getClientId(tssId);
+
+    const clientId = await this.getClientId();
     const body = {
       state,
       client_id: clientId,
       schema
     };
-    const finalUrl = `${this.fiskalyURL}/tss/${tssId}/tx/${fiskalyTransaction._id}?tx_revision=${fiskalyTransaction.revision + 1}`;
+    const finalUrl = `${this.fiskalyURL}/tss/${this.tssId}/tx/${fiskalyTransaction._id}?tx_revision=${fiskalyTransaction.revision + 1}`;
     let httpHeaders = {
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${fiskalyAuth.access_token}` }
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.fiskalyAuth.access_token}` }
     }
-    return await this.httpClient.put<any>(finalUrl, body, httpHeaders).toPromise();
+    return this.httpClient.put<any>(finalUrl, body, httpHeaders).toPromise();
   }
 
-  async getClientId(tssId: string) {
-    const clientId = localStorage.getItem('clientId');
-    if (clientId) {
-      return clientId;
+  async getClientId() {
+    if (this.client?.clientInfo?._id) {
+      return this.client?.clientInfo?._id;
     }
-    const client: any = await this.createClient(tssId);
-    localStorage.setItem('clientId', client.clientInfo._id);
-    return client.clientInfo._id;
+    await this.createClient();
+    return this.client.clientInfo._id;
   }
 
   async createTSS(location: string) {
-    let fiskalyAuth: any = localStorage.getItem('fiskalyAuth');
-    fiskalyAuth = JSON.parse(fiskalyAuth);
-    if (!fiskalyAuth) {
-      fiskalyAuth = await this.loginToFiskaly();
-    }
-    const iBusinessId = localStorage.getItem('currentBusiness');
-    return this.apiService.postNew('fiskaly', `/api/v1/tss/create/${iBusinessId}`, { fiskalyToken: fiskalyAuth.access_token, location }).toPromise();
+    if (!this.fiskalyAuth) await this.loginToFiskaly();
+    return this.apiService.postNew('fiskaly', `/api/v1/tss/create/${this.iBusinessId}`, { fiskalyToken: this.fiskalyAuth.access_token, location }).toPromise();
   }
 
-  async fetchTSS() {
-    let tssId = localStorage.getItem('tssId');
-    if (!tssId) {
-      const location = localStorage.getItem('currentLocation') || 'asperen';
-      const iBusinessId = localStorage.getItem('currentBusiness');
-      const result: any = await this.apiService.getNew('fiskaly', `/api/v1/tss/get/${iBusinessId}/${location}`).toPromise();
-      if (result) {
-        localStorage.setItem('tssId', result._id);
-        tssId = result._id;
+  fetchTSS() {
+    this.apiService.getNew('fiskaly', `/api/v1/tss/get/${this.iBusinessId}/${this.iLocationId}`).subscribe((result: any) => {
+      if (result?._id) {
+        this.setTss(result._id)
       }
-    }
-    return tssId;
+    });
   }
 
-  async createClient(tssId: string) {
-    let fiskalyAuth: any = localStorage.getItem('fiskalyAuth');
-    fiskalyAuth = JSON.parse(fiskalyAuth);
-    const iBusinessId = localStorage.getItem('currentBusiness');
-    if (!fiskalyAuth) {
-      fiskalyAuth = await this.loginToFiskaly();
+  async createClient() {
+    // console.log('fs create client')
+    if (!this.fiskalyAuth) {
+      await this.loginToFiskaly();
     }
     const body = {
-      fiskalyToken: fiskalyAuth.access_token,
-      location: localStorage.getItem('currentLocation') || 'asperen',
-      currentWorkstation: localStorage.getItem('currentWorkstation'),
-      tssId
+      fiskalyToken: this.fiskalyAuth.access_token,
+      location: this.iLocationId,
+      currentWorkstation: this.iWorkstationId,
+      tssId: this.tssId
     };
-    return await this.apiService.postNew('fiskaly', `/api/v1/tss/fetch-client/${iBusinessId}`, body).toPromise();
+    this.client = await this.apiService.postNew('fiskaly', `/api/v1/tss/fetch-client/${this.iBusinessId}`, body).toPromise();
   }
 
-  getTSSList() {
-    const iBusinessId = localStorage.getItem('currentBusiness');
-    return this.apiService.getNew('fiskaly', `/api/v1/tss/list/${iBusinessId}`);
+  async getTSSList() {
+    // if(!this.fiskalyAuth) await this.loginToFiskaly();
+    return this.apiService.getNew('fiskaly', `/api/v1/tss/list/${this.iBusinessId}`).toPromise();
   }
 
-  async changeTSSState(iTssId: string, bEnabled: boolean) {
-    const iBusinessId = localStorage.getItem('currentBusiness');
+  async changeTSSState(location: any, bEnabled: boolean, bRemoveFromLive: boolean = false) {
     const body = {
       bEnabled,
-      iTssId
+      iTssId: location.iTssId,
+      bRemoveFromLive,
+      sLiveTssId: '',
+      fiskalyToken: '',
+      admin_puk: ''
     };
-    return await this.apiService.putNew('fiskaly', `/api/v1/tss/change-state/${iBusinessId}`, body).toPromise();
+    if (bRemoveFromLive) {
+      body.fiskalyToken = this.fiskalyAuth.access_token;
+      body.sLiveTssId = location.tssInfo._id;
+      body.admin_puk = location.tssInfo.admin_puk;
+    }
+    return await this.apiService.putNew('fiskaly', `/api/v1/tss/change-state/${this.iBusinessId}`, body).toPromise();
+  }
 
+  clearAll() {
+    this.tssId = null;
+    this.fiskalyAuth = null;
+    this.client = null;
   }
 }

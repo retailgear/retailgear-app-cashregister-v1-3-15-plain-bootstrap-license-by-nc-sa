@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 
 import { TillRoutingModule } from './till-routing.module';
 import { TillComponent } from './till.component';
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { TranslateModule } from "@ngx-translate/core";
 import { DropdownModule } from "primeng/dropdown";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -41,7 +40,6 @@ import { SupplierWarningDialogComponent } from './dialogs/supplier-warning-dialo
   imports: [
     CommonModule,
     TillRoutingModule,
-    FontAwesomeModule,
     TranslateModule,
     FormsModule,
     ReactiveFormsModule,
@@ -55,7 +53,6 @@ import { SupplierWarningDialogComponent } from './dialogs/supplier-warning-dialo
   exports: [
     TillComponent,
     TillRoutingModule,
-    FontAwesomeModule,
     TranslateModule,
     FormsModule,
     //PrimeNG

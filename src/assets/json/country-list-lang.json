@@ -1,0 +1,374 @@
+[
+   {
+      "country_code": "AF",
+      "lang": "Pushto",
+      "country": "Afghanistan",
+      "lang_code": "ps"
+   },
+   {
+      "country_code": "AL",
+      "lang": "Albanian",
+      "country": "Albania",
+      "lang_code": "sq"
+   },
+   {
+      "country_code": "FR",
+      "lang": "French",
+      "country": "France",
+      "lang_code": "fr"
+   },
+   {
+      "country_code": "AD",
+      "lang": "Catalan",
+      "country": "Andorra",
+      "lang_code": "ca"
+   },
+   {
+      "country_code": "PT",
+      "lang": "Portuguese",
+      "country": "Portugal",
+      "lang_code": "pt"
+   },
+   {
+      "country_code": "AM",
+      "lang": "Armenian",
+      "country": "Armenia",
+      "lang_code": "hy"
+   },
+   {
+      "country_code": "AZ",
+      "lang": "Azerbaijani",
+      "country": "Azerbaijan",
+      "lang_code": "az"
+   },
+   {
+      "country_code": "BD",
+      "lang": "Bengali",
+      "country": "Bangladesh",
+      "lang_code": "bn"
+   },
+   {
+      "country_code": "BY",
+      "lang": "Byelorussian",
+      "country": "Belarus",
+      "lang_code": "be"
+   },
+   {
+      "country_code": "BA",
+      "lang": "Serbian",
+      "country": "Bosnia & Herzegovina",
+      "lang_code": "sr"
+   },
+   {
+      "country_code": "BN",
+      "lang": "Malay",
+      "country": "Brunei",
+      "lang_code": "ms"
+   },
+   {
+      "country_code": "BG",
+      "lang": "Bulgarian",
+      "country": "Bulgaria",
+      "lang_code": "bg"
+   },
+   {
+      "country_code": "KH",
+      "lang": "Cambodian",
+      "country": "Cambodia",
+      "lang_code": "km"
+   },
+   {
+      "country_code": "CN",
+      "lang": "Chinese",
+      "country": "China",
+      "lang_code": "zh"
+   },
+   {
+      "country_code": "CY",
+      "lang": "Greek",
+      "country": "Cyprus",
+      "lang_code": "el"
+   },
+   {
+      "country_code": "CZ",
+      "lang": "Czech",
+      "country": "Czechia",
+      "lang_code": "cs"
+   },
+   {
+      "country_code": "DK",
+      "lang": "Danish",
+      "country": "Denmark",
+      "lang_code": "da"
+   },
+   {
+      "country_code": "DJ",
+      "lang": "Somali",
+      "country": "Djibouti",
+      "lang_code": "so"
+   },
+   {
+      "country_code": "ER",
+      "lang": "Tigrinya",
+      "country": "Eritrea",
+      "lang_code": "ti"
+   },
+   {
+      "country_code": "EE",
+      "lang": "Estonian",
+      "country": "Estonia",
+      "lang_code": "et"
+   },
+   {
+      "country_code": "ET",
+      "lang": "Amharic",
+      "country": "Ethiopia",
+      "lang_code": "am"
+   },
+   {
+      "country_code": "FI",
+      "lang": "Finnish",
+      "country": "Finland",
+      "lang_code": "fi"
+   },
+   {
+      "country_code": "FR",
+      "lang": "Swiss German",
+      "country": "France",
+      "lang_code": "gsw"
+   },
+   {
+      "country_code": "GE",
+      "lang": "Georgian",
+      "country": "Georgia",
+      "lang_code": "ka"
+   },
+   {
+      "country_code": "DE",
+      "lang": "German",
+      "country": "Germany",
+      "lang_code": "de"
+   },
+   {
+      "country_code": "GH",
+      "lang": "Hausa",
+      "country": "Ghana",
+      "lang_code": "ha"
+   },
+   {
+      "country_code": "GL",
+      "lang": "Greenlandic",
+      "country": "Greenland",
+      "lang_code": "kl"
+   },
+   {
+      "country_code": "HU",
+      "lang": "Hungarian",
+      "country": "Hungary",
+      "lang_code": "hu"
+   },
+   {
+      "country_code": "IS",
+      "lang": "Icelandic",
+      "country": "Iceland",
+      "lang_code": "is"
+   },
+   {
+      "country_code": "IN",
+      "lang": "Hindi",
+      "country": "India",
+      "lang_code": "hi"
+   },
+   {
+      "country_code": "ID",
+      "lang": "Indonesian",
+      "country": "Indonesia",
+      "lang_code": "id"
+   },
+   {
+      "country_code": "IR",
+      "lang": "Persian",
+      "country": "Iran",
+      "lang_code": "fa"
+   },
+   {
+      "country_code": "IE",
+      "lang": "Irish",
+      "country": "Ireland",
+      "lang_code": "ga"
+   },
+   {
+      "country_code": "IL",
+      "lang": "Hebrew",
+      "country": "Israel",
+      "lang_code": "he"
+   },
+   {
+      "country_code": "IT",
+      "lang": "Italian",
+      "country": "Italy",
+      "lang_code": "it"
+   },
+   {
+      "country_code": "JP",
+      "lang": "Japanese",
+      "country": "Japan",
+      "lang_code": "ja"
+   },
+   {
+      "country_code": "KZ",
+      "lang": "Kazakh",
+      "country": "Kazakhstan",
+      "lang_code": "kk"
+   },
+   {
+      "country_code": "LV",
+      "lang": "Latvian",
+      "country": "Latvia",
+      "lang_code": "lv"
+   },
+   {
+      "country_code": "LT",
+      "lang": "Lithuanian",
+      "country": "Lithuania",
+      "lang_code": "lt"
+   },
+   {
+      "country_code": "MT",
+      "lang": "Maltese",
+      "country": "Malta",
+      "lang_code": "mt"
+   },
+   {
+      "country_code": "MD",
+      "lang": "Romanian",
+      "country": "Moldova",
+      "lang_code": "ro"
+   },
+   {
+      "country_code": "NA",
+      "lang": "Afrikaans",
+      "country": "Namibia",
+      "lang_code": "af"
+   },
+   {
+      "country_code": "NP",
+      "lang": "Nepali",
+      "country": "Nepal",
+      "lang_code": "ne"
+   },
+   {
+      "country_code": "NL",
+      "lang": "Dutch",
+      "country": "Netherlands",
+      "lang_code": "nl"
+   },
+   {
+      "country_code": "KP",
+      "lang": "Korean",
+      "country": "North Korea",
+      "lang_code": "ko"
+   },
+   {
+      "country_code": "NO",
+      "lang": "Norwegian Bokmål",
+      "country": "Norway",
+      "lang_code": "nb"
+   },
+   {
+      "country_code": "PL",
+      "lang": "Polish",
+      "country": "Poland",
+      "lang_code": "pl"
+   },
+   {
+      "country_code": "RU",
+      "lang": "Russian",
+      "country": "Russia",
+      "lang_code": "ru"
+   },
+   {
+      "country_code": "SK",
+      "lang": "Slovak",
+      "country": "Slovakia",
+      "lang_code": "sk"
+   },
+   {
+      "country_code": "SI",
+      "lang": "Slovenian",
+      "country": "Slovenia",
+      "lang_code": "sl"
+   },
+   {
+      "country_code": "ZA",
+      "lang": "Zulu",
+      "country": "South Africa",
+      "lang_code": "zu"
+   },
+   {
+      "country_code": "ES",
+      "lang": "Spanish",
+      "country": "Spain",
+      "lang_code": "es"
+   },
+   {
+      "country_code": "LK",
+      "lang": "Singhalese",
+      "country": "Sri Lanka",
+      "lang_code": "si"
+   },
+   {
+      "country_code": "SE",
+      "lang": "Swedish",
+      "country": "Sweden",
+      "lang_code": "sv"
+   },
+   {
+      "country_code": "TH",
+      "lang": "Thai",
+      "country": "Thailand",
+      "lang_code": "th"
+   },
+   {
+      "country_code": "TR",
+      "lang": "Turkish",
+      "country": "Turkey",
+      "lang_code": "tr"
+   },
+   {
+      "country_code": "UA",
+      "lang": "Ukrainian",
+      "country": "Ukraine",
+      "lang_code": "uk"
+   },
+   {
+      "country_code": "AE",
+      "lang": "Arabic",
+      "country": "United Arab Emirates",
+      "lang_code": "ar"
+   },
+   {
+      "country_code": "GB",
+      "lang": "English",
+      "country": "United Kingdom",
+      "lang_code": "en"
+   },
+   {
+      "country_code": "US",
+      "lang": "Hawaiian",
+      "country": "United States",
+      "lang_code": "haw"
+   },
+   {
+      "country_code": "UZ",
+      "lang": "Uzbek",
+      "country": "Uzbekistan",
+      "lang_code": "uz"
+   },
+   {
+      "country_code": "VN",
+      "lang": "Vietnamese",
+      "country": "Vietnam",
+      "lang_code": "vi"
+   }
+]

@@ -2,9 +2,9 @@
   <div class="card-header" style="margin-top: 20px;">
     <h4>{{ "SEND_MANUAL_COMMAND"| translate}}</h4>
     <div>
-      <button type="button" class="btn btn-sm btn-light" (click)="close(false)">
-        <fa-icon [icon]="faTimes"></fa-icon>
-      </button>
+      <a class="cancel my-auto" (click)="close(false)">
+        <i class="fa fa-times fabutton"></i>
+      </a>
     </div>
   </div>
   <div class="card-body py-3">
@@ -13,9 +13,9 @@
         <div class="col-12 ">
         </div>
         <span class="fw-bolder">
-          {{ "FAX" | translate}}
+          {{ "FAX" | translate}} 
         </span>
-        <div class="col-12">op DESKTOP-GS49AV2</div>
+        <div class="col-12">{{labelPrintSettings?.sPrinterName}}</div>
       </div>
       <div class="row mb-3">
         <div class="col-12  text-end">

@@ -1,0 +1,31 @@
+.link {
+  margin-left: 40px;
+}
+
+.articlegroups {
+  margin-left: 30px;
+}
+
+.btag {
+  color: var(--bs-primary);
+}
+
+.btn-clr {
+  background-color: #aebaf2;
+}
+
+.custom-accordian-style {
+  overflow-y: scroll;
+  max-height: 350px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 3px 3px 5px #ccc;
+}
+
+.card-header {
+  .card-title {
+    span {
+      font-weight: 500;
+    }
+  }
+}

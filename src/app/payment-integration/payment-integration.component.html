@@ -1,0 +1,189 @@
+<div class="container p-4">
+    <div class="card py-2 mb-4" data-kt-scroll-section="payment-account-management">
+        <div class="card-header bg-white py-3 px-4 d-flex flex-column">
+            <h4 class="card-title">{{"PAYMENT_ACCOUNT_MANAGEMENT" | translate}}</h4>
+            <p class="mt-1 text-muted">({{'CLICK_ON_PROVIDER_LOGO_TO_UPDATE_CREDENTIALS' | translate }})</p>
+        </div>
+        <div class="card-body px-5">
+            <div class="d-flex justify-content-evenly">
+                <div class="cursor-pointer" (click)="toggleSettings('paynl')">
+                    <svg width="64" height="40" viewBox="0 0 64 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_596_748)">
+                            <path
+                                d="M53.7703 39.9995H0V9.27536C0 4.16076 4.14642 0 9.24281 0H53.7703C58.8673 0 63.0137 4.16076 63.0137 9.27536V30.7241C63.0137 35.8387 58.8673 39.9995 53.7703 39.9995Z"
+                                fill="#585FFF"></path>
+                            <path
+                                d="M33.1375 14.5266C32.1051 13.9107 30.9287 13.5802 29.7277 13.5687C28.5267 13.5571 27.3442 13.865 26.3002 14.4609C25.2563 15.0568 24.3883 15.9195 23.7845 16.9613C23.1806 18.003 22.8625 19.1867 22.8625 20.3919C22.8625 21.597 23.1806 22.7807 23.7845 23.8225C24.3883 24.8643 25.2563 25.727 26.3002 26.3229C27.3442 26.9188 28.5267 27.2266 29.7277 27.2151C30.9287 27.2035 32.1051 26.873 33.1375 26.2571V27.1329H36.4663V13.6353H33.1375V14.5266ZM29.6619 23.8756C28.9754 23.8748 28.3046 23.6699 27.7342 23.2866C27.1638 22.9033 26.7194 22.359 26.4572 21.7224C26.1951 21.0857 26.1269 20.3854 26.2613 19.7099C26.3956 19.0343 26.7266 18.414 27.2123 17.9271C27.698 17.4403 28.3166 17.1089 28.9899 16.9748C29.6632 16.8407 30.3611 16.9099 30.9952 17.1737C31.6294 17.4375 32.1714 17.884 32.5527 18.4568C32.934 19.0296 33.1375 19.703 33.1375 20.3919C33.1365 21.3162 32.7698 22.2023 32.1181 22.8555C31.4665 23.5087 30.583 23.8756 29.6619 23.8756Z"
+                                fill="white"></path>
+                            <path
+                                d="M15.7432 9.2207H9.16772V27.1326H12.4966V21.7074H15.8116C16.6315 21.7066 17.4433 21.5432 18.2002 21.2269C18.9571 20.9105 19.6443 20.4473 20.2224 19.8638C20.8005 19.2803 21.2581 18.588 21.569 17.8266C21.8799 17.0652 22.0379 16.2498 22.0339 15.427C22.0146 11.9798 19.1768 9.2207 15.7432 9.2207ZM15.763 18.3687H12.4966V12.5577H15.8116C16.1962 12.5583 16.5768 12.6356 16.9313 12.7852C17.2858 12.9349 17.6071 13.1538 17.8764 13.4294C18.1457 13.7049 18.3577 14.0314 18.5 14.39C18.6423 14.7485 18.712 15.1319 18.7051 15.5178C18.6748 17.1077 17.3474 18.366 15.763 18.366V18.3687Z"
+                                fill="white"></path>
+                            <path
+                                d="M54.2222 27.2475C55.344 27.2475 56.2535 26.3349 56.2535 25.2092C56.2535 24.0835 55.344 23.1709 54.2222 23.1709C53.1003 23.1709 52.1909 24.0835 52.1909 25.2092C52.1909 26.3349 53.1003 27.2475 54.2222 27.2475Z"
+                                fill="white"></path>
+                            <path
+                                d="M49.4673 13.5879L45.5603 23.7285L41.5358 13.6355H37.8948L43.2758 27.1331H44.2473L44.2297 27.1796C43.9764 27.8286 43.5347 28.3862 42.9618 28.7803C42.3889 29.1743 41.7113 29.3866 41.0167 29.3895H40.6239V32.7298H41.0719C42.4376 32.7239 43.7701 32.3065 44.8966 31.5317C46.0231 30.7568 46.8917 29.6603 47.3897 28.3842L53.0902 13.5879H49.4673Z"
+                                fill="white"></path>
+                        </g>
+                        <defs>
+                            <clipPath id="clip0_596_748">
+                                <rect width="63.0137" height="40" fill="white"></rect>
+                            </clipPath>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="cursor-pointer" (click)="toggleSettings('ccv')">
+                    <svg width="101" height="34" viewBox="0 0 101 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M100.976 3.94573C100.976 6.125 99.209 7.89142 97.03 7.89142C94.8507 7.89142 93.0843 6.125 93.0843 3.94573C93.0843 1.76646 94.8507 4.12847e-05 97.03 4.12847e-05C99.209 4.12847e-05 100.976 1.76646 100.976 3.94573Z"
+                            fill="#0395FF" />
+                        <path d="M77.6482 0.647503L89.2639 23.8299L84.5523 33.0932L68.2521 0.647349L77.6482 0.647503Z"
+                            fill="black" />
+                        <path
+                            d="M58.7819 20.3155C57.506 22.9213 54.829 24.7164 51.7319 24.7164C47.3986 24.7164 43.8859 21.2036 43.8859 16.8704C43.8859 12.5369 47.3986 9.02411 51.7319 9.02411C54.8627 9.02411 57.5645 10.8585 58.8231 13.5104L66.3097 9.74543C63.6714 4.35766 58.1352 0.647217 51.7319 0.647217C42.7723 0.647217 35.509 7.91054 35.509 16.8704C35.509 25.83 42.7723 33.0933 51.7319 33.0933C58.0907 33.0933 63.5937 29.4343 66.2538 24.1078L58.7819 20.3155Z"
+                            fill="black" />
+                        <path
+                            d="M24.2651 20.3155C22.9893 22.9213 20.3122 24.7164 17.2151 24.7164C12.8819 24.7164 9.36908 21.2036 9.36908 16.8704C9.36908 12.5369 12.8819 9.02411 17.2151 9.02411C20.3459 9.02411 23.0477 10.8585 24.3064 13.5104L31.7929 9.74543C29.1546 4.35766 23.6184 0.647217 17.2151 0.647217C8.25551 0.647217 0.992188 7.91054 0.992188 16.8704C0.992188 25.83 8.25551 33.0933 17.2151 33.0933C23.5739 33.0933 29.0769 29.4343 31.737 24.1078L24.2651 20.3155Z"
+                            fill="black" />
+                    </svg>
+        
+                </div>
+            </div>
+            <div style="border:1px solid #ccc;border-radius:5px;" class="mt-5 p-5" *ngIf="currentOpenSettings != ''">
+                <div @fade *ngIf="currentOpenSettings === 'paynl' ">
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>{{ 'SERVICE_ID' | translate }}</label>
+                                <input class="form-control" placeholder="{{ 'ENTER_SERVICE_ID' | translate }}"
+                                    [(ngModel)]="oPaynl.sServiceId">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>{{ 'API_TOKEN' | translate }}</label>
+                                <input class="form-control" placeholder="{{ 'API_TOKEN' | translate }}"
+                                    [(ngModel)]="oPaynl.sApiToken">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>{{ 'API_CODE' | translate }}</label>
+                                <input class="form-control" placeholder="{{ 'API_CODE' | translate }}"
+                                    [(ngModel)]="oPaynl.sApiCode">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label for="forWebshop" name="forWebshop" class="form-label">{{"USE_FOR_WEBSHOP" |
+                                translate}}</label>
+                            <div class="form-check form-check-solid form-switch fv-row lh-xxl">
+                                <input name="useForWebshop" id="forWebshop" type="checkbox"
+                                    class="form-check-input w-45px h-30px" [(ngModel)]="bPaynlUseForWebshop" />
+                            </div>
+                        </div>
+                    </div>
+        
+                </div>
+                <div @fade *ngIf="currentOpenSettings === 'ccv' ">
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>{{ 'API_CODE' | translate }}</label>
+                                <input class="form-control" placeholder="{{ 'API_CODE' | translate }}"
+                                    [(ngModel)]="oCCV.sApiCode">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>{{ 'MANAGEMENT_ID' | translate }}</label>
+                                <input class="form-control" placeholder="{{ 'MANAGEMENT_ID' | translate }}"
+                                    [(ngModel)]="oCCV.sManagementId">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label for="forWebshop" name="forWebshop" class="form-label">{{"USE_FOR_WEBSHOP" |
+                                translate}}</label>
+                            <div class="form-check form-check-solid form-switch fv-row lh-xxl">
+                                <input name="useForWebshop" id="forWebshop" type="checkbox"
+                                    class="form-check-input w-45px h-30px" [(ngModel)]="bCcvUseForWebshop" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <button class="btn btn-primary" (click)="saveSettings()" [disabled]="bSavingSettings">{{ 'SAVE' |
+                            translate }}</button>
+                        <div *ngIf="bSavingSettings" class="spinner-border mx-auto"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    <div class="card py-2 mb-4" data-kt-scroll-section="pos-settings">
+        <div class="card-header bg-white py-3 px-4">
+            <h4 class="card-title">{{"POS_SETTINGS" | translate}}</h4>
+        </div>
+        <div class="card-body px-5">
+            <div class="tscroll" *ngIf="!bTerminalsLoading">
+                <table class="table table-row-gray-400 gx-2 mt-4 table-row-bordered table-rounded border border-gray-400"
+                    [style.width.px]="tableMaxWidth">
+                    <thead>
+                        <tr>
+                            <td class="sticky-col first-col border border-gray-400"></td>
+                            <td *ngFor="let workstation of workstations; trackBy:trackByFunction;" class="lh-xxl w-260px">
+                                {{ workstation.sName }}
+                                <div style="white-space: normal;" class="badge" *ngIf="workstation?.computer"
+                                    [ngClass]="workstation?.computer?.state == 'connected' ? 'badge-light-success' : 'badge-light-danger'">
+                                    {{ workstation?.computer?.name }}
+        
+                                </div>
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody class="scroll-x" *ngIf="!loading">
+                        <tr class="lh-xxl" *ngFor="let type of typeList, let tIndex = index;">
+                            <td class="sticky-col first-col border border-gray-400">
+                                <label class="vertical-label-text mt-per-35"> {{ type.name }} </label>
+                            </td>
+                            <td *ngFor="let workstation of workstations" class="w-260px">
+                                <div *ngIf="workstation[type.key]?.sTerminalId != ''; else selectTerminal">
+                                    <div *ngIf="workstation[type.key]?.edit == false">
+                                        <label>{{ workstation[type.key].sTerminalName }}</label>
+                                        <div class="float-end mt-2">
+                                            <button class="btn btn-info px-4 py-2" (click)="workstation[type.key].edit = true">
+                                                <fa-icon [icon]="faPencilAlt"></fa-icon>
+                                            </button>
+                                            <button class="btn btn-danger ms-1 px-4 py-2"
+                                                (click)="remove($event, type.key, workstation)">
+                                                <fa-icon [icon]="faXmark"></fa-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="workstation[type.key]?.edit == true; then selectTerminal"></div>
+                                </div>
+                                <ng-template #selectTerminal>
+                                    <ng-select [clearable]="false" [(ngModel)]="workstation[type.key].sTerminalId"
+                                        (ngModelChange)="savePaymentIntegration($event, type.key, workstation)">
+                                        <ng-container *ngFor="let oTerminal of aTerminalList">
+                                            <ng-option *ngIf="type.key == oTerminal.sProvider" [value]="oTerminal.id">
+                                                {{ oTerminal.name }}
+                                            </ng-option>
+                                        </ng-container>
+                                    </ng-select>
+                                </ng-template>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        
+            <div class="spinner-box h-200px" *ngIf="bTerminalsLoading">
+                <div class="three-quarter-spinner">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

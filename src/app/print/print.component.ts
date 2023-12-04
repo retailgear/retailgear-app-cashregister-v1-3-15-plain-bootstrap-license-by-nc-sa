@@ -7,7 +7,7 @@ import {TranslateService} from "@ngx-translate/core";
 @Component({
   selector: 'app-print',
   templateUrl: './print.component.html',
-  styleUrls: ['./print.component.sass']
+  styleUrls: ['./print.component.scss']
 })
 export class PrintComponent implements OnInit {
   dataString: any

@@ -1,0 +1,26 @@
+<div class="card">
+    <div class="card-header align-items-center">
+        <div class="col-md-10">
+            <h4 class="m-0">{{'SET_SEQUENCE_FOR_CASH_REGISTER' | translate}}</h4>
+        </div>
+        <div>
+            <a class="cancel ml-auto mt-3" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <p>{{'DRAG_METHOD_AS_PER_YOUR_REQUIREMENT' | translate }}</p>
+            <div cdkDropList class="payment-method-list" (cdkDropListDropped)="drop($event)">
+                <div class="payment-method-box" *ngFor="let oMethod of payMethods" cdkDrag>{{ oMethod.sName | translate }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer p-5 justify-content-end align-items-center d-flex">
+        <div *ngIf="bSaving" class="me-2 spinner-border mx-auto"></div>
+        <button class="btn btn-primary me-2" (click)="saveSequence()">
+            {{'SAVE' | translate}}
+        </button>
+    </div>
+</div>

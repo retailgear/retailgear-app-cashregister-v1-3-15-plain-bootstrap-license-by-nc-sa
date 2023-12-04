@@ -54,46 +54,96 @@
     </div>
     <div class="col-md-6">
         <div class="row mt-2" *ngIf="service.bEngraving">
-            <div class="col-md-6"> <label> {{ "TYPES" | translate}}</label></div>
-            <div class="col-md-6"> <label> {{ "PRICE" | translate}}</label></div>
-            <div class="col-md-6 mt-2">
-                <div class="form-check form-check-solid">
-                    <input name="input0" id="input0" type="checkbox" class="form-check-input"
-                        [(ngModel)]="service.oEngravingDetails.oFontDetails.bEnabled" />
-                    <span class="form-check-label fw-bold text-muted">{{ 'SELECTED_FONTS' | translate }} </span>
+            <div class="col-12 d-flex justify-content-between mb-3">
+                <label>{{'TERM_TO_USE_ON_WEBSHOP' | translate }}</label>
+                <div>
+                    <label for="engrave" class="cursor-pointer me-3">
+                        <input type="radio" name="engrave_term" class="form-check-input me-2 cursor-pointer" id="engrave" value="engrave" checked="checked" [(ngModel)]="service.sTermForEngraving"/>
+                        <span>{{ 'ENGRAVING' | translate }}</span>
+                    </label>
+                    <label for="embroidery" class="cursor-pointer">
+                        <input type="radio" name="engrave_term" class="form-check-input me-2 cursor-pointer" id="embroidery" value="embroidery" [(ngModel)]="service.sTermForEngraving"/>
+                        <span>{{ 'EMBROIDERY' | translate }}</span>
+                    </label>
                 </div>
             </div>
-            <div class="col-md-6 mt-2">
-                <input name="input14" id="input14" type="number"
-                    [(ngModel)]="service.oEngravingDetails.oFontDetails.nPrice" class="form-control" fullWidth
-                    required="true">
+
+            <ng-container *ngIf="!isAddNewType">
+                <div class="col-md-5">
+                    <button class="btn btn-sm btn-primary w-100" (click)="isAddNewType = true;">
+                        {{ 'ADD_NEW_TYPE' | translate }}
+                    </button>
+                </div>
+                <div class="col-md-7">
+                    <button class="btn btn-sm btn-secondary w-100" (click)="removeSelectedType()" *ngIf="selectedType.sType != 'default'">
+                        {{ 'REMOVE_SELECTED' | translate }}
+                    </button>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="isAddNewType">
+                <div class="col-md-5"><label> {{ "NEW_TYPE_NAME" | translate}}</label></div>
+                <div class="col-md-7">
+                    <input name="input14" id="input14" type="text" [(ngModel)]="engravingTypeName" class="form-control">
+                </div>
+                <div class="col-md-12 text-warning" *ngIf="engravingTypeExist">
+                    {{ 'ENGRAVING_TYPE_ALEADY_EXIST' | translate}}
+                </div>
+                <div class="col-md-5 mt-2">
+                    <button class="btn btn-sm btn-primary w-100" (click)="addEngravingType()" [disabled]="engravingTypeName.trim() == ''">
+                        + {{ 'ADD' | translate }}
+                    </button>
+                </div>
+                <div class="col-md-7 mt-2">
+                    <button class="btn btn-sm btn-secondary w-100" (click)="isAddNewType = false">
+                        {{ 'CANCEL' | translate }}
+                    </button>
+                </div>
+            </ng-container>
+            <div class="col-md-5 mt-2"><label> {{ "TYPES" | translate}}</label></div>
+            <div class="col-md-7 mt-2">
+                <ng-select id="formFieldIp" name="propertyField" [items]="engravingList | async" [(ngModel)]="selectedType" [clearable]="false"
+                    [multiple]="false" [trackByFn]="trackByFn" *ngIf="!engravingListLoading">
+                    <ng-template ng-label-tmp let-item="item">
+                        <span class="ng-value-label">{{item.sType}}</span>
+                    </ng-template>
+                    <ng-template ng-option-tmp let-item="item">
+                        {{ item.sType }}
+                    </ng-template>
+                </ng-select>
             </div>
-            <div class="col-md-6 mt-2" *ngIf="service.oEngravingDetails.oFontDetails.bEnabled">
-                <label> {{"SELECT_FONT" | translate}} </label>
-            </div>
-            <div class="col-md-6 mt-2" *ngIf="service.oEngravingDetails.oFontDetails.bEnabled">
-                <span *ngFor="let font of fontList" class="d-none">
-                    <link [attr.href]="getSanitizedURL(font)" rel="stylesheet">
-                </span>
+            <div class="col-md-5 mt-2"><label> {{ "SELECT_FONT" | translate}}</label></div>
+            <div class="col-md-7 mt-2">
                 <ng-select id="formFieldIp" name="propertyField"
-                    [(ngModel)]="service.oEngravingDetails.oFontDetails.aFontList" [clearable]="false"
+                    [(ngModel)]="selectedType.oFontDetails.aFontList" [clearable]="false"
                     [multiple]="true">
                     <ng-option *ngFor="let opt of fontList" [value]="opt">
                         <label [ngStyle]="{'font-family' :opt}">{{ opt }}</label>
                     </ng-option>
                 </ng-select>
             </div>
-            <div class="col-md-6 mt-2">
-                <div class="form-check form-check-solid">
-                    <input name="input0" id="input0" type="checkbox" class="form-check-input"
-                        [(ngModel)]="service.oEngravingDetails.oImageDetails.bEnabled" />
-                    <span class="form-check-label fw-bold text-muted">{{ 'GIVEN_IMAGE' | translate }} </span>
+            <div class="col-md-5 mt-2"><label> {{ "PRICE" | translate}}</label></div>
+            <div class="col-md-7 mt-2">
+                <input name="input14" id="input14" type="number" [(ngModel)]="selectedType.oFontDetails.nPrice" class="form-control">
+            </div>
+            <div class="col-md-5 mt-2"><label class="word-break"> {{ "FOR_SELECTED_ARTICLE_GROUP" | translate}}</label></div>
+            <div class="col-md-7 mt-2">
+                <div class="form-check form-check-solid form-switch fv-row lh-xxl">
+                    <input name="input0" id="input0" type="checkbox" class="form-check-input w-45px h-30px"
+                        [(ngModel)]="selectedType.oFontDetails.isForArticleGroup" />
                 </div>
             </div>
-            <div class="col-md-6 mt-2">
-                <input name="input14" id="input14" type="number"
-                    [(ngModel)]="service.oEngravingDetails.oImageDetails.nPrice" class="form-control" fullWidth
-                    required="true">
+            <div class="col-md-5 mt-2" *ngIf="selectedType.oFontDetails.isForArticleGroup"><label> {{ "ARTICLE_GROUPS" | translate}}</label></div>
+            <div class="col-md-7 mt-2" *ngIf="selectedType.oFontDetails.isForArticleGroup">
+                <ng-select id="formFieldIp" [clearable]="false" [items]="articleGroups | async"  [typeahead]="articleInput$" [loading]="articlesLoading"
+                    [minTermLength]="2" [multiple]="true" [placeholder]="'ENTER_2_OR_MORE_CHARACTERS_FOR_SEARCH' | translate" [trackByFn]="trackByFn" [(ngModel)]="selectedType.oFontDetails.aArticleGroup">
+                    <ng-template ng-label-tmp let-item="item" let-clear="clear">
+                        <span class="ng-value-label">{{item.oName[selectedLanguage]}}</span>
+                        <span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true">×</span>
+                    </ng-template>
+                    <ng-template ng-option-tmp let-item="item">
+                        {{ item.oName[selectedLanguage] }}
+                    </ng-template>
+                </ng-select>
             </div>
         </div>
     </div>

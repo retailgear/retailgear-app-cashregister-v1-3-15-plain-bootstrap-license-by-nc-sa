@@ -6,7 +6,7 @@ import { ToastService } from '../toast';
 @Component({
   selector: 'app-action-settings',
   templateUrl: './action-settings.component.html',
-  styleUrls: ['./action-settings.component.sass']
+  styleUrls: ['./action-settings.component.scss']
 })
 export class ActionSettingsComponent implements OnInit {
 
@@ -34,6 +34,7 @@ export class ActionSettingsComponent implements OnInit {
     'PRINT_PDF',
     'PRINT_PDF_ALTERNATIVE',
     'PRINT_THERMAL',
+    'PRINT_THERMAL_ALTERNATIVE',
     'EMAIL'
   ];
 

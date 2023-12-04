@@ -2,54 +2,103 @@
     <div class="card-header" style="margin-top: 20px;">
         <h4>{{ "COUPON" | translate}}</h4>
         <div>
-            <button type="button" class="btn btn-sm btn-light" (click)="close({ action: false })">
-                <fa-icon [icon]="faTimes"></fa-icon>
-            </button>
+            <a class="cancel my-auto" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
         </div>
     </div>
-    <div class="card-body row">
-        <div class="col-md-12">
-            <input name="coupon_code" id="coupon_code" type="text" class="form-control w-100" placeholder="{{ '
-                COUPON_CODE' | translate}}" required="true">
+    <form [formGroup]="couponFormGroup" novalidate (ngSubmit)="save()">
+        <div class="card-body row">
+            <div class="col-md-12">
+                <input formControlName="sCouponCode" name="coupon_code" id="coupon_code" type="text" class="form-control w-100" placeholder="{{ 'COUPON_CODE' | translate}}" required="true">
+            </div>
+            <div class="col-md-3 mt-2">
+                <label> {{"DISCOUNT_TYPE" | translate}}</label>
+            </div>
+            <div class="col-md-9 d-flex mt-2">
+                <div class="form-check form-check-custom form-check-solid form-check-lg align-items-start">
+                    <input formControlName="sDiscountType" class="form-check-input" type="radio" value="fixedAmount"/>
+                    <span class="my-auto ms-2">{{ "FIXED_AMOUNT" | translate}}</span>
+                </div>
+                <div class="form-check form-check-custom form-check-solid form-check-lg align-items-start ms-4">
+                    <input formControlName="sDiscountType" class="form-check-input" type="radio" value="percentage"/>
+                    <span class="my-auto ms-2">{{ "PERCENTAGE" | translate}}</span>
+                </div>
+            </div>
+            <div class="col-md-3 mt-2">
+                <label> {{"COUPON_AMOUNT" | translate}}</label>
+            </div>
+            <div class="col-md-9 mt-2">
+                <input formControlName="nAmount" id="coupon_code" type="number" class="form-control w-100" required="true">
+            </div>
+            <div class="col-md-3 mt-2">
+                <label> {{"COUPON_MIN_SPEND" | translate}}</label>
+            </div>
+            <div class="col-md-9 mt-2">
+                <input formControlName="nMinSpend" id="coupon_code" type="number" class="form-control w-100" min="0" required="true">
+            </div>
+            <div class="col-md-3 mt-2">
+                <label> {{"COUPON_EXPIRY_DATE" | translate}}</label>
+            </div>
+            <div class="col-md-9 mt-2">
+                <div class="input-group date" id="dDateExpired" data-target-input="nearest">
+                    <input formControlName="dDateExpired" type="date" class="form-control datetimepicker-input"/>
+                </div>
+            </div>
+            <div class="col-md-3 mt-2">
+                <label> {{"USAGE_LIMIT_PER_COUPON" | translate}}</label>
+            </div>
+            <div class="col-md-9 mt-2">
+                <input formControlName="nLimit" id="coupon_code" type="number" class="form-control w-100" min="0" required="true">
+            </div>
+            <div class="col-md-3 mt-2">
+                <label> {{"ONLY_SELECTED_ARTICLE_GROUP" | translate}}</label>
+            </div>
+            <div class="col-md-9 mt-2">
+                <div class="form-check form-check-solid form-switch fv-row lh-xxl">
+                    <input id="bExcludeProduct" type="checkbox" class="form-check-input w-45px h-30px"
+                        formControlName='bExcludeProduct' />
+                </div>
+            </div>
+            <ng-container *ngIf="couponFormGroup.controls.bExcludeProduct.value">
+                <div class="col-md-3 mt-2">
+                    <label> {{"INCLUDE_EXCLUDE_ARTICLE_GROUP" | translate}}</label>
+                </div>
+                <div class="col-md-9 mt-2 d-flex">
+                    <div class="form-check form-check-custom form-check-solid form-check-lg align-items-start">
+                        <input formControlName="bExcludeSaleProduct" class="form-check-input" type="radio" [value]="true"/>
+                        <span class="my-auto ms-2">{{ "INCLUDE" | translate}}</span>
+                    </div>
+                    <div class="form-check form-check-custom form-check-solid form-check-lg align-items-start ms-4">
+                        <input formControlName="bExcludeSaleProduct" class="form-check-input" type="radio" [value]="false"/>
+                        <span class="my-auto ms-2">{{ "EXCLUDE" | translate}}</span>
+                    </div>
+                </div>
+                <div class="col-md-3 mt-2">
+                    <label> {{"SELECT_ARTICLE_GROUP" | translate}}</label>
+                </div>
+                <div class="col-md-9 mt-2">
+                    <ng-select formControlName="aProductArticleGroup" id="formFieldIp" [clearable]="false" [items]="articleGroups | async"  [typeahead]="articleInput$" [loading]="articlesLoading"
+                        [minTermLength]="2" [multiple]="true" [placeholder]="'ENTER_2_OR_MORE_CHARACTERS_FOR_SEARCH' | translate" [trackByFn]="trackByFn">
+                        <ng-template ng-label-tmp let-item="item" let-clear="clear">
+                            <span class="ng-value-label">{{item.oName[selectedLanguage]}}</span>
+                            <span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true">×</span>
+                        </ng-template>
+                        <ng-template ng-option-tmp let-item="item">
+                            {{ item.oName[selectedLanguage] }}
+                        </ng-template>
+                    </ng-select>
+                </div>
+            </ng-container>
         </div>
-        <div class="col-md-3">
-            <label> {{"DISCOUNT_TYPE" | translate}}</label>
+        <div class="card-footer row">
+            <div class="col-md-11">
+                <button type="submit" class="btn btn-primary">{{ "SAVE" | translate}}</button>
+            </div>
+            <div class="col-md-1">
+                <button type="reset" class="btn btn-secondary" (click)="close({ action: false })">{{ "CLOSE" |
+                    translate}}</button>
+            </div>
         </div>
-        <div class="col-md-9">
-            <input name="coupon_code" id="coupon_code" type="text" class="form-control w-100" required="true">
-        </div>
-        <div class="col-md-3">
-            <label> {{"COUPON_AMOUNT" | translate}}</label>
-        </div>
-        <div class="col-md-9">
-            <input name="coupon_code" id="coupon_code" type="text" class="form-control w-100" required="true">
-        </div>
-        <div class="col-md-3">
-            <label> {{"COUPON_MIN_SPEND" | translate}}</label>
-        </div>
-        <div class="col-md-9">
-            <input name="coupon_code" id="coupon_code" type="text" class="form-control w-100" required="true">
-        </div>
-        <div class="col-md-3">
-            <label> {{"COUPON_EXPIRY_DATE" | translate}}</label>
-        </div>
-        <div class="col-md-9">
-            <input name="coupon_code" id="coupon_code" type="text" class="form-control w-100" required="true">
-        </div>
-        <div class="col-md-3">
-            <label> {{"USAGE_LIMIT_PER_COUPON" | translate}}</label>
-        </div>
-        <div class="col-md-9">
-            <input name="coupon_code" id="coupon_code" type="text" class="form-control w-100" required="true">
-        </div>
-    </div>
-    <div class="card-footer row">
-        <div class="col-md-11">
-            <button type="button" class="btn btn-secondary" (click)="save()">{{ "SAVE" | translate}}</button>
-        </div>
-        <div class="col-md-1">
-            <button type="button" class="btn btn-secondary" (click)="close({ action: false })">{{ "CLOSE" |
-                translate}}</button>
-        </div>
-    </div>
+    </form>
 </div>

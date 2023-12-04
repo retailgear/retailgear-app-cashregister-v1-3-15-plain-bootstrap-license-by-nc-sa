@@ -1,0 +1,63 @@
+<div class="card shadow-sm">
+
+    <!-- Header -->
+    <div class="card-header">
+        <h3 class="card-title">{{ eType | translate}}</h3>
+        <div class="card-toolbar">
+            <button type="button" class="btn btn-sm btn-light" (click)="close({isClose: true})">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+    </div>
+
+    <!-- Body -->
+    <div class="card-body">
+        <full-calendar [options]="calendarOptions"></full-calendar>
+        <br>
+        <div class="row">
+
+            <!-- LOCATION -->
+            <div class="col-md-3">
+                <label class="fs-6 form-label fw-bolder text-dark">
+                    {{'LOCATION' | translate }}
+                </label>
+                <div class="w-100" *ngIf="!aLocation?.length">
+                    <div class="spinner-border mx-auto"></div>
+                </div>
+                <div class="w-100" *ngIf="aLocation?.length">
+                    <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+                        [(ngModel)]="aSelectedLocation" (change)="onChangeDropdown('location')" [clearable]="false">
+                        <ng-option *ngFor="let location of aLocation" [value]="location._id">
+                            {{location.sName}}
+                            <div *ngIf="sDayClosureMethod != 'workstation'"
+                                [ngStyle]="{'background-color': location.backgroundColor, 'width': '10px', 'height': '10px', 'border': '1px solid black' }">
+                            </div>
+                        </ng-option>
+                    </ng-select>
+                </div>
+            </div>
+
+            <!-- WORK_STATION -->
+            <div class="col-3">
+                <label class="fs-6 form-label fw-bolder text-dark">
+                    {{'WORK_STATION' | translate}}
+                </label>
+                <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+                    [(ngModel)]="selectedWorkStation" (change)="onChangeDropdown('workstation')" [clearable]="false">
+                    <ng-option *ngFor="let workstation of aWorkStation" [value]="workstation._id">{{workstation.sName}}
+                        <div *ngIf="sDayClosureMethod == 'workstation'"
+                            [ngStyle]="{'background-color': workstation.backgroundColor, 'width': '10px', 'height': '10px', 'border': '1px solid black' }">
+                        </div>
+                    </ng-option>
+                </ng-select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer">
+        <div class="text-end">
+            <button class="btn btn-secondary" (click)="close({isClose: true})">{{ 'CANCEL' | translate}}</button>
+        </div>
+    </div>
+</div>

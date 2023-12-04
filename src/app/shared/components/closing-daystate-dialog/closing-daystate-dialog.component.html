@@ -1,0 +1,29 @@
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3 class="card-title">{{ 'CLOSE_DAY_STATE' | translate}}</h3>
+        <div class="card-toolbar">
+            <button type="button" class="btn btn-sm btn-light" (click)="close({type: false})">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+      <p>You probably want to skip counting the money. Do you want to continue with the current cash ?</p>
+      <div class="mb-5">
+        <input class="form-check-input me-2 cursor-pointer" id="skim_all" type="radio" name="choice" value="skim_all" [(ngModel)]="choice" />
+        <label class="form-check-label cursor-pointer" for="skim_all">{{ 'NO_BROUGHT_EVERYTHING_TO_THE_CASH_SAFE' | translate }}</label>
+      </div>
+      <div class="mb-5">
+        <input class="form-check-input me-2 cursor-pointer" id="leave_in_till" type="radio" name="choice" value="leave_in_till" [(ngModel)]="choice" />
+        <label class="form-check-label cursor-pointer" for="leave_in_till">{{ 'I_WANT_TO_START_TOMORROW_WITH' | translate }} 
+          <strong>{{ nCashInTill | currency: tillService.currency }}</strong>{{ 'CASH' | translate }}</label>
+      </div>
+
+    </div>
+    <div class="card-footer">
+      <div class="text-end">
+        <button class="btn btn-primary me-2 " (click)="close({type: true, data: choice})">{{ 'CLOSE_DAY_STATE' | translate}}</button>
+        <button class="btn btn-secondary" (click)="close({type: false})">{{ 'CANCEL' | translate}}</button>
+      </div>
+    </div>
+</div>

@@ -2,40 +2,193 @@
     <div class="row">
         <div class="col-12">
             <div class="card card-flush">
-                <div class="card-header align-items-center py-5 gap-2 gap-md-5">
-                    <div class="card-title">
-                        <div class="d-flex align-items-center position-relative my-1">
-                            <span class="svg-icon svg-icon-4 position-absolute ms-4">
-                                <i class="fas fa-xs fa-search"></i>
-                            </span>
-                            <input type="text" class="form-control form-control-solid w-250px ps-14 me-4" #inputElement
-                                (keyup.enter)="getCustomers()" [(ngModel)]="requestParams.searchValue" name="search"
-                                placeholder="{{'SEARCH' | translate}}">
-                            <button class="btn btn-primary" (click)="getCustomers()">{{'SEARCH' | translate}} </button>
+                <div class="card-header bg-white align-items-center py-5 gap-2 gap-md-5">
+                    <!-- <div class="card-title"> -->
+                    <div class="row w-100 px-2 d-flex align-items-end">
+                        <div class="col-8 d-flex align-items-center">
+                            <div class="col-lg-6 pe-2">
+                                <div class="form-control form-control-solid d-flex align-items-center search_box bg-light p-0">
+                                    <span class="svg-icon svg-icon-4 position-absolute ms-4">
+                                        <i class="fas fa-xs fa-search"></i>
+                                    </span>
+                                    <input type="text" class="w-100 border-0 ps-5 py-2 bg-transparent ng-tns-c379-0 ng-pristine ng-valid ng-touched"
+                                        [(ngModel)]="requestParams.searchValue" (keyup.enter)="getCustomers()" (keyup)="customerEventHandler($event)"
+                                        name="search"
+                                        placeholder="{{(aPlaceHolder).join(',')}}" autofocus>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary me-2" (click)="getCustomers()">{{'SEARCH' | translate}}
+                            </button>
+                            <div class="d-flex align-items-center ads_search">
+                                <button class="btn btn-secondary me-2" (click)="resetFilters()">
+                                    <i class="fa fa-sync"></i>
+                                </button>
+                                <button type="button" (click)="showAdvanceSearch = !showAdvanceSearch" class="btn btn-info me-3">
+                                    <i class="fa fa-filter"></i>
+                                </button>
+                                </div>
+                                </div>
+                        <div class="col-4 d-flex justify-content-end">
+                            <button class="btn btn-primary me-3" (click)="createCustomer()">{{"NEW" |
+                                translate}}</button>
+                            <button class="btn btn-light-primary mx-2" (click)="export()">{{'DOWNLOAD' |
+                                translate}}</button>
                         </div>
-                    </div>
-                    <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                        </div>
+                        <div class="col-lg-12 d-flex align-items-end flex-wrap px-2" *ngIf="showAdvanceSearch">
+                        <label class="col-12 small form-label fw-bolder text-dark">{{ 'ADVANCED_SEARCH' | translate
+                            }}</label>
+                        <div class="col-12" *ngIf="requestParams.oFilterBy.aSearchField.length">
+                            <p class="mb-0 text-muted fw-bolder small">
+                                {{"PLEASE_FOLLOW_EXAMPLE_ORDER_FOR_A_BETTER_EXPERIENCE" | translate}}
+                            </p>
+                            <label class="text-muted"> {{"EXAMPLE" | translate}} : {{(aInputHint).join(',')}} </label>
+                            <p *ngIf="!bIsProperSearching" class="text-warning m-0"> {{ "PLEASE_SEARCH_AS_SHOWN" |
+                                translate }} </p>
+                            </div>
+                            <div class="col-4 me-4 customers-fields">
+                            <label class="fw-bolder text-muted" for="customersGroup">{{'CUSTOMER_FIELDS' | translate}}
+                            </label>
+                            <ng-select class="form-control form-control-solid p-0" [multiple]="true" [closeOnSelect]="false"
+                                [(ngModel)]="requestParams.oFilterBy.aSearchField" [clearable]="false" (ngModelChange)="setPlaceHolder()">
+                                <ng-option *ngFor="let item of aFilterFields" [value]="item.value">{{item.key |
+                                    translate}}</ng-option>
+                                </ng-select>
+                            </div>
+                            <div class="col-3 me-4 customers-fields">
+                            <label class="fw-bolder text-muted" for="customersGroup">{{'CUSTOMER_GROUP' | translate}}
+                            </label>
+                            <ng-select class="form-control form-control-solid p-0" [multiple]="true" [clearable]="false" [closeOnSelect]="false"
+                                [(ngModel)]="requestParams.oFilterBy.aSelectedGroups">
+                                <ng-option *ngFor="let group of customerGroupList" [value]="group._id">{{group.sName}}</ng-option>
+                            </ng-select>
+                            </div>
+                            <div class="col-3 me-4 customers-fields">
+                            <label class="fw-bolder text-muted" for="customersGroup">{{'CUSTOMER_TYPE' | translate}}
+                            </label>
+                            <ng-select class="form-control form-control-solid p-0" [(ngModel)]="requestParams.customerType" [clearable]="false"
+                                (change)="getCustomers()">
+                                <ng-option *ngFor="let customerType of customerTypes" [value]="customerType.value">{{customerType.key |
+                                    translate}}
+                                </ng-option>
+                                </ng-select>
+                                </div>
+                                <div class="col-4 mt-5">
+                                    <label class="w-100 form-check form-switch form-check-custom form-check-solid">
+                                        <input class="form-check-input" type="checkbox" [(ngModel)]="requestParams.bShowRemovedCustomers"
+                                            (change)="getCustomers()" />
+                                <span class="form-check-label fw-bold m-0 me-2">{{ "SHOW_DELETED_CUSTOMERS" | translate
+                                    }}</span>
+                                </label>
+                                </div>
+                                </div>
+                                </div>
 
-                        <button class="btn btn-primary" (click)="export()">{{'EXPORT' | translate}}</button>
-                        <button class="btn btn-primary" (click)="createCustomer()">{{"NEW" | translate}}</button>
-                    </div>
-                </div>
+                <!-- </div> -->
                 <div class="card-body pt-0">
                     <div class="dataTables_wrapper dt-bootstrap4 no-footer">
                         <div class="table-responsive">
-                            <table
-                                class="table table-striped table-rounded table-hover fs-6 gy-5 gs-5 dataTable no-footer">
+                            <table class="table table-striped table-rounded table-hover fs-6 gy-5 gs-5 dataTable no-footer">
                                 <thead>
-                                    <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                                    <tr class="fw-bold fs-6 text-gray-400 text-uppercase border-gray-200">
+                                        <th scope="col-2" *ngFor="let th of tableHeaders"
+                                            [ngClass]="{'fw-bolder': th.selected, 'cursor-pointer': !th.disabled, 'pe-none': th.disabled}"
+                                            (click)="setSortOption(th)">
+                                            {{ th.key | translate }}
+                                            <fa-icon *ngIf="th.selected" [icon]="th.sort === 'asc' ? faArrowDown : faArrowUp"></fa-icon>
+                                        </th>
+                                    </tr>
+                                    <!-- <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                                        <th>
+                                            {{"NAME" | translate}} / {{"COMPANY_NAME" | translate}}
+                                        </th>
                                         <th *ngFor="let column of allColumns" class="min-w-100px sorting" tabindex="0">
                                             {{column | translate}}
                                         </th>
-                                    </tr>
+                                        
+                                        <th>
+                                            {{"ACTION" | translate}}
+                                        </th>
+                                    </tr> -->
                                 </thead>
                                 <tbody class="fw-bold text-gray-600">
-                                    <tr *ngFor='let customer of customers | paginate: paginationConfig'
-                                        class="bg-hover-secondary" (click)="openCustomer(customer)">
-                                        <td *ngFor="let column of allColumns">{{customer[column]}}</td>
+                                    <tr *ngFor='let customer of customers | paginate: paginationConfig' class="bg-hover-secondary">
+                                        <td class="col-2">
+                                            <p class="m-0">{{customer.name}}</p>
+                                            <div>
+                                                <ng-container *ngIf="customer?.eStatus == 'd'">
+                                                    <span class="badge badge-danger">{{"DELETED" | translate}}</span>
+                                                </ng-container>
+                                                <ng-container *ngIf="customer?.isUpdated">
+                                                    <span class="badge badge-primary">{{"UPDATED" | translate}}</span>
+                                                </ng-container>
+                                                <ng-container *ngIf="customer?.isMerged">
+                                                    <span class="badge badge-danger"> {{"MERGED" | translate}}</span>
+                                                </ng-container>
+                                            </div>
+                                        </td>
+                                        <td *ngFor="let column of allColumns" class="col-2" (click)="openCustomer(customer)">{{customer[column]}}</td>
+                                        <td>
+                                            <div class="btn-group me-4" *ngIf="false">
+
+                                                <button [disabled]="customer.isDisable" class="btn btn-secondary fs-bold px-6" (click)="openCustomer(customer)">
+                                                    <span class="indicator-label">{{ "VIEW" | translate }}</span>
+                                                </button>
+                                                <button [disabled]="customer.isDisable" class="btn btn-secondary btn-icon fs-bold" role="button">
+                                                    <div class="btn btn-icon" data-kt-menu-trigger="hover" data-kt-menu-attach="parent"
+                                                        data-kt-menu-placement="bottom-end" data-kt-menu-flip="bottom">
+                                                        <!--begin::Svg Icon | path: icons/duotune/arrows/arr072.svg-->
+                                                        <span class="svg-icon svg-icon-2 m-0">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                                <path
+                                                                    d="M11.4343 12.7344L7.25 8.55005C6.83579 8.13583 6.16421 8.13584 5.75 8.55005C5.33579 8.96426 5.33579 9.63583 5.75 10.05L11.2929 15.5929C11.6834 15.9835 12.3166 15.9835 12.7071 15.5929L18.25 10.05C18.6642 9.63584 18.6642 8.96426 18.25 8.55005C17.8358 8.13584 17.1642 8.13584 16.75 8.55005L12.5657 12.7344C12.2533 13.0468 11.7467 13.0468 11.4343 12.7344Z"
+                                                                    fill="black"></path>
+                                                            </svg>
+                                                            </span>
+                                                            <!--end::Svg Icon-->
+                                                    </div>
+                                                    <!--begin::Menu-->
+                                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-200px py-4"
+                                                        data-kt-menu="true">
+                                                        <!--begin::Menu item-->
+                                                        <div class="menu-item px-3 text-center" *ngFor="let cMenu of customerMenu">
+                                                            <div class="menu-link px-3" (click)="clickMenuOpt(cMenu.key, customer)">{{ cMenu.key
+                                                                |
+                                                                translate}}</div>
+                                                            </div>
+                                                            <!--end::Menu item-->
+                                                    </div>
+                                                    <!--end::Menu-->
+                                                </button>
+
+                                            </div>
+                                            <div class="btn-group btn_group_container rounded" role="group" aria-label="Button group with nested dropdown">
+                                                <button type="button" class="btn px-4 py-2" (click)="openCustomer(customer)" [disabled]="customer.isDisable">{{
+                                                    "VIEW" |
+                                                    translate
+                                                    }}</button>
+                                            
+                                                <div class="btn-group" role="group">
+                                                    <button type="button" class="btn px-3 py-2 dropdown_toggle_btn" [disabled]="customer.isDisable">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                            <path
+                                                                d="M11.4343 12.7344L7.25 8.55005C6.83579 8.13583 6.16421 8.13584 5.75 8.55005C5.33579 8.96426 5.33579 9.63583 5.75 10.05L11.2929 15.5929C11.6834 15.9835 12.3166 15.9835 12.7071 15.5929L18.25 10.05C18.6642 9.63584 18.6642 8.96426 18.25 8.55005C17.8358 8.13584 17.1642 8.13584 16.75 8.55005L12.5657 12.7344C12.2533 13.0468 11.7467 13.0468 11.4343 12.7344Z"
+                                                                fill="black"></path>
+                                                        </svg>
+                                                    </button>
+                                                    <ul class="dropdown_menu">
+                                                        <li *ngFor="let cMenu of customerMenu">
+                                                            <div class="dropdown_item">
+                                                                <div class="menu-link px-3" (click)="clickMenuOpt(cMenu.key, customer)">{{
+                                                                    cMenu.key | translate}}
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -46,7 +199,7 @@
                         </div>
                     </div>
                     <div class="separator separator-dashed mt-9 mb-6"></div>
-                    <div class="row">
+                    <div class="row" *ngIf="customers?.length">
                         <div
                             class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
                             <div class="dataTables_length" id="kt_ecommerce_sales_table_length">
@@ -54,8 +207,7 @@
                                     <select name="kt_ecommerce_sales_table_length"
                                         aria-controls="kt_ecommerce_sales_table"
                                         class="form-select form-select-sm form-select-solid"
-                                        [(ngModel)]="requestParams.limit"
-                                        (change)="changeItemsPerPage(requestParams.limit)">
+                                        [(ngModel)]="paginationConfig.itemsPerPage" (change)="changeItemsPerPage()">
                                         <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{ pageNum }}
                                         </option>
                                     </select>

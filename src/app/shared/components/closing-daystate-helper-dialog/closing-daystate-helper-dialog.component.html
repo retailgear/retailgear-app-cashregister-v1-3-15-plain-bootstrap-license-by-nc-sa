@@ -1,0 +1,95 @@
+<div class="card shadow-sm">
+  <div class="card-header">
+    <h3 class="card-title">{{ 'CLOSE_DAY_STATE' | translate}}</h3>
+    <div class="card-toolbar">
+      <button type="button" class="btn btn-sm btn-light" (click)="close()">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="container-fluid">
+      <div class="row mb-4">
+    
+        <div class="col-12">
+          <label class="form-check form-check-custom">
+            <input class="form-check-input checkbox-hw me-3" type="checkbox"
+              [(ngModel)]="oHelperDetails.oStartAmountIncorrect.bChecked" />
+            <span class="cursor-pointer">{{'MY_START_CASH_WAS_INCORRECT' | translate }}</span>
+          </label>
+        </div>
+    
+        <div class="col-11 offset-1 d-flex justify-content-between align-items-center" *ngIf="oHelperDetails.oStartAmountIncorrect.bChecked">
+          <span class="me-5">{{'ENTER_START_AMOUNT_YOU_WANT_TO_ADD' | translate }}</span>
+          <div class="w-100">
+            <input type="number" min="0" class="form-control mb-2" [(ngModel)]="oHelperDetails.oStartAmountIncorrect.nAmount" (ngModelChange)="validate()">
+            <span class="err-msg" *ngIf="oHelperDetails.oStartAmountIncorrect.nAmount < 0">{{'START_AMOUNT_MUST_BE_POSITIVE' | translate}}</span>
+            <span class="text-info" *ngIf="oHelperDetails.oStartAmountIncorrect.nAmount > 0">
+              {{'NEW_START_AMOUNT' | translate}} = {{ oCountings.nCashAtStart + oHelperDetails.oStartAmountIncorrect.nAmount | currency: tillService.currency }}
+            </span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="row mb-4">
+        <div class="col-12">
+          <label class="form-check form-check-custom">
+            <input class="form-check-input checkbox-hw" type="checkbox"
+              [(ngModel)]="oHelperDetails.bCantCloseDueToDifference" />
+            <span class="ms-3 cursor-pointer">{{'CANT_CLOSE_BECAUSE_OF_DIFFERENCE' | translate }}</span>
+          </label>
+        </div>
+        <div class="col-8 mt-2 offset-1" *ngIf="oHelperDetails.bCantCloseDueToDifference">
+          <span class="me-5">{{'CALL' | translate }}: +31 345 631 776</span>
+        </div>
+      </div>
+    
+      <div class="row mb-4">
+        <div class="col-12 mb-4">
+          <label class="form-check form-check-custom me-2">
+            <input class="form-check-input checkbox-hw" type="checkbox" [(ngModel)]="oHelperDetails.bWrongDayEndCash"/>
+            <span class="ms-3 cursor-pointer">{{'MY_CASH_AT_END_OF_DAY_IS_INCORRECT_BECAUSE' | translate }}</span>
+          </label>
+        </div>
+        <div class="col-12" *ngIf="oHelperDetails.bWrongDayEndCash">
+          
+          <div class="row align-items-center mb-3" *ngFor="let oReason of oHelperDetails.aReasons, let i = index">
+            <div class="col-1 text-end">
+              <button class="btn btn-default px-0" (click)="remove(i)">
+                <i class="fa fa-trash color-danger"></i>
+              </button>
+            </div>
+            <div class="col-9">
+              <ng-select class="w-100" placeholder="{{'SELECT' | translate }}" [clearable]="false" [disabled]="oReason.bDisabled"
+                [(ngModel)]="oReason.sKey"
+                (change)="onChange($event, oReason, i)">
+                <ng-option [value]="oItem.sKey" *ngFor="let oItem of oReason.aOptions" [disabled]="oItem.bDisabled">
+                  {{ oItem.sTitle | translate }}
+                </ng-option>
+              </ng-select>
+              <span class="err-msg mb-3" *ngIf="oReason.bShowMsg">{{ oReason.sMessage | translate }}</span>
+            </div>
+            <div class="col-2 d-flex align-items-start">
+              <input *ngIf="!oReason?.bShowMsg" type="number" class="form-control" [(ngModel)]="oReason.nAmount" [disabled]="oReason.bDisabled">
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-2">
+              <button class="btn btn-dark btn-sm" [disabled]="!oHelperDetails.aReasons[oHelperDetails.aReasons?.length - 1]?.sKey"
+                (click)="addMoreReasons()">{{ 'ADD_MORE' | translate }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    <div class="text-end">
+      <div *ngIf="bProcessing" class="spinner-border me-3"></div>
+      <button [disabled]="bDisable || bProcessing" class="btn btn-primary me-2" (click)="close(true)">{{ 'CONTINUE' | translate}}</button>
+      <button class="btn btn-info me-2" (click)="reset()">{{ 'RESET' | translate}}</button>
+      <button class="btn btn-secondary" (click)="close()">{{ 'CANCEL' | translate}}</button>
+    </div>
+  </div>
+</div>

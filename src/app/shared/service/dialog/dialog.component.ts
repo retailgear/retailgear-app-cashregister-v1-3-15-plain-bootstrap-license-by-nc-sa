@@ -17,7 +17,7 @@ import { Subject } from 'rxjs';
 @Component({
   selector: 'app-dialog',
   templateUrl: './dialog.component.html',
-  styleUrls: ['./dialog.component.sass']
+  styleUrls: ['./dialog.component.scss']
 })
 export class DialogComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -44,7 +44,7 @@ export class DialogComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    import('src/app/shared/shared.module').then(({ SharedModule }) => {
+    import('../../shared.module').then(({ SharedModule }) => {
       this.compiler.compileModuleAsync(SharedModule).then(moduleFactory => {
         const moduleRef: any = moduleFactory.create(this.injector);
         const componentFactory = moduleRef.instance.resolveComponent(this.template);
@@ -52,6 +52,7 @@ export class DialogComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.context && Object.keys(this.context).length > 0) {
           Object.keys(this.context).forEach(key => {
             this.componentRef.instance[key] = this.context[key];
+            if (key == 'bAssignDialogRef' && this.context[key]) this.componentRef.instance.dialogRef = this;
           });
         }
         if (this.cssClass) {
@@ -71,7 +72,7 @@ export class DialogComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   clickOnBackdrop() {
-    this.triggerEvent.emit('close');
+    if (this.closeOnBackdropClick) this.triggerEvent.emit('close');
   }
 
   ngOnDestroy(): void {

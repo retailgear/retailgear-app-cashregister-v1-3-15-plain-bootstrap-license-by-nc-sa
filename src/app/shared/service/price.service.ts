@@ -14,7 +14,7 @@ export class PriceService {
   }
 
   getDiscount(discount: { value: number, percent: boolean, itemPrice: number }, format = true): any {
-    console.log('getDiscount 16: ', discount);
+    // console.log('getDiscount 16: ', discount);
     if (discount?.percent) {
       return this.roundPrice(discount.value) + '%'
     } else {

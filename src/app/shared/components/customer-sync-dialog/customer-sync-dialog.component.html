@@ -1,0 +1,34 @@
+<div class="card shadow-lg">
+    <div class="card-header align-items-center py-5">
+        <h4 class="card-title">{{'WHICH_DATA_YOU_WANT_TO_USE' | translate}}</h4>
+        <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+            <a class="cancel ml-auto mt-3" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
+        </div>
+    </div>
+    <div class="card-body py-4">
+        <div class="row mb-3">
+            <p class="m-0 p-0" *ngIf="selectedCustomer == 'current'">
+                {{"OVERWRITE_CUSTOMER_DATA_SAVED_IN_DATABASE_WITH_TRANSACTION_CUSTOMER_DATA" | translate}}
+            </p>
+            <p class="m-0 p-0" *ngIf="selectedCustomer == 'system'">
+                {{"OVERWRITE_TRANSACTION_CUSTOMER_WITH_CUSTOMER_DATA_SAVED_IN_DATABASE" | translate}}
+            </p>
+        </div>
+        <div class="row">
+            <ng-select fullWidth class="form-control form-control-solid p-0" [clearable]="false"
+                name="selectedCustomer" [(ngModel)]="selectedCustomer">
+                <ng-option class="m-0" value="current">{{"CHOOSE_CURRENT_CUSTOMER" | translate}}</ng-option>
+                <ng-option class="m-0" value="system">{{"CHOOSE_SYSTEM_CUSTOMER" | translate}}</ng-option>
+            </ng-select>
+        </div>
+    </div>
+
+    <div class="card-footer d-flex justify-content-end align-items-center py-5">
+        <button class="btn btn-primary" (click)="UpdateCustomerData()">
+            {{'SAVE_AND_CLOSE' | translate}}
+        </button>
+    </div>
+
+</div>

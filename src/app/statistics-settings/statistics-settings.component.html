@@ -1,0 +1,161 @@
+<div class="container p-4">
+    <div class="card py-2">
+        <div class="card-header bg-white py-3 px-4">
+            <div class="card-title">
+                <span>{{'STATISTICS_SETTINGS' | translate}}</span>
+            </div>
+        </div>
+
+        <div class="card-body px-5" *ngIf="settings">
+            <div class="row mb-5">
+                <div class="col-6">
+                    <ul>
+                        <li>
+                            <label
+                                class="form-check form-switch form-check-custom form-check-solid">{{"SUMUP_MY_ARTICLE_GROUP_BASED_ON_TURNOVER_GROUP"
+                                | translate}}</label>
+                            </li>
+                            </ul>
+                            </div>
+                            <div class="col-3">
+                                <label class="form-check form-switch form-check-custom form-check-solid">
+                                    <input type="checkbox" class="form-check-input" [(ngModel)]="settings.bSumUpArticleGroupStatistics">
+                                </label>
+                            </div>
+                            </div>
+                            <div class="row mb-5" *ngIf="settings?.bSumUpArticleGroupStatistics">
+                                <div class="col-12">
+                    <label class="link">A. <a routerLink="/business/article-groups">{{"CHECK_TURNOVER_GROUP" |
+                            translate}}</a></label>
+                    </div>
+                    </div>
+                    <div class="row align-items-center mb-5" *ngIf="settings?.bSumUpArticleGroupStatistics">
+                        <div class="col-6">
+                            <label class="link">B. {{"ARTICLE_GROUP_WITHOUT_CATEGORY_OR_TURNOVER_GROUP" | translate}}</label>
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-secondary my-2" type="button" data-bs-toggle="collapse" (click)="collapsedBtn = !collapsedBtn"
+                                [ngClass]="{'collapsed': collapsedBtn }" data-bs-target="#kt_accordion_123" aria-expanded="true"
+                                aria-controls="kt_accordion_123">
+                                {{ "VIEW" | translate}}
+                                <fa-icon *ngIf="!collapsedBtn" [icon]="faArrowDown"></fa-icon>
+                                <fa-icon *ngIf="collapsedBtn" [icon]="faArrowUp"></fa-icon>
+                            </button>
+                            </div>
+                            <div class="col-12">
+                    <div id="kt_accordion_123" [ngClass]="{'show': collapsedBtn }"
+                        class="accordion-collapse collapse custom-accordian-style link">
+                        <div *ngIf="settings?.bSumUpArticleGroupStatistics">
+                            <div class="list-group list-group-flush d-flex flex-row flex-wrap">
+                                <a (click)="goToArticleGroup(article._id)" class="list-group-item list-group-item-action cursor-pointer p-5 w-50"
+                                    *ngFor="let article of articleGroupList">
+                                    {{article?.oName[selectedLanguage]}}
+                                </a>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+
+            <div class="row mb-5">
+                <div class="col-6">
+                    <ul>
+                        <li>
+                            <label class="form-check form-switch form-check-custom form-check-solid">{{"SHOW_DATSTATES_BASED_ON_TURNOVER_GROUP"
+                                | translate }}</label>
+                            </li>
+                            </ul>
+                            </div>
+                            <div class="col-3">
+                                <label class="form-check form-switch form-check-custom form-check-solid">
+                                    <input type="checkbox" class="form-check-input"
+                                        [ngStyle]="{ 'background-color' : (articleGroupList.length > 0 || bIsDisable) ? '#aebaf2' : '' }"
+                            [(ngModel)]="settings.bShowDayStatesBasedOnTurnover"
+                            (ngModelChange)="onChangeShowDayStatesBasedOnTurnover($event)"
+                            [disabled]="articleGroupList.length > 0 || bIsDisable">
+                            </label>
+                            </div>
+                            </div>
+                            </div>
+
+        <div class="card-header bg-white py-3 px-4 mt-4">
+            <div class="card-title">
+                <span>{{'AUDIT_REPORT_SETTINGS' | translate}}</span>
+            </div>
+        </div>
+
+        <div class="card-body px-5" *ngIf="settings?.oStatisticsSettings">
+            <div class="row mb-5">
+                <label class="col-4">{{ "PAGE_SIZE" | translate }}</label>
+                <div class="col-4">
+                    <ng-select [clearable]="false" [items]="aPageSizes" [(ngModel)]="settings.oStatisticsSettings.sPageSize"></ng-select>
+                    </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h3>{{ 'DETAILED_MODE' | translate }}</h3>
+                            <div class="row mb-5">
+                                <label class="col-8">{{"INCLUDE_REPAIRS" | translate }}</label>
+                                <div class="col-4">
+                                    <label class="form-check form-switch form-check-custom form-check-solid">
+                                <input type="checkbox" class="form-check-input" [(ngModel)]="settings.oStatisticsSettings.bIncludeRepairs">
+                                </label>
+                                </div>
+                                </div>
+                                <div class="row mb-5">
+                                    <label class="col-8">{{"INCLUDE_REFUNDS" | translate }}</label>
+                                    <div class="col-4">
+                                        <label class="form-check form-switch form-check-custom form-check-solid">
+                                <input type="checkbox" class="form-check-input" [(ngModel)]="settings.oStatisticsSettings.bIncludeRefunds">
+                                </label>
+                                </div>
+                                </div>
+                                <div class="row mb-5">
+                                    <label class="col-8">{{"INCLUDE_GOLD_PURCHASES" | translate }}</label>
+                                    <div class="col-4">
+                                        <label class="form-check form-switch form-check-custom form-check-solid">
+                                <input type="checkbox" class="form-check-input" [(ngModel)]="settings.oStatisticsSettings.bIncludeGoldpurchase">
+                                </label>
+                                </div>
+                                </div>
+                                <div class="row mb-5">
+                                    <label class="col-8">{{"INCLUDE_DISCOUNTS" | translate }}</label>
+                                    <div class="col-4">
+                                        <label class="form-check form-switch form-check-custom form-check-solid">
+                                <input type="checkbox" class="form-check-input" [(ngModel)]="settings.oStatisticsSettings.bIncludeDiscounts">
+                                </label>
+                                </div>
+                                </div>
+                                <div class="row mb-5">
+                                    <label class="col-8">{{"INCLUDE_GIFTCARDS" | translate }}</label>
+                                    <div class="col-4">
+                                        <label class="form-check form-switch form-check-custom form-check-solid">
+                                <input type="checkbox" class="form-check-input" [(ngModel)]="settings.oStatisticsSettings.bIncludeGiftcards">
+                                </label>
+                                </div>
+                                </div>
+                                </div>
+
+                <div class="col-6">
+                    <h3>{{ 'COMPACT_MODE' | translate }}</h3>
+                    <div class="row mb-5">
+                        <label class="col-8">{{"VAT_RATE_DETAILS" | translate }}</label>
+                        <div class="col-4">
+                            <label class="form-check form-switch form-check-custom form-check-solid">
+                                <input type="checkbox" class="form-check-input"
+                                    [(ngModel)]="settings.oStatisticsSettings.bShowVatInCompactMode">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                </div>
+                </div>
+
+        <div class="card-footer py-3 px-4">
+            <div class="col-2">
+                <button class="btn btn-primary" (click)="updateSettings()"> {{ "SAVE" | translate}}</button>
+            </div>
+            </div>
+            </div>
+</div>

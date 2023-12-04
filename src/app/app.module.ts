@@ -1,48 +1,71 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { AppComponent } from './app.component';
+import { TranslateModule } from "@ngx-translate/core";
 import { AppRoutingModule } from './app-routing.module';
-import { TranslateLoader, TranslateModule } from "@ngx-translate/core";
-// import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { AppComponent } from './app.component';
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { HttpClientModule } from '@angular/common/http';
-import { PrintComponent } from './print/print.component';
 import { FormsModule } from "@angular/forms";
-import { Observable } from 'rxjs';
+// import { PrintComponent } from './print/print.component';
 
 // Translate imports
+import { OverlayModule } from '@angular/cdk/overlay';
 import { NgJsonEditorModule } from 'ang-jsoneditor';
+import { TranslationsService } from './shared/service/translation.service';
+// import { BarcodeComponent } from './barcode/barcode.component';
+import { AppInitService } from './shared/service/app-init.service';
 import { SharedServiceModule } from './shared/shared-service.module';
-import { BarcodeComponent } from './barcode/barcode.component';
-import { TranslationsService } from 'src/app/shared/service/translation.service';
+import { LoginCashRegisterComponent } from './login-cash-register/login-cash-register.component';
 
+import { RecaptchaModule, RecaptchaFormsModule } from 'ng-recaptcha';
+import { ToastModule } from './shared/components/toast';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PrintComponent,
-    BarcodeComponent,
+    // PrintComponent,
+    // BarcodeComponent,
+    LoginCashRegisterComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
-    // BrowserAnimationsModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     TranslateModule.forRoot(),
     FormsModule,
     NgJsonEditorModule,
-    SharedServiceModule
+    SharedServiceModule,
+    OverlayModule,
+    RecaptchaFormsModule,
+    RecaptchaModule,
+    ToastModule,
+    NgSelectModule
   ],
-  providers: [],
+  providers: [
+    AppInitService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initCsp,
+      deps: [AppInitService],
+      multi: true
+    },
+  ],
   bootstrap: [AppComponent]
 })
+
 export class AppModule {
   constructor(
     private translationsService: TranslationsService,
-
-
   ) {
-    console.log('cash register app module constructor')
     // this.translationsService.init()
   }
+}
+
+export function initCsp(appInitService: AppInitService) {
+  return () => {
+    appInitService.initCsp();
+  };
 }

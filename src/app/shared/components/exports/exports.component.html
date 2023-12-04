@@ -1,37 +1,27 @@
 <div class="card shadow-sm">
-    <div class="card-header d-flex">
+    <div class="card-header d-flex align-items-center">
         <h3 class="card-title">{{"EXPORT_FIELD_SELECTION" | translate}}</h3>
-        <a class="cancel ml-auto mt-3" (click)="close(false)">
-            <i class="fa fa-times"></i>
+        <a class="cancel my-auto" (click)="close(false)">
+            <i class="fa fa-times fabutton"></i>
         </a>
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-md-2" style="font-weight: bold">Basic details</div>&nbsp;
-            <!-- <div class="col-md-3" style="font-weight: bold;">
-                <label class="form-check form-switch form-check-custom form-check-solid">
-                    <input class="form-check-input" type="checkbox" [(ngModel)]="useSameFilter" />
-                    <span class="form-check-label fw-bold">{{ "USE_EXISTING_FILTER" | translate }}</span>
-                </label>
+            <div class="col-md-12 my-3 fs-5">
+                <strong>{{"BASIC_DETAILS" | translate}}</strong>
             </div>
-            <div class="col-md-3">
-                <ng-select class="form-control p-0" id="firstAG" [(ngModel)]="firstAG" (change)="selectFirstAG($event)"
-                    [clearable]="false">
-                    <ng-option *ngFor="let option of articleGroupNames" [value]="option">{{ option.oName?.en ||
-                        'Unknown' }}</ng-option>
-                </ng-select>
-            </div>
-            <div class="col-md-3">
-                <ng-select class="form-control p-0" id="secondAG" [(ngModel)]="secondAG"
-                    (change)="selectSecondAG($event)" [clearable]="false">
-                    <ng-option *ngFor="let option of articleGroupNames" [value]="option">{{ option.oName?.en ||
-                        'Unknown' }}</ng-option>
-                </ng-select>
-            </div> -->
         </div>
-        <div class="d-flex my-1" *ngFor="let obj of headerList">
-            <input type="checkbox" class="form-check-input me-2" [value]="obj" checked (click)='removeFields(obj)' />
-            {{obj}}
+        <div class="d-flex flex-wrap justify-content-between my-1">
+            <div class="w-100 mb-3 d-flex">
+                <input class="form-check-input me-1" type="checkbox" [checked]="bAllSelected" id="kt_roles_select_all1"
+                (change)="selectAll($event.target)" />
+                <span class="fw-bolder">{{"SELECT_ALL" | translate}}</span>
+            </div>
+            <div class="w-200px mb-3" *ngFor="let obj of customerHeaderList">
+                <input class="form-check-input" type="checkbox" id="kt_roles_select_all" [checked]="obj.isSelected"
+                    [(ngModel)]="obj.isSelected" (click)='removeFields(obj,$event)' />
+                {{obj.name | translate}}
+            </div>
         </div>
         <div class="row p-0" *ngIf="loader">
             <div class="spinner-box h-300px">
@@ -39,24 +29,51 @@
                 </div>
             </div>
         </div>
-        <!-- <div *ngIf='!loader'>
-            <div class="row">
-                <div class="col-md-4" style="font-weight: bold">Product details</div>
-                <div class="col-md-1">
-                    <fa-icon *ngIf='!expand' icon="chevron-right" (click)="getProductDetails()"></fa-icon>
-                    <fa-icon *ngIf='expand' icon="chevron-down" (click)="getProductDetails()"></fa-icon>
+        <div class="row">
+            <div class="col-md-12 fs-5 my-3" >
+                <strong>{{"ADVANCED" | translate}}</strong>
+            </div>
+            <div class="col-md-12 d-flex align-items-center">
+                <div class="col-4">
+                    <label class="w-100 form-check form-switch form-check-custom form-check-solid">
+                        <span class="form-check-label fw-bold m-0 me-2">{{ "SHOW_DELETED_CUSTOMERS" | translate }}</span>
+                        <input class="form-check-input" type="checkbox" [(ngModel)]="requestParams.bShowRemovedCustomers" />
+                    </label>
+                </div>
+                <div class="col-4">
+                    <div class="col-12 customers-fields">
+                        <label class="fw-bolder text-muted" for="customersGroup">{{'CUSTOMER_TYPE' | translate}}
+                        </label>
+                    </div>
+                    <div class="col-11 customers-fields">
+                        <ng-select class="form-control form-control-solid p-0" [(ngModel)]="requestParams.customerType"
+                            [clearable]="false">
+                            <ng-option *ngFor="let customerType of customerTypes"
+                                [value]="customerType.value">{{customerType.key |
+                                translate}}
+                            </ng-option>
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="col-11 customers-fields">
+                        <label class="fw-bolder text-muted" for="customersGroup">{{'CUSTOMER_GROUP' | translate}} </label>
+                        <ng-select class="form-control form-control-solid p-0" [multiple]="true" [clearable]="false" [(ngModel)]="requestParams.oFilterBy.aSelectedGroups">
+                            <ng-option *ngFor="let group of customerGroupList" [value]="group._id">{{group.sName}}</ng-option>
+                        </ng-select>
+                    </div>
                 </div>
             </div>
-            <div class="d-flex my-1" *ngFor="let obj of secondHeaderList">
-                <label *ngIf='expand'>
-                    <input type="checkbox" class="form-check-input me-2" [value]="obj"
-                        (click)='addToSecondHeaderList(obj)' /> {{obj}}
-                </label>
-            </div>
-        </div> -->
+        </div>
     </div>
-    <div class="card-footer">
-        <button class="cancel btn btn-secondary ms-auto mb-2" (click)="getExportData(';')">{{"EXPORT_SELECTION_TO_CSV_WITH_SEMI_COLON" | translate}}</button>
-        <button class="cancel btn btn-secondary ms-auto" (click)="getExportData(',')">{{"EXPORT_SELECTION_TO_CSV_WITH_COMMA" | translate}}</button>
+    <div class="card-footer d-flex justify-content-end">
+        <button class="cancel btn btn-primary" style="margin-right: 10px;" (click)="getExportData()">
+            {{"EXPORT_TO_CSV" | translate}}
+            <div *ngIf="isCsvLoading" class="spinner-border fs-5"></div>
+        </button>
+        <button class="cancel btn btn-secondary" (click)="getExportPDF()">
+            {{"EXPORT_TO_PDF" | translate}}
+            <div *ngIf="isPdfLoading" class="spinner-border fs-5"></div>
+        </button>
     </div>
 </div>

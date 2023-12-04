@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { FiskalySettingsComponent } from './fiskaly-settings.component';
 import { FiskalySettingsRoutingModule } from './fiskaly-settings-routing.module';
 import { TranslateModule } from '@ngx-translate/core';
+import { SharedModule } from '../shared/shared.module';
 
 
 @NgModule({
@@ -15,6 +16,7 @@ import { TranslateModule } from '@ngx-translate/core';
     FiskalySettingsRoutingModule,
     TranslateModule,
     FormsModule,
+    SharedModule
   ]
 })
 export class FiskalySettingsModule { }

@@ -1,15 +1,15 @@
 <div class="card shadow-sm">
-  <div class="card-header" style="margin-top: 20px;">
-    <h4>{{ 'IMAGE_UPDATE' | translate}}</h4>
+  <div class="card-header py-5 d-flex align-items-center">
+    <h4 class="mb-0">{{ 'IMAGE_UPDATE' | translate}}</h4>
     <div mat-dialog-actions>
       <button mat-dialog-close type="button" class="btn btn-sm btn-light" (click)="close(false)">
         <fa-icon [icon]="faTimes"></fa-icon>
       </button>
     </div>
   </div>
-  <div class="card-body pt-0 row">
-    <div>
-      <button class="btn btn-secondary" (click)="webcamImage = null; useCamera()"> {{ "USE_CAMERA_OR_WEBCAM" |
+  <div class="card-body py-5 row">
+    <div class="mb-3">
+      <button class="btn btn-secondary me-4" (click)="webcamImage = null; useCamera()"> {{ "USE_CAMERA_OR_WEBCAM" |
         translate}}</button>
       <label for="file1" class="btn btn-secondary" (click)="webcamImage = null; useUpload()">{{ "UPLOAD_FILE" |
         translate}}</label>
@@ -29,8 +29,10 @@
           [src]="webcamImage.imageAsDataUrl || sanitizeImageUrl(webcamImage)" />
         <!-- <img class="img-thumbnail" height="241" width="430" [src]="webcamImage.imageAsDataUrl" /> -->
       </div>
-
-      <button class="btn btn-primary" (click)="submit()" type="submit"> {{ "SUBMIT" | translate}}</button>
+      <button class="btn btn-light-info w-100 mb-0 mt-3" (click)="triggerSnapshot()" *ngIf="!webcamImage" [disabled]="isImageValid" type="submit"> {{ "MAKE_PICTURE" | translate}}</button>
     </div>
+  </div>
+  <div class="card-footer py-5 d-flex justify-content-end">
+    <button class="btn btn-primary" (click)="submit()" [disabled]="isImageValid" type="submit"> {{ "SUBMIT" | translate}}</button>
   </div>
 </div>

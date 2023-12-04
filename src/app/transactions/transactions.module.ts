@@ -5,7 +5,7 @@ import { TransactionsRoutingModule } from './transactions-routing.module';
 import { NgxPaginationModule, PaginatePipe } from 'ngx-pagination';
 import { NgSelectModule } from '@ng-select/ng-select';
 // import { SharedModule } from '../../shared/shared.module';
-import { DialogService } from '../shared/service/dialog';
+import { DialogService,DialogComponent } from '../shared/service/dialog';
 
 import { TransactionsComponent } from './transactions.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -28,11 +28,10 @@ import { SharedModule } from '../shared/shared.module';
     FormsModule,
     NgSelectModule,
     TranslateModule,
-    // SupplierProductSliderModule
-    // SharedModule
   ],
   providers: [ 
     DialogService,
+    DialogComponent,
     PaginatePipe
    ]
 })

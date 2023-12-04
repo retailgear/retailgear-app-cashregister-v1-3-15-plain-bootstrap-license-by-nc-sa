@@ -6,3 +6,13 @@
         width: 100%;
     }
 }
+.form-control.ng-invalid {
+    outline: 1px solid red
+}
+a.cancel{
+    cursor: pointer;
+    color:#a63b55;
+}
+.fabutton {
+    font-size: 30px;
+}

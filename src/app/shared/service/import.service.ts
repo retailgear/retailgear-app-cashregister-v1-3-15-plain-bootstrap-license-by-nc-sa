@@ -12,7 +12,8 @@ export class ImportService {
     processImportCustomer(data: any) {
         const { customer } = data;
 
-        const processCustomer = {   
+        const processCustomer = { 
+            nClientId: customer?.['nClientId'] ? customer['nClientId'] : "do-nothing",
             sSalutation: customer?.['sSalutation'] ? customer['sSalutation'] : "do-nothing",
             sFirstName: customer?.['sFirstName'] ? customer['sFirstName'] : "do-nothing",
             sPrefix: customer?.['sPrefix'] ? customer['sPrefix'] : "do-nothing",
@@ -23,6 +24,13 @@ export class ImportService {
             oPhone: {
                 sMobile: customer?.['sMobile'] ? customer['sMobile'] : "do-nothing",
                 sLandLine: customer?.['sLandLine'] ? customer['sLandLine'] : "do-nothing",
+    
+                /*Overwrite prefixes only if numbers and country code are passed */
+                sPrefixMobile: customer?.['sMobile'] && customer?.['sCountryCode'] ? "overwrite" : "do-nothing",
+                sPrefixLandline: customer?.['sLandLine'] && customer?.['sCountryCode']? "overwrite" : "do-nothing",
+
+                bWhatsApp: customer?.['bWhatsApp'] ? customer['bWhatsApp'] : "do-nothing",
+                sFax: customer?.['sFax'] ? customer['sFax'] : "do-nothing",
             },
 
             oShippingAddress: {
@@ -36,7 +44,8 @@ export class ImportService {
                 sHouseNumberSuffix: customer?.['sHouseNumberSuffix'] ? customer['sHouseNumberSuffix'] : "do-nothing",
                 sPostalCode: customer?.['sPostalCode'] ? customer['sPostalCode'] : "do-nothing",
                 sCity: customer?.['sCity'] ? customer['sCity'] : "do-nothing",
-                sCountry: customer?.['sCountry'] ? customer['sCountry'] : "do-nothing",
+                sCountry: customer?.['sCountry'] ? customer['sCountry'] : "overwrite",
+                sCountryCode: customer?.['sCountryCode'] ? customer['sCountryCode'] : "overwrite"
             },
 
             oInvoiceAddress: {
@@ -50,12 +59,15 @@ export class ImportService {
                 sHouseNumberSuffix: customer?.['sHouseNumberSuffix'] ? customer['sHouseNumberSuffix'] : "do-nothing",
                 sPostalCode: customer?.['sPostalCode'] ? customer['sPostalCode'] : "do-nothing",
                 sCity: customer?.['sCity'] ? customer['sCity'] : "do-nothing",
-                sCountry: customer?.['sCountry'] ? customer['sCountry'] : "do-nothing",
+                sCountry: customer?.['sCountry'] ? customer['sCountry'] : "overwrite",
+                sCountryCode: customer?.['sCountryCode'] ? customer['sCountryCode'] : "overwrite"
             },
-
+            nPoints: customer?.['nPoints'] ? customer['nPoints'] : "do-nothing",
             sComment: customer?.['sComment'] ? customer['sComment'] : "do-nothing",
+            sNote: customer?.['sNote'] ? customer['sNote'] : "do-nothing",
             nMatchingCode: customer?.['nMatchingCode'] ? customer['nMatchingCode'] : "do-nothing",
-            bNewsletter: customer?.['bNewsletter'] ? customer['bNewsletter'] : "do-nothing"
+            bNewsletter: customer?.['bNewsletter'] ? customer['bNewsletter'] : "do-nothing",
+            dDateOfBirth: customer?.['dDateOfBirth'] ? customer['dDateOfBirth'] : "do-nothing"
         }
 
         return processCustomer;

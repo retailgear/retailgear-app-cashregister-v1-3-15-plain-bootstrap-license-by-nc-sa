@@ -5,9 +5,10 @@ import { ToastComponent } from './toast.component';
 import { ToastService } from './toast.service';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
-  imports: [OverlayModule, CommonModule, FontAwesomeModule],
+  imports: [OverlayModule, CommonModule, FontAwesomeModule, TranslateModule],
   declarations: [ToastComponent],
   entryComponents: [ToastComponent]
 })

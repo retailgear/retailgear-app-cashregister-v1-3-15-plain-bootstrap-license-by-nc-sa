@@ -8,11 +8,12 @@ import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam'
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { ToastService } from '../toast';
 
 @Component({
   selector: 'app-image-upload',
   templateUrl: './image-upload.component.html',
-  styleUrls: ['./image-upload.component.sass']
+  styleUrls: ['./image-upload.component.scss']
 })
 export class ImageUploadComponent implements OnInit {
   faTimes = faTimes;
@@ -22,6 +23,7 @@ export class ImageUploadComponent implements OnInit {
   public allowCameraSwitch = true;
   public multipleWebcamsAvailable = false;
   deviceId: any = '';
+  isImageValid:Boolean = false;
   requestParams: any = {
     iBusinessId: ''
   }
@@ -50,7 +52,8 @@ export class ImageUploadComponent implements OnInit {
     private viewContainerRef: ViewContainerRef,
     private apiService: ApiService,
     private http: HttpClient,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private toastService:ToastService
   ) {
     const _injector = this.viewContainerRef.parentInjector;
     this.dialogRef = _injector.get<DialogComponent>(DialogComponent);
@@ -72,11 +75,25 @@ export class ImageUploadComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustUrl(imageUrl);
   }
 
+
   onFileChange(event: any) {
     this.file = undefined;
+    this.isImageValid = false;
     if (event.target.files.length > 0) {
-      this.file = event.target.files[0];
-      this.webcamImage = URL.createObjectURL(event.target.files[0]);
+      if(event.target.files[0].type == 'image/png' || event.target.files[0].type == 'image/jpeg' || event.target.files[0].type == 'image/jpg'){
+        if(event.target.files[0].size > 4000 && event.target.files[0].size <= 2097152){
+          this.isImageValid = false;
+          this.file = event.target.files[0];
+          this.webcamImage = URL.createObjectURL(event.target.files[0]);
+        }else{
+          this.isImageValid = true;
+          this.toastService.show({ type: 'warning', text: 'Image size must be 4kb to 2 mb' });
+        }
+      }else{
+        this.isImageValid= true;
+        this.toastService.show({ type: 'warning', text: "Image extension must be png , jpeg , jpg" })
+      }
+    
     }
   }
 

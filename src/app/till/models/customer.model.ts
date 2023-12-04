@@ -8,7 +8,7 @@ export class Customer {
    public sPrefix: string,
    public sLastName: string,
    public dDateOfBirth: Date,
-   public nClientId: number,
+   public nClientId: string,
    public sGender: string,
    public bIsEmailVerified: boolean,
    public bCounter: boolean,

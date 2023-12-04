@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { faTimes, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
-import { PriceService } from 'src/app/shared/service/price.service';
+import { PriceService } from '../../shared/service/price.service';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -20,7 +20,7 @@ export class OtherComponent {
   constructor(private priceService: PriceService) { }
 
   deleteItem(): void {
-    this.itemChanged.emit('delete')
+    this.itemChanged.emit({type: 'delete'})
   }
   getDiscount(item: any): string {
     return this.priceService.getDiscount(item.nDiscount)

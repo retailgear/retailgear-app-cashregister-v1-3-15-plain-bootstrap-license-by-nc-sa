@@ -6,7 +6,7 @@ import { DialogComponent } from '../../service/dialog';
 @Component({
   selector: 'app-print-settings-details',
   templateUrl: './print-settings-details.component.html',
-  styleUrls: ['./print-settings-details.component.sass']
+  styleUrls: ['./print-settings-details.component.scss']
 })
 export class PrintSettingsDetailsComponent implements OnInit {
 

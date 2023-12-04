@@ -1,5 +1,5 @@
 <div class="card shadow-sm">
-    <div class="card-header" style="margin-top: 20px;">
+    <div class="card-header py-3">
         <h3>{{"SELECT_SUPPLIER_AND_BRAND" | translate}}</h3>
     </div>
     <div class="card-body row pb-0 pt-3 ">
@@ -8,18 +8,13 @@
              <span class="required">   {{ "ARTICLE_GROUP" | translate}} </span>
                 <div *ngIf="articleGroupLoading" class="spinner-border mx-3 h-15px w-15px"></div>
             </label>
-            <ng-select #articleGroupRef *ngIf="!articlegroup" [(ngModel)]="articlegroup"
-                (search)="searchArticlegroup($event.term)" (ngModelChange)="changeInArticleGroup()"
-                class="form-control form-control-solid p-0 w-100 custom" placeholder="{{'SEARCH_ARTICLE' | translate}}"
-                [disabled]="1 > articleGroupsList.length" [minTermLength]="2" [clearable]="false"
-                [isOpen]="filteredArticleGroups.length > 0">
-                <!-- [disabled]="1 > articleGroupsList.length" -->
-                <ng-option *ngFor="let option of filteredArticleGroups" [value]="option">{{option.oName.en ||
-                    'Unknown'}}</ng-option>
+            <ng-select class="form-control form-control-solid p-0" *ngIf="!articlegroup"  [isOpen]="filteredArticleGroups.length > 0" placeholder="{{'SEARCH_ARTICLE' | translate}}" (search)="searchArticlegroup($event.term)" (change)="changeInArticleGroup(articlegroup)" [clearable]="false" #articleGroupRef  [(ngModel)]="articlegroup">
+                <ng-option *ngFor="let option of filteredArticleGroups" [value]="option">{{option?.sArticleGroupName || 'Unknown'}}</ng-option>
             </ng-select>
-            <div class="chip d-flex" *ngIf="articlegroup">
-                {{articlegroup.oName.en}}
-                <div (click)="articlegroup=null">
+             
+            <div class="form-control form-control-solid d-flex align-items-center p-3" *ngIf="articlegroup">
+               {{articlegroup.sArticleGroupName}}
+                <div class="d-flex align-items-center justify-content-center" (click)="changeInArticleGroup(null)">
                     &nbsp;<i class="close fas fa-times cursor-pointer"></i>
                 </div>
             </div>
@@ -27,15 +22,14 @@
         <div class="pb-4">
             <label class="fs-5 my-2" for="brand">{{ "BRAND" | translate}}</label>
             <ng-select *ngIf="!brand" [(ngModel)]="brand" (search)="searchBrand($event.term)"
-                (ngModelChange)="changeInBrand()" class="form-control form-control-solid p-0 w-100 custom"
-                placeholder="{{'SEARCH_BRAND' | translate}} ({{'OPTIONAL' | translate}})" [minTermLength]="2" [clearable]="false"
-                [isOpen]="filteredBrandList.length > 0">
+                (change)="changeInBrand(brand)" class="form-control form-control-solid p-0"
+                placeholder="{{'SEARCH_BRAND' | translate}} ({{'OPTIONAL' | translate}})" [minTermLength]="2" [clearable]="false">
                 <ng-option *ngFor="let option of filteredBrandList" [value]="option">{{option.sName ||
                     'Unknown'}}</ng-option>
             </ng-select>
-            <div class="chip d-flex" *ngIf="brand">
+            <div class="form-control form-control-solid d-flex align-items-center p-3" *ngIf="brand">
                 {{brand.sName}}
-                <div (click)="brand=null">
+                <div class="d-flex align-items-center justify-content-center" (click)="brand=null">
                     &nbsp;<i class="close fas fa-times cursor-pointer"></i>
                 </div>
             </div>
@@ -46,15 +40,14 @@
                 <span class="required">{{ "SUPPLIER" | translate}} </span>
             </label>
             <ng-select *ngIf="!supplier" [(ngModel)]="supplier" (search)="searchSupplier($event.term)"
-                (ngModelChange)="changeInSupplier()" class="form-control form-control-solid p-0 w-100 custom"
-                placeholder="{{'SEARCH_SUPPLIER' | translate}}" [minTermLength]="2" [clearable]="false"
-                [isOpen]="filteredSupplierList.length > 0">
+                (ngModelChange)="changeInSupplier()" class="form-control form-control-solid p-0"
+                placeholder="{{'SEARCH_SUPPLIER' | translate}}" [minTermLength]="2" [clearable]="false">
                 <ng-option *ngFor="let option of filteredSupplierList" [value]="option">{{option.sName ||
                     'Unknown'}}</ng-option>
             </ng-select>
-            <div class="chip d-flex" *ngIf="supplier">
+            <div class="form-control form-control-solid d-flex align-items-center p-3" *ngIf="supplier">
                 {{supplier.sName}}
-                <div (click)="supplier=null">
+                <div class="d-flex align-items-center justify-content-center" (click)="supplier=null; changeInSupplier();">
                     &nbsp;<i class="close fas fa-times cursor-pointer"></i>
                 </div>
             </div>

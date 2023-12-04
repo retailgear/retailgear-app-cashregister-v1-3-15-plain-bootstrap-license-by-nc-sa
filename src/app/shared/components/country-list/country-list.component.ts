@@ -10,7 +10,7 @@ import countryList from '../../../../assets/json/list.json'
 @Component({
   selector: 'country-list',
   templateUrl: './country-list.component.html',
-  styleUrls: ['./country-list.component.sass']
+  styleUrls: ['./country-list.component.scss']
 })
 export class CountryListComponent implements OnInit , OnChanges{
 
@@ -59,7 +59,7 @@ export class CountryListComponent implements OnInit , OnChanges{
     }
 
     this.filteredOptions$ = this.countryListByLang;
-
+    if(this.country == 'UK') this.country = 'GB';
     const country = _.find(this.countryListByLang, {key: this.country});
     if (country) {
       this.value = country.value;

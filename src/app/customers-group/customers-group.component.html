@@ -1,0 +1,89 @@
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-flush">
+                <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                    <div class="card-title">
+                        <div class="d-flex align-items-center position-relative my-1">
+                            <span class="svg-icon svg-icon-4 position-absolute ms-4">
+                                <i class="fas fa-xs fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control form-control-solid w-250px ps-14 me-4"
+                                name="searchValue" (keyup.enter)="getCustomersGroupList()"
+                                [(ngModel)]="requestParams.searchValue"
+                                placeholder="{{'SEARCH_CUSTOMER_GROUP' | translate}}">
+                            <button class="btn btn-primary" (click)="getCustomersGroupList();">{{'SEARCH' | translate}}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                        <button class="btn btn-primary" (click)="createGroup()">{{'NEW' | translate}} </button>
+                    </div>
+
+                </div>
+                <div class="card-body pt-0">
+                    <div class="dataTables_wrapper dt-bootstrap4 no-footer">
+                        <div class="table-responsive">
+                            <table
+                                class="table table-striped table-rounded table-hover fs-6 gy-5 gs-5 dataTable no-footer">
+                                <thead>
+                                    <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                                        <td *ngFor="let col of headerColumn" class="min-w-100px sorting" tabindex="0">
+                                            {{col | translate}} </td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody class="fw-bold text-gray-600">
+                                    <tr *ngFor="let group of groupList | paginate: paginationConfig ; let i = index"
+                                        class="bg-hover-secondary">
+                                        <td>{{group.sName | translate}} </td>
+                                        <td>{{group.sDescription | translate}} </td>
+                                        <td>
+                                            <button class="btn btn-secondary mx-2" (click)="editCustomersGroup(group)">
+                                                <i class="fas fa-xs fa-edit"></i>
+
+                                            </button>
+                                            <button class="btn btn-danger mx-2" (click)="deleteCustomersGroup(group)">
+                                                <i class="fas fa-xs fa-trash"></i>
+
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex">
+                            <h5 *ngIf='!groupList.length && !showLoader'> {{ "NO_DATA_FOUND" | translate}} !</h5>
+                            <div *ngIf="showLoader" class="spinner-border mx-auto"></div>
+                        </div>
+                    </div>
+                    <div class="separator separator-dashed mt-9 mb-6"></div>
+                    <div class="row" *ngIf='groupList?.length'>
+                        <div
+                            class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
+                            <div class="dataTables_length" id="kt_ecommerce_sales_table_length">
+                                <label>
+                                    <select name="kt_ecommerce_sales_table_length"
+                                        aria-controls="kt_ecommerce_sales_table"
+                                        class="form-select form-select-sm form-select-solid"
+                                        [(ngModel)]="paginationConfig.itemsPerPage"
+                                        (change)="changeItemsPerPage()">
+                                        <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{ pageNum }}
+                                        </option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+                        <div
+                            class="col-sm-12 col-md-9 d-flex align-items-center justify-content-center justify-content-md-end">
+                            <pagination-controls [hidden]="groupList.length === 0" (pageChange)="pageChanged($event)"
+                                (pageBoundsCorrection)="pageChanged($event)" [maxSize]="setPaginateSize"
+                                [previousLabel]="'PREVIOUS' | translate" [nextLabel]="'NEXT' | translate"
+                                screenReaderPaginationLabel="Pagination" [screenReaderPageLabel]="'PAGE' | translate">
+                            </pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -1,15 +1,15 @@
 import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { ToastService } from 'src/app/shared/components/toast';
-import { ApiService } from 'src/app/shared/service/api.service';
-import { ImportService } from 'src/app/shared/service/import.service';
-import { TranslationsService } from 'src/app/shared/service/translation.service';
-import { StepperComponent } from 'src/app/shared/_layout/components/common';
+import { ToastService } from '../../shared/components/toast';
+import { ApiService } from '../../shared/service/api.service';
+import { ImportService } from '../../shared/service/import.service';
+import { TranslationsService } from '../../shared/service/translation.service';
+import { StepperComponent } from '../../shared/_layout/components/common';
 @Component({
   selector: 'app-customer-import',
   templateUrl: './customer-import.component.html',
-  styleUrls: ['./customer-import.component.sass']
+  styleUrls: ['./customer-import.component.scss']
 })
 export class CustomerImportComponent implements OnInit {
 
@@ -21,7 +21,11 @@ export class CustomerImportComponent implements OnInit {
   businessDetails: any = {};
   stepperInstatnce: any;
   translate:any =[];
+  bShowError: boolean = false;
+  
   @ViewChild('stepperContainer', { read: ViewContainerRef }) stepperContainer!: ViewContainerRef;
+  created: any;
+  failed: any;
 
   constructor(
     private importService: ImportService,
@@ -84,18 +88,21 @@ export class CustomerImportComponent implements OnInit {
       iBusinessId: this.businessDetails._id,
       oTemplate: this.importService.processImportCustomer({ customer:updatedTemplate }),
       aCustomer: newParsedCustomer,
-      sDefaultLanguage: localStorage.getItem('language') || 'n;'
+      sDefaultLanguage: localStorage.getItem('language') || 'nl'
     };
 
 
     this.apiService.postNew('customer', '/api/v1/customer/import', data).subscribe((result: any) => {
       this.importInprogress = false;
       if(result?.message == 'success'){
+        this.created = result?.data?.created || [];
+        this.failed = result?.data?.failed || [];
+        this.parsedCustomerData = [];
         this.toastService.show({type:'success' , text:this.translate['SUCCESSFULLY_IMPORTED']})
       }
     }, (error) => {
-      console.log(error);
-      this.toastService.show({type:'warning' , text:error.message});
+      this.parsedCustomerData = [];
+      this.bShowError = true;
     });
   }
 

@@ -13,7 +13,7 @@ import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 @Component({
   selector: 'app-dialer',
   templateUrl: './dialer.component.html',
-  styleUrls: ['./dialer.component.sass'],
+  styleUrls: ['./dialer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DialerComponent implements OnChanges, OnInit {
@@ -25,6 +25,8 @@ export class DialerComponent implements OnChanges, OnInit {
   get quantity() {
     return this.qty
   }
+  @Input() bSerialSearchMode: any
+  @Input() item: any
   @Output() quantityChange = new EventEmitter<number>()
 
   faPlus = faPlus
@@ -54,5 +56,6 @@ export class DialerComponent implements OnChanges, OnInit {
   }
 
   change(oldValue: any, newValue: any): void {
+    this.quantityChange.emit(this.qty)
   }
 }

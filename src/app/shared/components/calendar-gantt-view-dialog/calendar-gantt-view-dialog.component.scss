@@ -1,0 +1,11 @@
+::ng-deep .fc-prev-button:before {
+  content: '<';
+}
+
+::ng-deep .fc-next-button:before {
+  content: '>';
+}
+
+::ng-deep .fc-icon {
+  display: none;
+}

@@ -43,12 +43,25 @@ export class PdfService {
 
   private data: any = {};
   private css: string = "";
-  private currency: string = "€";
+  
+  oCurrencies:any = {
+    pound: "£",
+    swiss: "₣",
+    euro: "€"
+  }
+  currency: string = "euro";
+  separator: string = "dot";
+  oSeparator:any = {
+    dot: '.',
+    comma: ','  
+  }
+
   private defaultElement: string = "span";
   private fontSize: string = "10pt";
   private layout: any[] = [];
   private margins: number[] = [0];
-  private dateFormat: string = "L";
+  private dateFormat: string = "DD-MM-yyyy hh:mm";
+  private dateOnlyFormat: string = "DD-MM-yyyy";
   private orientation: string = "portrait";
   private paperSize: string | PaperSize = "A4";
   private pixelsPerMm: number = 3.76;
@@ -78,6 +91,11 @@ export class PdfService {
       type: "A6",
       width: "105",
       height: "148"
+    },
+    {
+      type: "custom",
+      width: "0",
+      height: "0"
     }
   ]
 
@@ -169,21 +187,22 @@ export class PdfService {
   }
 
   private formatContent(val: any, type: string): any {
-
-    //1. make a 'global' array of translations used in the receipts.
-    //2. translate all the keywords in the language that the user has selected.
-    //3. make sure the array is available in this function
-    //4. add an option below to replace the keyword with the translation
-
+    // console.log('formatContent', {val, type})
     switch (type) {
       case 'money':
         return this.convertStringToMoney(val);
-      case 'moneyplus':
-        return this.currency + ' ' + this.convertStringToMoney(val);
       case 'barcode':
         return this.convertValueToBarcode(val);
       case 'date':
-        return moment(val).format(this.dateFormat);
+        return (val === '' || val === 'NO_DATE_SELECTED' || moment(val).format(this.dateFormat) == 'Invalid date') ? val : moment(val).format(this.dateFormat);
+      case 'dateonly':
+        return (val === '' || val === 'NO_DATE_SELECTED' || moment(val).format(this.dateOnlyFormat) == 'Invalid date') ? val : moment(val).format(this.dateOnlyFormat);
+      case 'uppercase':
+        return val.toUpperCase();
+      case 'lowercase':
+        return val.toLowerCase();
+      case 'translate':
+        return this.translateService.instant(val.replaceAll('-','_').toUpperCase());
       default:
         return val;
     }
@@ -196,18 +215,28 @@ export class PdfService {
   }
 
   private convertStringToMoney(val: any): any {
-    if (val % 1 === 0) {
-      //no decimals
-      return (val) ? String(val + ',00') : '0,00';
-    } else {
-      val = String(val);
-      let parts = val.split('.');
-
-      if (parts[1].length === 1) {
-        val = val + '0';
+    const sCurrency = this.oCurrencies[this.currency];
+    const sSeparator = this.oSeparator[this.separator];
+    if (val % 1 === 0) { //no decimals
+      if (val) {
+        val = (val >= 0) ?
+          sCurrency + val :
+          '-' + sCurrency + Math.abs(val);
+        val = String(val + sSeparator + '00');
+      } else {
+        val = sCurrency + '0' + sSeparator + '00';
       }
-      return val.replace('.', ',')
+    } else { // has decimals
+      val = String(val);
+      const parts = val.split('.');
+      if (parts[1].length === 1) val = val + '0';
+      if (val >= 0) {
+        val = sCurrency + val
+      } else {
+        val = '-' + sCurrency + Math.abs(val)
+      }
     }
+    return val.replace('.', sSeparator);
   }
 
   private convertValueToBarcode(val: string): any {
@@ -465,9 +494,8 @@ export class PdfService {
 
       if (this.orientation === 'portrait' || this.orientation === 'landscape') {
 
-        definedPaperSize = this.staticPaperSize.find((size) => {
-          return size.type === paperSize
-        })
+
+        definedPaperSize = this.staticPaperSize.find((size) => size.type === paperSize)
 
         if (this.orientation === 'landscape') {
           let definedPaperSizeOldWidth = definedPaperSize.width
@@ -530,9 +558,9 @@ export class PdfService {
     if (template.css) {
       this.css = template.css
     }
-    if (template.currency) {
-      this.currency = template.currency
-    }
+    // if (template.currency) {
+    //   this.currency = template.currency
+    // }
     if (template.defaultElement) {
       this.defaultElement = template.defaultElement
     }
@@ -582,7 +610,6 @@ export class PdfService {
     
     for (let r = 0; r < rowsToBeCreated; r++) {
       let finalDataSourceObject = dataSourceObject;
-      
       if (typeof dataSourceObject.length === 'number') {
         finalDataSourceObject = Object.values(dataSourceObject)[r];
       }
@@ -606,6 +633,7 @@ export class PdfService {
         let colsize = col.size;
         let gutterSize = this.calcColumnGutter(colsize, gutter);
         let newRowWidth = this.calcRowWidth(printableArea.width, colsize, gutterSize);
+        if (col?.object) finalDataSourceObject = finalDataSourceObject[col.object];
         let newCol = this.createCol(i, cols.length, newRowWidth, gutter, col, finalDataSourceObject, colsize, printableArea);
         if (this.isDefined(col.css)) {
           newCol = this.applyCss(newCol, col.css);
@@ -655,7 +683,6 @@ export class PdfService {
 
     const printableWidth = (paperSize.width - (margins.left + margins.right));
     const printableHeight = (paperSize.height - (margins.top + margins.bottom));
-
     const printableArea = {
       x: margins.left,
       y: margins.top,
@@ -811,6 +838,8 @@ export class PdfService {
   }
 
   replaceVariables(originalText: string, dataSourceObject: any) {
+    const bTesting = false;
+    if(bTesting) console.log('replaceVariables', {originalText});
     if (!this.isDefined(originalText)) {
       return;
     }
@@ -818,20 +847,23 @@ export class PdfService {
     originalText = this.processConditions(originalText, dataSourceObject);
 
     let extractedVariables = this.getVariables(originalText);
+    if (bTesting) console.log({extractedVariables})
     let providedData = dataSourceObject;
+    if (bTesting) console.log({ providedData })
     let finalString = originalText;
 
     if (extractedVariables) {
       for (let a = 0; a < extractedVariables.length; a++) {
         let currentMatch = extractedVariables[a];
-
+        if (bTesting) console.log({ currentMatch })
 
         const matchedMatch = currentMatch.match(/\[/g)
 
         if (matchedMatch && matchedMatch.length === 2) {
           let currentMatchClean = this.removeBrackets(currentMatch);
 
-          let variableStringFiltered = currentMatchClean
+          let variableStringFiltered = currentMatchClean;
+          if (bTesting) console.log({ variableStringFiltered })
           let format = '';
 
           if (currentMatchClean.match(/\|/g) !== null) {
@@ -881,7 +913,6 @@ export class PdfService {
 
                 break;
               case 3:
-
                 if (this.isDefined(this.data[parts[0]])) {
                   layer1 = this.data[parts[0]];
                   if (this.isDefined(layer1[parts[1]])) {
@@ -908,26 +939,29 @@ export class PdfService {
                 variableStringFiltered = 'no match';
                 break;
             }
-          } else {
+          } //else {
             // variableStringFiltered = currentMatchClean
-          }
+          //}
 
-          let matched = false;
+          // let matched = false;
           let newText = '';
           if (this.isDefined(providedData)) {
+            if (bTesting) console.log(926, 'providedData[variableStringFiltered]',providedData[variableStringFiltered])
             if (providedData[variableStringFiltered]) {
               newText = providedData[variableStringFiltered];
+              if (bTesting) console.log(928, { newText })
             } else if (variableStringFiltered.startsWith("__")) {
               newText = this.translateService.instant(variableStringFiltered.substring(2));
             } else {
               newText = '';
             }
-            
+            if(bTesting) console.log(959, { newText })
             if (this.isDefined(format) && format !== '') {
               newText = this.formatContent(newText, format);
+              if (bTesting) console.log(962, {newText})
             }
             finalString = finalString.replace(currentMatch, newText);
-
+            if (bTesting) console.log(964, { finalString })
             // for (const key of Object.keys(providedData)) {
             //   if (key === variableStringFiltered) {
             //     if (String(providedData[variableStringFiltered]).length > 0) {
@@ -1411,11 +1445,51 @@ export class PdfService {
     pdfGenerator.style.display = 'none'
     pdfGenerator.id = 'pdfGenerator'
     document.body.appendChild(pdfGenerator)
-
+    templateString = this.processTemplateString(JSON.parse(templateString));
     return this.generate(templateString, JSON.stringify(data), fileName, print, printData, businessId, transactionId)
   }
 
   logService(details: string) {
+  }
+
+  processTemplateString(template:any) {
+    let t:any = {...template};
+    
+    delete template.dCreatedDate;
+    delete template.dUpdatedDate;
+    delete template.eStatus;
+    delete template.eType;
+    delete template.iBusinessId;
+    delete template.iLocationId;
+    delete template.sName;
+    delete template._id;
+    delete template.__v;
+
+    template?.aSettings.forEach((setting:any) => {
+      switch (setting.sParameter) {
+        case 'orientation':
+          t.orientation = setting.value;
+          break;
+        case 'pageSize':
+          t.paperSize = (setting.value === 'custom') ? { width: setting.nWidth, height: setting.nHeight, type: 'custom-papersize' } :setting.value;
+          break;
+        case 'pageMargins':
+          console.log({ setting });
+          t.margins = { 
+            left: setting.aValues[0], 
+            top: setting.aValues[1], 
+            right: setting.aValues[2], 
+            bottom: setting.aValues[3] 
+          };
+          break;
+        case 'fontSize':
+          t.fontSize = setting.value;
+          break;
+      }
+      t.css = setting?.css;
+      t.defaultElement = "p";
+    });
+    return JSON.stringify(t);
   }
 
 

@@ -1,34 +1,31 @@
 import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { TemplateJSON, TemplateJSONElement } from 'src/app/print-settings/print-settings.component';
-import { ToastService } from 'src/app/shared/components/toast';
-import { DialogComponent } from 'src/app/shared/service/dialog';
-import { Js2zplService } from 'src/app/shared/service/js2zpl.service';
+import { TemplateJSON, TemplateJSONElement } from '../../print-settings/print-settings.component';
+import { ToastService } from '../../shared/components/toast';
+import { DialogComponent } from '../../shared/service/dialog';
+import { Js2zplService } from '../../shared/service/js2zpl.service';
 
 export const makeDataObjectForProduct = (product: any) => {
 
   const dataObject = {
-    "%%PRODUCT_NAME%%": product.sProductNumber,
-    "%%SELLING_PRICE%%": product.nPriceIncVat,
-    "%%PRODUCT_NUMBER%%": product.sProductNumber,
-    "%%ARTICLE_NUMBER%%": product.sArticleNumber,
-    "%%BRAND_NAME%%": product.brandName,
-    "%%QUANTITY%%": product.nReceivedQuantity,
+    "%%PRODUCT_NAME%%": product?.sProductName,
+    "%%SELLING_PRICE%%": product?.nPriceIncVat,
+    "%%PRODUCT_NUMBER%%": product?.sProductNumber,
+    "%%ARTICLE_NUMBER%%": product?.sArticleNumber,
+    "%%BRAND_NAME%%": product?.oBusinessBrand?.sAlias || product?.oBusinessBrand?.sName,
+    "%%QUANTITY%%": 1,
     "%%EAN%%": "",
-    "%%DIAMONDINFO%%": "",
-    "%%PRODUCT_WEIGHT%%": "",
-    "%%DESCRIPTION%%": product.sComment,
-    "%%MY_OWN_COLLECTION%%": "",
-    "%%VARIANTS_COLLECTION%%": "",
-    "%%BRAND_COLLECTION1%%": "",
-    "%%BRAND_COLLECTION2%%": "",
-    "%%TOTALCARATWEIGHT%%": 0.08,
-    "%%LAST_DELIVIERY_DATE%%": "",
-    "%%SUPPLIER_NAME%%": "",
-    "%%SUPPLIER_CODE%%": "",
+    "%%DIAMONDINFO%%": product?.sDiamondInfo,
+    "%%PRODUCT_WEIGHT%%": 12.32,
+    "%%DESCRIPTION%%": product?.sComment || product?.sLabelDescription,
+    "%%MY_OWN_COLLECTION%%": product?.sArticleGroupName || '',
+    "%%TOTALCARATWEIGHT%%": 0.65,
+    "%%LAST_DELIVERY_DATE%%": product.dDateLastPurchased,
+    "%%SUPPLIER_NAME%%": product.oBusinessPartner?.sBusinessPartnerName,
+    "%%SUPPLIER_CODE%%": product.oBusinessPartner?.sBusinessCode,
     "%%SUGGESTED_RETAIL_PRICE%%": "0,00",
     "%%PRODUCT_CATEGORY%%": "",
-    "%%PRODUCT_SIZE%%": "",
+    "%%PRODUCT_SIZE%%": 30,
     "%%JEWEL_TYPE%%": "",
     "%%JEWEL_MATERIAL%%": "",
   }
@@ -39,15 +36,17 @@ export const makeDataObjectForProduct = (product: any) => {
 @Component({
   selector: 'app-label-template-model',
   templateUrl: './label-template-model.component.html',
-  styleUrls: ['./label-template-model.component.sass']
+  styleUrls: ['./label-template-model.component.scss']
 })
 export class LabelTemplateModelComponent implements OnInit {
   @ViewChild('jsonEditor') jsonEditor!: any
   dialogRef: DialogComponent;
   faTimes = faTimes;
-  mode: 'create' | 'edit' = 'create'
-  jsonData = {}
-  image = ''
+  mode: 'create' | 'edit' = 'create';
+  jsonData = {};
+  image = '';
+  eType:any;
+  iTemplateId:any;
 
   constructor(private viewContainerRef: ViewContainerRef,
     private toastService: ToastService,
@@ -57,17 +56,27 @@ export class LabelTemplateModelComponent implements OnInit {
   }
 
   ngOnInit() {
+    // console.log(this.mode)
   }
   saveLabelTemplate() {
-    if (this.validateTemplateJson(this.jsonEditor.jsonData))
-      this.close(this.jsonEditor.jsonData)
+    if(this.eType === 'tspl') {
+      this.close({
+        ...this.jsonEditor.jsonData, 
+        "readOnly": false,
+        "nSeqOrder": 1,
+      })  
+    } else {
+        if (this.validateTemplateJson(this.jsonEditor.jsonData)) this.close(this.jsonEditor.jsonData)
+    }
   }
+
   close(data: any) {
     this.dialogRef.close.emit(data);
   }
   validateTemplateJson(jsonData: TemplateJSON) {
+    if(this.eType === 'tspl') return true;
     let excluded = ['dCreatedDate', 'dUpdatedDate', '_id', '__v']
-    let json: TemplateJSON = {
+    let json: any = {
       "readOnly": false,
       "inverted": false,
       "encoding": 28,
@@ -94,14 +103,16 @@ export class LabelTemplateModelComponent implements OnInit {
       "width": 72,
       offsetleft: 0,
       offsettop: 0,
-      iBusinessId: '',
-      iLocationId: ''
+      // iBusinessId: '',
+      // iLocationId: '',
+      "bDefault": true,
+      "nSeqOrder": 1,
     }
     let jsonKeys = Object.keys(json)
     let jsonDataKeys = Object.keys(jsonData).filter(e => {
       return !excluded.includes(e)
     })
-
+    // console.log('jsonKeys', jsonKeys, 'jsonDataKeys',jsonDataKeys);
     let isMissingAnyKey = jsonKeys.sort().join() !== jsonDataKeys.sort().join();
     if (isMissingAnyKey) {
       this.toastService.show({ type: 'warning', text: 'Invalid Json Template' });
@@ -120,11 +131,22 @@ export class LabelTemplateModelComponent implements OnInit {
     const Product = makeDataObjectForProduct({
       nPriceIncVat: 100,
       nReceivedQuantity: 0,
-      sArticleNumber: "article number",
-      sProductNumber: "product number",
-      sComment: "description",
-      brandName: "Brand Name",
-
+      sArticleNumber: "00000000000",
+      sProductNumber: "PN-12345",
+      sComment: "Description",
+      dLastDeliveryDate: "01/01/2023",
+      sBusinessPartnerName: "Supplier",
+      sProductName: 'Name',
+      oBusinessBrand: {
+        sAlias: 'Brand alias',
+        sName: 'Brand name'
+      },
+      oBusinessPartner: {
+        sBusinessCode: 'SCODE',
+        sName: 'Supplier Name'
+      },
+      sArticleGroupName: 'Article group',
+      sDiamondInfo: 'Diamond information'
     })
     const JsonTemplate = JSON.parse(JSON.stringify(this.jsonEditor.jsonData));
 

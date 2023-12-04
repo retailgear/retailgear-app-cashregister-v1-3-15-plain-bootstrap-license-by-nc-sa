@@ -7,7 +7,7 @@ import { ToastService } from '../toast';
 @Component({
   selector: 'app-print-settings-editor',
   templateUrl: './print-settings-editor.component.html',
-  styleUrls: ['./print-settings-editor.component.sass']
+  styleUrls: ['./print-settings-editor.component.scss']
 })
 export class PrintSettingsEditorComponent implements OnInit {
 
@@ -37,9 +37,16 @@ export class PrintSettingsEditorComponent implements OnInit {
       eType: 'dropdown'
     },
     {
+      sTitle: 'PDF Method',
+      sParameter: 'pdfMethod',
+      eOptions: ['PDFMake', 'Javascript'],
+      value: 'PDFMake',
+      eType: 'dropdown'
+    },
+    {
       sTitle: 'Page size',
       sParameter: 'pageSize',
-      eOptions: ['A4', 'A5', 'custom'],
+      eOptions: ['A4', 'A5', 'A6', 'custom'],
       value: 'A5',
       nWidth: 0,
       nHeight: 0,
@@ -52,13 +59,13 @@ export class PrintSettingsEditorComponent implements OnInit {
       aValues: [0, 0, 0, 0],
       eType: 'textArray'
     },
-    // {
-    //   sTitle: 'Font',
-    //   sParameter: 'font',
-    //   value: 'MyCustom',
-    //   eOptions: ['MyCustom'],
-    //   eType: 'dropdown'
-    // },
+    {
+      sTitle: 'Font',
+      sParameter: 'font',
+      value: 'Default',
+      eOptions: ['Roboto', 'Times New Roman'],
+      eType: 'dropdown'
+    },
     {
       sTitle: 'Font size',
       sParameter: 'fontSize',
@@ -100,13 +107,14 @@ export class PrintSettingsEditorComponent implements OnInit {
     });
   }
   mapWithDefaultSettings(){
-    this.oTemplate.aSettings.map((setting:any)=>{
-      this.aDefaultSettings.forEach((defaultSetting:any) => {
-        if (setting.sParameter === defaultSetting.sParameter){
-          setting.eOptions = defaultSetting?.eOptions;
-          setting.eType = defaultSetting?.eType;
-        }
-      });
+    this.aDefaultSettings.forEach((defaultSetting:any) => {
+      const oMatch = this.oTemplate.aSettings.find((setting: any) => setting.sParameter === defaultSetting.sParameter );
+      if (oMatch){
+        oMatch.eOptions = defaultSetting?.eOptions;
+        oMatch.eType = defaultSetting?.eType;
+      } else {
+        this.oTemplate.aSettings.push(defaultSetting);
+      }      
     });
     
   }

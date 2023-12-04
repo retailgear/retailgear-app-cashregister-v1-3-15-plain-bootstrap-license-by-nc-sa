@@ -1,10 +1,10 @@
-<div class="card shadow-sm">
-    <div class="card-header" style="margin-top: 20px;">
-        <h4>{{ (from == 'web-orders' ? 'WEB_ORDER_DETAILS' : 'WEB_RESERVATION_DETAILS') | translate}}</h4>
-        <div mat-dialog-actions>
-            <button mat-dialog-close type="button" class="btn btn-sm btn-light" (click)="close(false)">
-                <fa-icon [icon]="faTimes"></fa-icon>
-            </button>
+<div class="card">
+    <div class="card-header mt-5">
+        <div class="card-title">{{ (from == 'web-orders' ? 'WEB_ORDER_DETAILS' : 'WEB_RESERVATION_DETAILS') | translate}}</div>
+        <div>
+            <a class="cancel my-auto" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
         </div>
     </div>
     <div class="card-body">
@@ -59,10 +59,10 @@
                         <div class="text-gray-800">{{activityItems[0]?.receipts[0]?.sTransactionNumber}}</div>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <ng-select name="status" id="status" [(ngModel)]="activity.eActivityStatus"
+                        <ng-select name="status" id="status" [(ngModel)]="activity.eActivityItemStatus"
                             placeholder="{{'ORDER_STATUS' | translate}}"
-                            (ngModelChange)="changeStatusForAll(activity.eActivityStatus)">
-                            <ng-option *ngFor="let status of statuses" [value]="status.value">{{status.key | translate}}
+                            (ngModelChange)="changeStatusForAll(activity.eActivityItemStatus)">
+                            <ng-option *ngFor="let status of statuses" [disabled]="status.disabled" [value]="status.value">{{status.key | translate}} {{status.text | translate}}
                             </ng-option>
                         </ng-select>
                     </div>
@@ -70,23 +70,23 @@
                     <div class="col-md-8 mt-3 mt-3">
                         <div class="text-gray-800">{{FeStatus}}</div>
                     </div>
-                    <label *ngIf="activity.eActivityStatus == 'completed'"
+                    <label *ngIf="activity.eActivityItemStatus == 'completed'"
                         class="col-md-4 mt-5 text-muted">{{"SHIPPING_METHOD" | translate}} : </label>
-                    <div *ngIf="activity.eActivityStatus == 'completed'" class="col-md-8 mt-5">
+                    <div *ngIf="activity.eActivityItemStatus == 'completed'" class="col-md-8 mt-5">
                         <div class="text-gray-800">{{"COMPLETED" | translate}}</div>
                     </div>
-                    <label *ngIf="activity.eActivityStatus == 'completed'" class="col-md-4 mt-5 text-muted">{{"CARRIER"
+                    <label *ngIf="activity.eActivityItemStatus == 'completed'" class="col-md-4 mt-5 text-muted">{{"CARRIER"
                         | translate}} : </label>
-                    <div *ngIf="activity.eActivityStatus == 'completed'" class="col-md-8 mt-5">
+                    <div *ngIf="activity.eActivityItemStatus == 'completed'" class="col-md-8 mt-5">
                         <ng-select name="carrier" id="carrier" [(ngModel)]="activity.eCarrier"
                             placeholder="{{'CARRIER' | translate}}"
                             (ngModelChange)="changeCarrierForAll(activity.eCarrier)">
                             <ng-option *ngFor="let carrier of carriers" [value]="carrier">{{carrier}}</ng-option>
                         </ng-select>
                     </div>
-                    <input *ngIf="activity.eActivityStatus == 'completed'" type="text" name="activityName"
+                    <input *ngIf="activity.eActivityItemStatus == 'completed'" type="text" name="activityName"
                         [(ngModel)]="activity.sTrackingNumber" [placeholder]="'TRACK_AND_TRACE_ORDER' | translate"
-                        class="form-control" (ngModelChange)="changeTrackingNumberForAll(activity.sTrackingNumber)">
+                        class="form-control" (blur)="changeTrackingNumberForAll(activity.sTrackingNumber)">
                     <!-- <label class="form-check form-switch form-check-custom form-check-solid mt-5">
                         <input class="form-check-input" type="checkbox" id="bPayInCashRegister"
                             checked="checked" [(ngModel)]="activity.bPayInCashRegister"
@@ -95,36 +95,46 @@
                     </label> -->
                 </div>
                 <div class="col-md-4">
-                    <button class="btn btn-sm btn-secondary w-100 d-flex" (click)="thermalPrintWebOrder()">
-                        <fa-icon [icon]="faDownload"></fa-icon>
-                        <label class="mx-auto">{{ "RECEIPT" | translate}}</label>
+                    <button class="btn btn-sm btn-light btn-active-light-primary w-100 d-flex mb-2" (click)="thermalPrintWebOrder()">
+                        <fa-icon [icon]="faReceipt"></fa-icon>
+                        <label class="mx-auto cursor-pointer">{{ "RECEIPT" | translate}}</label>
                     </button>
-                    <!-- <button class="btn btn-sm btn-secondary w-100 d-flex" (click)="thermalPrintWebOrder()">
+                    <!-- <button class="btn btn-sm btn-light btn-active-light-primary w-100 d-flex mb-2" (click)="thermalPrintWebOrder()">
                         <fa-icon [icon]="faReceipt"></fa-icon>
                         <label class="mx-auto">{{ "THERMAL_PRINT" | translate}}</label>
                     </button> -->
-                    <button class="btn btn-sm btn-secondary w-100 d-flex"
+                    <button class="btn btn-sm btn-light btn-active-light-primary w-100 d-flex mb-2"
                         (click)="openTransaction(activity, 'activity')">
-                        <label class="mx-auto"> {{"EXCHANGE" | translate}}</label>
+                        <fa-icon [icon]="faUndoAlt"></fa-icon>
+                        <label class="mx-auto cursor-pointer"> {{"EXCHANGE" | translate}}</label>
                     </button>
-                    <button class="btn btn-sm btn-secondary w-100 d-flex" (click)="downloadWebOrder()">
+                    <button class="btn btn-sm btn-light btn-active-light-primary w-100 d-flex mb-2" (click)="generatePDF(false)">
                         <fa-icon [icon]="faDownload"></fa-icon>
-                        <label class="mx-auto">{{ "DOWNLOAD_PDF" | translate}}</label>
+                        <label class="mx-auto cursor-pointer">{{ "DOWNLOAD_PDF" | translate}}</label>
                     </button>
-                    <button *ngIf="activity.eActivityStatus == 'completed'"
-                        [disabled]="!showDeliverBtn && checkAllLocations()"
-                        class="btn btn-sm btn-primary w-100 d-flex mt-5" (click)="deliver('sentToCustomer')">
-                        <label class="mx-auto">{{ "SEND_TO_CUSTOMER" | translate}}</label>
-                    </button>
-                    <button *ngIf="activity.eActivityStatus == 'completed'"
-                        class="btn btn-sm btn-secondary w-100 d-flex">
-                        <label class="mx-auto">{{ "READY_TO_PICKUP" | translate}}</label>
-                    </button>
-                    <button *ngIf="activity.eActivityStatus == 'completed'"
-                        [disabled]="!showDeliverBtn && checkAllLocations()"
-                        class="btn btn-sm btn-secondary w-100 d-flex" (click)="deliver('deliver')">
-                        <label class="mx-auto"> {{"DELIVER" | translate}}</label>
-                    </button>
+                    <ng-container *ngIf="bShowCompletedFields">
+                        <button [disabled]="!showDeliverBtn && checkAllLocations()"
+                            class="btn btn-sm btn-primary w-100 d-flex" (click)="deliver('sentToCustomer')">
+                            <fa-icon [icon]="faEnvelope"></fa-icon>
+                            <label class="mx-auto cursor-pointer">{{ "SEND_TO_CUSTOMER" | translate}}</label>
+                        </button>
+                        <button class="btn btn-sm btn-light btn-active-light-primary w-100 d-flex mb-2">
+                            <fa-icon [icon]="faEnvelope"></fa-icon>
+                            <label class="mx-auto cursor-pointer">{{ "READY_TO_PICKUP" | translate}}</label>
+                        </button>
+                        <button [disabled]="!showDeliverBtn && checkAllLocations()"
+                            class="btn btn-sm btn-light btn-active-light-primary w-100 d-flex" (click)="deliver('deliver')">
+                            <label class=""> {{"DELIVER" | translate}}</label>
+                        </button>
+                    </ng-container>
+                </div>
+
+                <div *ngIf="loading">
+                    <div>
+                        <div class="spinner-box" style="top: 50%; left: 50%; transform: translate(-50%, -50%)">
+                            <div class="three-quarter-spinner"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -138,100 +148,109 @@
                 <div class="flex-equal me-5">
                     <table class="table table-hover table-rounded table-striped border gy-7 gs-7">
                         <thead>
-                            <tr class="fw-bold fs-6 text-gray-400">
-                                <td class="text-muted">{{'IMAGE' | translate}}</td>
-                                <td class="text-muted">{{'PRODUCT' | translate}}</td>
-                                <td class="text-muted">{{'STATUS' | translate}}</td>
-                                <td class="text-muted">{{'CUSTOMER' | translate}}</td>
-                                <td class="text-muted">{{'PRICE' | translate}}</td>
-                                <td class="text-muted">{{'QUANTITY' | translate}}</td>
-                                <td class="text-muted">{{'DATE' | translate}}</td>
-                                <td class="text-muted">{{'DISCOUNT_PER_ITEM' | translate}}</td>
-                                <td class="text-muted">{{'TAX' | translate}}</td>
-                                <td class="text-muted">{{'TOTAL_PRICE' | translate}}</td>
-                                <!-- date -->
+                            <tr class="fw-bold fs-6 text-gray-400 text-muted">
+                                <td>{{'IMAGE' | translate}}</td>
+                                <td>{{'PRODUCT' | translate}}</td>
+                                <td>{{'STATUS' | translate}}</td>
+                                <td>{{'PRICE' | translate}}</td>
+                                <td>{{'QUANTITY' | translate}}</td>
+                                <!-- <td>{{'DATE' | translate}}</td> -->
+                                <td>{{'DISCOUNT_PER_ITEM' | translate}}</td>
+                                <td>{{'GIFTCARD_DISCOUNT' | translate}}</td>
+                                <td>{{'COUPON_DISCOUNT' | translate}}</td>
+                                <td>{{'TAX' | translate}}</td>
+                                <td>{{'PAID_AMOUNT' | translate}}</td>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody *ngIf="activityItems?.length">
                             <ng-container *ngFor="let item of activityItems; let i = index">
                                 <tr>
                                     <td>
-                                        <img src="{{ item?.aImage?.length > 0 ? item.aImage[0] : imagePlaceHolder}}"
+                                        <img src="{{ item?.aImage?.length && item.bRegular ? item.aImage[0] : imagePlaceHolder}}"
                                             (error)="item.aImage[0]=imagePlaceHolder" class="product_image">
                                     </td>
                                     <td>
-                                        <div>
-                                            {{item?.receipts[0]?.sProductNumber || getName(item)}}
-                                        </div>
+                                        <span class="badge badge-info">{{item.eKindName | translate }}</span><br />
+                                        <span> {{ (item?.sProductName || '') + ' ' + (item?.receipts[0]?.sProductNumber || '')  }}</span><br />
+                                        <!-- <span>{{ item.sArticleGroupName }}<br></span> -->
+                                        <span *ngIf="item.bRegular">{{ item.sArticleNumber }}</span>
                                         <br>
                                         <div *ngIf="item?.aProductVariant?.length > 0">
                                             <div *ngFor="let variant of item?.aProductVariant" class="d-flex">
-                                                <div class="w-25">
-                                                    {{ variant.sVariantBase }}
-                                                </div> :
+                                                <div class="w-25">{{ variant.sVariantBase }}</div> :
                                                 <div class="w-50 px-2">
-                                                    <span *ngIf="variant.sVariantBase !== 'color'"> {{ variant.value }}
+                                                    <span *ngIf="variant.sVariantBase !== 'color'"> {{ variant.value }}</span>
+                                                    <span *ngIf="variant.sVariantBase === 'color'" [style.background]="variant.value"
+                                                        class="px-2 border border-gray-600">
                                                     </span>
-                                                    <span *ngIf="variant.sVariantBase === 'color'"
-                                                        [style.background]="variant.value"
-                                                        class="px-2 border border-gray-600"></span>
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td *ngIf="!item?.bRefund">
-                                        <select *ngIf="item.eActivityItemStatus != 'refundInCashRegister'" name="status"
+                                        <ng-select name="status" id="status" [(ngModel)]="item.eActivityItemStatus" *ngIf="item.eActivityItemStatus != 'refundInCashRegister'"
+                                            placeholder="{{'ORDER_STATUS' | translate}}"  (ngModelChange)="updateActivityItem(item)">
+                                            <ng-option *ngFor="let status of statusesForItems"  [value]="status.value">{{status.key |
+                                                translate}}
+                                            </ng-option>
+                                        </ng-select>
+                                        <!-- <select *ngIf="item.eActivityItemStatus != 'refundInCashRegister'" name="status"
                                             id="status" class="form-select" [(ngModel)]="item.eActivityItemStatus"
                                             (ngModelChange)="updateActivityItem(item)">
                                             <option *ngFor="let status of statusesForItems" [value]="status">{{status}}
                                             </option>
-                                        </select>
-                                        <input
-                                            *ngIf="item.eActivityItemStatus == 'refundInCashRegister' || item.eActivityItemStatus == 'refund'"
+                                        </select> -->
+                                        <!-- <input
+                                            *ngIf="['refundInCashRegister', 'refund'].includes(item.eActivityItemStatus)"
                                             type="text" [disabled]="true" [(ngModel)]="item.eActivityItemStatus"
-                                            class="form-control">
+                                            class="form-control"> -->
                                     </td>
                                     <td *ngIf="item?.bRefund"></td>
-                                    <td>{{item?.customer?.sFirstName}} {{item?.customer?.sLastName}}</td>
-                                    <td>{{item?.nPriceIncVat}}</td>
+                                    <td>{{item?.nPriceIncVat | currency: tillService.currency}}</td>
                                     <td>
                                         <div class="d-flex align-items-stretch flex-shrink-0 me-sm-2">
                                             {{item?.nQuantity}}
                                         </div>
                                         <div class="d-flex align-items-stretch flex-shrink-0 me-sm-2"
-                                            *ngIf="showDetails && userDetail && item?.iBusinessProductId">
+                                            *ngIf="showDetails && userDetail && item?.iBusinessProductId && item.bRegular">
                                             <div class="cursor-pointer my-auto fs-5 fw-bolder text-gray-700"
                                                 data-kt-menu-trigger="hover" data-kt-menu-attach="parent"
                                                 data-kt-menu-placement="bottom-start" data-kt-menu-flip="bottom">
-                                                <label class="fs-5 form-label fw-bolder text-dark">{{"LOCATION" |
-                                                    translate}} : </label>
-                                                <span *ngIf="item?.receipts[0]">( {{item?.receipts[0]?.locationName ||
-                                                    'Unknown'}} )</span>
+                                                <label class="fs-5 form-label fw-bolder text-dark">{{"LOCATION" |translate}} : </label>
+                                                <span *ngIf="item?.receipts[0]">( {{item?.receipts[0]?.locationName || 'Unknown'}} )</span>
                                             </div>
                                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-200px"
                                                 data-kt-menu="true">
-                                                <div *ngIf="business?.aInLocation?.length" class="menu-item px-3"
+                                                <div *ngIf="businessDetails?.aLocation?.length" class="menu-item px-3"
                                                     data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
                                                     <div class="menu-item px-3 cursor-pointer"
-                                                        *ngFor="let location of business.aInLocation">
+                                                        *ngFor="let location of businessDetails.aLocation">
                                                         <a class="menu-link d-flex px-5"
                                                             (click)="selectBusiness(i, location)">
                                                             {{ location.sName }}
                                                         </a>
                                                     </div>
                                                 </div>
-                                                <div *ngIf="business?.aInLocation?.length == 0" class="menu-item px-3">
+                                                <div *ngIf="businessDetails?.aLocation?.length == 0" class="menu-item px-3">
                                                     <span class="menu-link d-flex" (click)="selectBusiness(i)">
-                                                        {{ business.sName || 'Unknown'}}</span>
+                                                        {{ businessDetails.sName || 'Unknown'}}</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td>{{item.dCreatedDate | date: 'short'}}</td>
-                                    <td>{{item?.nDiscount || 0}} {{ item?.bDiscountOnPercentage ? '%' : ''}}</td>
-                                    <td>{{item?.nVatRate || 0}}</td>
+                                    <!-- <td>{{item.dCreatedDate | date: 'short'}}</td> -->
                                     <td>
-                                        <div>{{item?.nPaymentAmount || 0}}</div>
+                                        <div *ngIf="item.bRegular">
+                                            <span *ngIf="!item?.bDiscountOnPercentage">{{ item.nDiscountToShow | currency: tillService.currency}}</span>
+                                            <span *ngIf="item?.bDiscountOnPercentage">{{ item.nDiscount }}% ({{item.nDiscountToShow | currency:tillService.currency}})</span>
+                                        </div>
+                                        <div *ngIf="!item.bRegular" class="text-center">-</div>
+                                    </td>
+                                    <td>{{item?.nRedeemedGiftcardAmount | currency: tillService.currency }}</td>
+                                    <td>{{item?.nCouponDiscount | currency: tillService.currency }}</td>
+                                    <td>{{item?.nVatRate || 0}}% ({{item.vat || 0 | currency: tillService.currency }})</td>
+                                    <td>
+                                        <div>{{(item?.nPaymentAmount || 0) | currency: tillService.currency}}</div>
                                         <div *ngIf="item.receipts.length > 1"
                                             class="fw-bold fs-6 text-gray-800 border-bottom-2 border-gray-200 text-muted">
                                             <button class="btn btn-primary-sm" (click)="item.showMore = !item.showMore">
@@ -259,7 +278,7 @@
                                                     <td class="text-muted">{{'TOTAL_PRICE' | translate}}</td>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody *ngIf="item?.receipts?.length" >
                                                 <ng-container>
                                                     <tr
                                                         *ngFor="let receipt of item.receipts; let receiptsIndex = index">
@@ -312,30 +331,28 @@
                                                                     data-kt-menu-placement="bottom-start"
                                                                     data-kt-menu-flip="bottom">
                                                                     <label
-                                                                        class="fs-5 form-label fw-bolder text-dark">{{"LOCATION"
-                                                                        | translate}} : </label>
-                                                                    <span *ngIf="receipt">( {{receipt?.locationName ||
-                                                                        'Unknown'}} )</span>
+                                                                        class="fs-5 form-label fw-bolder text-dark">{{"LOCATION"| translate}} : </label>
+                                                                    <span *ngIf="receipt">( {{receipt?.locationName || 'Unknown'}} )</span>
                                                                 </div>
                                                                 <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-200px"
                                                                     data-kt-menu="true">
-                                                                    <div *ngIf="business?.aInLocation?.length > 0"
+                                                                    <div *ngIf="businessDetails?.aLocation?.length > 0"
                                                                         class="menu-item px-3"
                                                                         data-kt-menu-trigger="hover"
                                                                         data-kt-menu-placement="right-start">
                                                                         <div class="menu-item px-3 cursor-pointer"
-                                                                            *ngFor="let location of business.aInLocation">
+                                                                            *ngFor="let location of businessDetails.aLocation">
                                                                             <a class="menu-link d-flex px-5"
                                                                                 (click)="selectBusiness(i, location)">
                                                                                 {{ location.sName }}
                                                                             </a>
                                                                         </div>
                                                                     </div>
-                                                                    <div *ngIf="business?.aInLocation?.length == 0"
+                                                                    <div *ngIf="businessDetails?.aLocation?.length == 0"
                                                                         class="menu-item px-3">
                                                                         <span class="menu-link d-flex"
                                                                             (click)="selectBusiness(i)">
-                                                                            {{ business.sName || 'Unknown'}}</span>
+                                                                            {{ businessDetails.sName || 'Unknown'}}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -352,33 +369,30 @@
                                         </table>
                                     </td>
                                 </tr>
-                                <tr *ngIf='i == (activityItems.length - 1)'>
-                                    <td>{{'TOTAL' | translate}}</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>{{quantity}}</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>{{totalPrice}}</td>
-                                </tr>
                             </ng-container>
+                            <tr>
+                                <td>{{'TOTAL' | translate}}</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>{{quantity}}</td>
+                                <td>{{ nTotalDiscount | currency: tillService.currency }}</td>
+                                <td>{{ nTotalGiftcardDiscount | currency: tillService.currency }}</td>
+                                <td>{{ nTotalCouponDiscount | currency: tillService.currency }}</td>
+                                <td>{{ nTotalVat | currency: tillService.currency}}</td>
+                                <td>{{ nTotalPaidAmount | currency: tillService.currency}}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             <div class="d-flex">
-                <h5 *ngIf='!activityItems.length && !loading' style="text-align: center">{{'NO_DATA_FOUND' | translate
-                    }}
-                </h5>
-                <div *ngIf="loading" class="spinner-border mx-auto"></div>
+                <h5 *ngIf='!activityItems?.length && !loading' class="text-center">{{'NO_DATA_FOUND' | translate }}</h5>
             </div>
         </div>
     </div>
-    <div class="card-footer d-flex justify-content-end align-items-center">
-        <div *ngIf="bIsSaving" class="me-2 spinner-border mx-auto"></div>
-        <button class="btn btn-primary" (click)="submit($event)">{{"SUBMIT" | translate}}</button>
-    </div>
+    <!-- <div class="card-footer d-flex justify-content-end align-items-center"> -->
+        <!-- <div *ngIf="bIsSaving" class="me-2 spinner-border mx-auto"></div>
+        <button class="btn btn-primary" (click)="submit($event)">{{"SUBMIT" | translate}}</button> -->
+    <!-- </div> -->
 </div>

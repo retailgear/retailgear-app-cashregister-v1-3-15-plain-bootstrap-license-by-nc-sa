@@ -2,9 +2,9 @@
     <div class="card-header" style="margin-top: 20px;">
         <h4>{{ 'EDIT_SETTINGS_FOR : ' + format.name | translate}}</h4>
         <div>
-            <button type="button" class="btn btn-sm btn-light" (click)="close(false)">
-                <fa-icon [icon]="faTimes"></fa-icon>
-            </button>
+            <a class="cancel my-auto" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
         </div>
     </div>
     <div class="card-body p-5">
@@ -17,7 +17,7 @@
                         <h3>{{oTemplate.sTitle}}</h3>
                     </div>
 
-                    <div class="col-12 setting" *ngFor="let setting of oTemplate.aSettings">
+                    <div class="col-12" *ngFor="let setting of oTemplate.aSettings">
 
                         <div *ngIf="setting.eType==='switch'" class="row align-items-center mb-3">
                             <label class="col-3">{{ setting.sTitle }}</label>
@@ -28,7 +28,6 @@
                         </div>
 
                         <div *ngIf="setting.eType==='dropdown'" class="row align-items-center mb-3">
-
                             <label class="col-3">{{ setting.sTitle }}</label>
                             <ng-select [(ngModel)]="setting.value" [clearable]="false" class="col-3">
                                 <ng-option *ngFor="let option of setting.eOptions" [value]="option">{{ option }}
@@ -37,15 +36,27 @@
 
                             <ng-container *ngIf="setting.value==='custom'">
                                 <div class="col-3">
-                                    <div class="d-flex align-items-center">
+                                    <div class="d-flex align-items-center justify-content-between">
                                         <label class="me-2">{{ 'WIDTH' | translate }}</label>
-                                        <input type="number" class="form-control" [(ngModel)]="setting.nWidth">
+                                        <div class="d-flex flex-column align-items-end">
+                                            <span class="text-info fw-bolder font-italic">{{'dots' | translate}}</span>
+                                            <input type="number" class="form-control" [(ngModel)]="setting.nWidth">
+                                        </div>
+                                    </div>
+                                    <div class="text-right text-info font-italic fw-bolder">
+                                        = {{ (setting.nWidth / 2.8346).toFixed(2) }} mm
                                     </div>
                                 </div>
                                 <div class="col-3">
-                                    <div class="d-flex align-items-center">
+                                    <div class="d-flex align-items-center justify-content-between">
                                         <label class="me-2">{{ 'HEIGHT' | translate }}</label>
-                                        <input type="number" class="form-control" [(ngModel)]="setting.nHeight">
+                                        <div class="d-flex flex-column align-items-end">
+                                            <span class="text-info fw-bolder font-italic">{{'dots' | translate}}</span>
+                                            <input type="number" class="form-control" [(ngModel)]="setting.nHeight">
+                                        </div>
+                                    </div>
+                                    <div class="text-right text-info font-italic fw-bolder">
+                                        = {{ (setting.nHeight / 2.8346).toFixed(2) }} mm
                                     </div>
                                 </div>
                             </ng-container>

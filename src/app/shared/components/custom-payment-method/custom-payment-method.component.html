@@ -1,63 +1,86 @@
 <div class="card">
-    <div class="card-header row" style="margin-top: 20px;">
-        <div class="col-md-10">
-            <h4 *ngIf="mode === 'create'">{{ 'CREATE_PAYMENT_METHOD' | translate}}</h4>
-            <h4 *ngIf="mode === 'details'">{{ 'UPDATE_PAYMENT_METHOD' | translate}}</h4>
+    <div class="card-header align-items-center py-4">
+        <div class="col-10">
+            <h4 class="m-0" *ngIf="mode === 'create'">{{ 'CREATE_PAYMENT_METHOD' | translate}}</h4>
+            <h4 class="m-0" *ngIf="mode === 'details' && customMethod.bIsDefaultPaymentMethod">{{ 'CREATE_COPY_OF_DEFAULT_PAYMENT_METHOD' | translate}}</h4>
+            <h4 class="m-0" *ngIf="mode === 'details' && !customMethod.bIsDefaultPaymentMethod">{{ 'UPDATE_PAYMENT_METHOD' | translate}}</h4>
         </div>
-        <div class="col-md-2"></div>
+        <div>
+            <a class="cancel my-auto" (click)="close()">
+                <i class="fa fa-times fabutton"></i>
+            </a>
+        </div>
     </div>
     <div class="card-body">
         <diV class="row">
-            <div class="col-md-4">
-                <label class="form-label form-control-solid">{{ 'NAME' | translate }}:</label>
-            </div>
-            <div class="col-md-8">
-                <input class="form-control form-control-solid" [readonly]="customMethod.bIsDefaultPaymentMethod" (value)="customMethod.sName" [(ngModel)]="customMethod.sName"/>
+            <div class="col-12">
+                <label class="form-label form-control-solid m-0">{{ 'NAME' | translate }}:</label>
+                <input class="form-control form-control-solid" [readonly]="customMethod.sName == 'Cash' || customMethod.bIsDefaultPaymentMethod" (value)="customMethod.sName" [(ngModel)]="customMethod.sName"/>
                 <span *ngIf="customMethod.bIsDefaultPaymentMethod"> 
-                    <label class="required"></label>{{ 'YOU_CANNOT_UPDATE_NAME_OF_THE_DEFAULT_PAYMENT_METHOD' | translate }}
+                    <label class="required"></label> {{ 'YOU_CANNOT_UPDATE_NAME_OF_THE_DEFAULT_PAYMENT_METHOD' | translate }}
                 </span>
             </div>
         </diV>
-        <diV class="row">
-            <div class="col-md-4">
-                <label class="form-label">{{ 'STOCK_REDUCTION' | translate}}</label>
+        <diV class="row d-flex align-items-center my-3">
+            <div class="col-10">
+                <label class="form-label m-0">{{ 'STOCK_REDUCTION' | translate}}</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-2">
                 <label class="form-check form-switch form-check-custom form-check-solid">
                     <input type="checkbox" class="form-check-input" [(ngModel)]="customMethod.bStockReduction"> 
                 </label>
             </div>
         </diV>
-        <diV class="row">
-            <div class="col-md-4">
-                <label class="form-label">{{ 'INVOICE' | translate}}</label>
+        <!-- <diV class="row d-flex align-items-center">
+            <div class="col-10">
+                <label class="form-label m-0">{{ 'INVOICE' | translate}}</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-2">
                 <label class="form-check form-switch form-check-custom form-check-solid">
                     <input type="checkbox" class="form-check-input" [(ngModel)]="customMethod.bInvoice"> 
                 </label>
             </div>
-        </diV>
-        <!-- <diV class="row">
-            <div class="col-md-4">
-                <label class="form-label">Assign saving points:</label>
+        </diV> -->
+        <diV class="row d-flex align-items-center mt-3">
+            <div class="col-10">
+                <label class="form-label m-0">{{ 'SHOW_IN_CASH_REGISTER' | translate}}</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-2">
+                <label class="form-check form-switch form-check-custom form-check-solid">
+                    <input type="checkbox" class="form-check-input" [(ngModel)]="customMethod.bShowInCashRegister" [disabled]="customMethod.sName == 'Cash'">
+                </label>
+            </div>
+        </diV>
+        <diV class="row d-flex align-items-center mt-3">
+            <div class="col-10">
+                <label class="form-label">{{ 'ASSIGN_SAVING_POINTS' | translate }}</label>
+            </div>
+            <div class="col-2">
                 <label class="form-check form-switch form-check-custom form-check-solid">
                     <input type="checkbox" class="form-check-input" [(ngModel)]="customMethod.bAssignSavingPoints"> 
                 </label>
             </div>
-        </diV> -->
-        <diV class="row">
-            <div class="col-md-4">
-                <label class="form-label">{{ 'ASSIGN_SAVING_POINTS_LAST_PAYMENT' | translate }}</label>
+        </diV>
+        <diV class="row d-flex align-items-center mt-3">
+            <div class="col-10">
+                <label class="form-label m-0">{{ 'USE_TERMINAL' | translate}}</label>
             </div>
-            <div class="col-md-8">
+            <div class="col-2">
+                <label class="form-check form-switch form-check-custom form-check-solid">
+                    <input type="checkbox" class="form-check-input" [(ngModel)]="customMethod.bUseTerminal"> 
+                </label>
+            </div>
+        </diV>
+        <!-- <diV class="row d-flex align-items-center mt-3">
+            <div class="col-10">
+                <label class="form-label m-0">{{ 'ASSIGN_SAVING_POINTS_LAST_PAYMENT' | translate }}</label>
+            </div>
+            <div class="col-2">
                 <label class="form-check form-switch form-check-custom form-check-solid">
                     <input type="checkbox" class="form-check-input" [(ngModel)]="customMethod.bAssignSavingPointsLastPayment"> 
                 </label>
             </div>
-        </diV>
+        </diV> -->
         <!-- <diV class="row">
             <div class="col-md-4">
                 <label class="form-label form-control-solid">Ledger Number:</label>
@@ -67,13 +90,11 @@
             </div>
         </diV> -->
     </div>
-    <div class="card-footer row">
-        <div class="col-md-10">
-            <button *ngIf="mode === 'create'" class="btn btn-primary" (click)="create()">{{ 'CREATE' | translate }}</button>
-            <button *ngIf="mode === 'details'" class="btn btn-primary" (click)="update()">{{ 'SUBMIT' | translate }}</button>
-        </div>
-        <div class="col-md-2">
+    <div class="card-footer p-5 justify-content-end align-items-center d-flex">
+        <button *ngIf="mode === 'create'" class="btn btn-primary" (click)="create()">{{ 'CREATE' | translate }}</button>
+        <button *ngIf="mode === 'details'" class="btn btn-primary" (click)="update()">{{ 'SUBMIT' | translate }}</button>
+        <!-- <div class="col-md-2">
             <button class="btn btn-secondary" (click)="close()">{{ 'CLOSE' | translate }}</button>
-        </div>
+        </div> -->
     </div>
 </div>

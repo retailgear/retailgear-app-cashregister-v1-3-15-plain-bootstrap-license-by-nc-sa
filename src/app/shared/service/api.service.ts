@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
 import { environment } from '../../../environments/environment';
 import { BehaviorSubject, Observable, of, throwError } from "rxjs";
-import { catchError, retry } from "rxjs/operators";
+import { catchError, map, retry } from "rxjs/operators";
 import { ToastService } from '../components/toast';
 
-type ApiTypes = 'auth' | 'organization' | 'core' | 'cashregistry' | 'customer' | 'bookkeeping' | 'website-builder' | 'backup' | 'oldplatform' | 'log' | 'fiskaly'
+type ApiTypes = 'auth' | 'organization' | 'core' | 'cashregistry' | 'customer' | 'bookkeeping' | 'website-builder' | 'backup' | 'oldplatform' | 'log' | 'fiskaly' | 'JEWELS_AND_WATCHES' | 'cron'
 
 @Injectable({
   providedIn: 'root'
@@ -22,14 +22,15 @@ export class ApiService {
 
   public userDetails: BehaviorSubject<any> = new BehaviorSubject<any>({});
   public businessDetails: BehaviorSubject<any> = new BehaviorSubject<any>({});
-  public activityItemDetails:BehaviorSubject<any> = new BehaviorSubject<any>({});
-  toastService:ToastService;
+  public activityItemDetails: BehaviorSubject<any> = new BehaviorSubject<any>({});
+  toastService: ToastService;
+  bSuppressFurtherToast: boolean = false;
 
   constructor(
     private httpClient: HttpClient,
   ) { }
 
-  setToastService(toastService: ToastService){
+  setToastService(toastService: ToastService) {
     this.toastService = toastService;
   }
 
@@ -42,25 +43,32 @@ export class ApiService {
 
   defaultHeaders: any = { 'Content-Type': 'application/json', observe: 'response' };
 
-  httpError(error: { error: { message: string; }; message: string; status: number, url:string }) {
+  resetDefaultHeaders() {
+    this.defaultHeaders = { 'Content-Type': 'application/json', observe: 'response' };
+  }
+  
+  httpError(error: { error: { message: string; }; message: string; status: number, url: string }) {
     let msg = ''
     if (error.error instanceof ErrorEvent) {
       //Client side error
-      msg = error.error.message
+      msg = error?.error?.message
     } else {
       //Server side error
-      msg = error.error.message
+      msg = error?.error?.message
     }
-
-    if(Number(error.status) == 0) {
+    if (Number(error.status) == 0) {
       let url = error.url.match('.*/v1/(.*)/') || ''
-      this.toastService.show({type: 'danger', text: `Something went wrong while executing this url '${url[1]}'` })
+      this.toastService.show({ type: 'danger', text: `Something went wrong while executing this url '${url[1]}'` })
     } else {
-      this.toastService.show({type: 'danger', text: msg || 'Something went wrong!' })
+      if (error.status == 498) {
+        if (!this.bSuppressFurtherToast) this.toastService.show({ type: 'danger', text: msg || 'Something went wrong!' })
+        this.bSuppressFurtherToast = true;
+      }
+      if (!this.bSuppressFurtherToast) this.toastService.show({ type: 'danger', text: msg || 'Something went wrong!' })
     }
     return throwError(new Error(msg))
   }
-  
+
   //  Function for set headers
   setAPIHeaders() {
     if (localStorage.getItem('authorization') && localStorage.getItem('authorization')?.trim() != '') {
@@ -188,6 +196,10 @@ export class ApiService {
         return environment.LOG_URL;
       case 'fiskaly':
         return environment.FISKALY_URL;
+      case 'JEWELS_AND_WATCHES':
+        return environment.JEWELS_AND_WATCHES_URL;
+      case 'cron':
+        return environment.CRON_URL;
       case 'oldplatform':
         return oldplatform += ':3000';
     }
@@ -207,16 +219,36 @@ export class ApiService {
       );
   }
 
+  // getNew(apiType: ApiTypes, url: string, header?: any): Observable<HttpResponse<any>> {
+  //   let finalUrl = this.getApiBaseUrl(apiType) + url;
+  //   let finalHeaders = header && Object.keys(header).length > 0 ? header : this.defaultHeaders;
+  //   let httpHeaders = {
+  //     headers: new HttpHeaders(finalHeaders),
+  //   }
+
+  //   return this.httpClient.get<any>(finalUrl, httpHeaders)
+  //     .pipe(
+  //       map(response => {
+  //         return response;
+  //       }),
+  //       catchError(this.httpError.bind(this))
+  //     );
+  // }
+
   postNew(apiType: ApiTypes, url: string, data: any, header?: any): Observable<HttpResponse<any>> {
-    this.setAPIHeaders();
     let finalUrl = this.getApiBaseUrl(apiType) + url;
     let finalHeaders = header && Object.keys(header).length > 0 ? header : this.defaultHeaders;
     let httpHeaders = {
       headers: new HttpHeaders(finalHeaders),
     }
-    return this.httpClient.post<any>(finalUrl, data, httpHeaders).pipe(catchError(this.httpError.bind(this)));
+    return this.httpClient.post<any>(finalUrl, data, httpHeaders)
+      .pipe(
+        map(response => {
+          return response;
+        }),
+        catchError(this.httpError.bind(this))
+      );
   }
-
   fileUpload(apiType: ApiTypes, url: string, data: any, header?: any): Observable<HttpResponse<any>> {
     this.setAPIHeaders();
     let finalUrl = this.getApiBaseUrl(apiType) + url;

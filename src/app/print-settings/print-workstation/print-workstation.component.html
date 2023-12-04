@@ -1,8 +1,7 @@
 <button class="btn btn-primary"> {{ "MANAGE_RECEIPTS" | translate }} </button>
-<button class="btn btn-primary float-end" (click)="editWorkstation()"> {{ "ADD_NEW_WORKSTATION" | translate }} </button>
+<!-- <button class="btn btn-primary float-end" (click)="editWorkstation()"> {{ "ADD_NEW_WORKSTATION" | translate }} </button> -->
 <div class="tscroll">
-    <table class="table table-row-gray-400 gx-2 mt-4 table-row-bordered table-rounded border border-gray-400"
-        [style.width.px]="tableMaxWidth">
+    <table class="table table-row-gray-400 gx-2 mt-4 table-row-bordered table-rounded border border-gray-400 table-workstation"> <!-- [style.width.px]="tableMaxWidth"-->
         <thead>
             <!-- <tr>
                 <td colspan="2" rowspan="2" class="sticky-col first-col border border-gray-400"></td>
@@ -10,26 +9,26 @@
                 </td>
             </tr> -->
             <tr>
-                <td colspan="2" class="sticky-col first-col border border-gray-400"></td>
-                <td *ngFor="let workstation of workstations | order_by:'nPrintNodeComputerId'; trackBy:trackByFunction;"
-                    class="lh-xxl" style="min-width: 260px;">
+                <td colspan="2" class="sticky-col bg-body first-col border border-gray-400"></td>
+                <td *ngFor="let workstation of workstations; trackBy:trackByFunction;"
+                    class="lh-xxl second-col">
                     {{ workstation.sName }}
-                    <div class="badge" *ngIf="workstation?.computer"
+                    <div style="white-space: normal;" class="badge" *ngIf="workstation?.computer"
                         [ngClass]="workstation?.computer?.state == 'connected' ? 'badge-light-success' : 'badge-light-danger'">
                         {{ workstation?.computer?.name }} 
 
                     </div>
                     
-                    <div class="badge" *ngIf="workstation?.computer?.state == 'disconnected'" style="color:red ; white-space:initial;">
+                    <div style="white-space: normal;" class="badge" *ngIf="workstation?.computer?.state == 'disconnected'" style="color:red ; white-space:initial;">
                         <span>
                             This workstation/computer seems to be offline, check if it's ON and check if the 'PrintHelper' software is running by searching 'PrintHelper' in the windows start menu.
                         </span>
                     
                     </div>
-                    <div class="badge badge-light-info" *ngIf="!workstation?.computer">
+                    <div style="white-space: normal;" class="badge badge-light-info" *ngIf="!workstation?.computer">
                         {{ "INSTALL_PRINT_HELPER_AND_CONFIG_WORKSTATION" | translate}}
                     </div>
-                    <button class="btn btn-info float-end px-4 py-2" (click)="editWorkstation(workstation)">
+                    <button class="btn btn-sm btn-info float-end px-4 py-2" (click)="editWorkstation(workstation)">
                         <fa-icon [icon]="faPencilAlt"></fa-icon>
                     </button>
                 </td>
@@ -39,12 +38,12 @@
             <ng-container *ngFor="let template of templates">
                 <tr class="lh-xxl" *ngFor="let type of template.typeList; let tIndex = index;">
                     <td [attr.rowspan]="template.typeList.length" *ngIf="tIndex == 0"
-                        class="sticky-col first-col border border-gray-400">
+                        class="sticky-col bg-body first-col border border-gray-400">
                         <label class="vertical-label-text mt-per-35"> {{ template.name }} </label>
                     </td>
-                    <td class="sticky-col second-col border border-gray-400">
+                    <td class="sticky-col bg-body second-col border border-gray-400">
                         {{ type.name | translate}}
-                        <button class="btn btn-info float-end px-4 py-2" [disabled]="!type.enabled"
+                        <button class="btn btn-sm btn-info float-end px-4 py-2" [disabled]="!type.enabled"
                             (click)="openEditSetting(type)">
                             <fa-icon [icon]="faPencilAlt"></fa-icon>
                         </button>
@@ -52,35 +51,53 @@
                     <td *ngFor="let workstation of workstations">
                         <div
                             *ngIf="getSelectedValue({name: template.name, type: type.key, workstation: workstation}) != ''; else set_workstation_printer">
+                            
                             <div *ngIf="!workstation[template.name][type.key]?.withName">
-                                <label class="mt-3">{{ workstation[template.name][type.key]?.printerName || ''
-                                    }}</label>
+                                
+                                <label class="mt-3">
+                                    {{ workstation[template.name][type.key]?.printerName || ''}}
+
+                                    <span *ngIf="workstation[template.name][type.key]?.sPrinterPageFormat" class="text-muted">
+                                        ({{ workstation[template.name][type.key]?.sPrinterPageFormat || ''}})
+                                    </span>
+
+                                    <span *ngIf="workstation[template.name][type.key]?.sPaperTray" class="text-muted">
+                                        <br /> {{ 'PAPER_TRAY' | translate}} : {{ workstation[template.name][type.key]?.sPaperTray || ''}})
+                                    </span>
+
+                                    <span *ngIf="workstation[template.name][type.key]?.nRotation" class="text-muted">
+                                        <br /> {{ 'ROTATION' | translate}} : {{ workstation[template.name][type.key]?.nRotation || ''}}
+                                    </span>
+                                </label>
                                 <div class="float-end mt-2">
-                                    <button class="btn btn-info px-4 py-2"
-                                        (click)="workstation[template.name][type.key].withName = true">
+                                    <button class="btn btn-sm btn-info px-4 py-2"
+                                        (click)="openSelectPrintPaperDialog(type.key, workstation, template.name)">
                                         <fa-icon [icon]="faPencilAlt"></fa-icon>
                                     </button>
-                                    <button class="btn btn-success ms-1 px-4 py-2"
+                                    <button class="btn btn-sm btn-success ms-1 px-4 py-2"
                                         (click)="copyPrintSetting({name: template.name, type: type.key, workstation: workstation})">
                                         <fa-icon [icon]="faCopy"></fa-icon>
                                     </button>
-                                    <button class="btn btn-danger ms-1 px-4 py-2"
+                                    <button class="btn btn-sm btn-danger ms-1 px-4 py-2"
                                         (click)="removePrintSetting({name: template.name, type: type.key, workstation: workstation})">
                                         <fa-icon [icon]="faXmark"></fa-icon>
                                     </button>
                                 </div>
                             </div>
-                            <div
-                                *ngIf="workstation[template.name][type.key]?.withName == true; then set_workstation_printer">
-
-                            </div>
+                            <div *ngIf="workstation[template.name][type.key]?.withName == true; then set_workstation_printer"></div>
                         </div>
                         <ng-template #set_workstation_printer>
-                            <ng-select id="printer" name="printer" [clearable]="false" class="mt-2"
-                                [items]="printersList" bindLabel="name" bindValue="keyValue" [groupBy]="groupByFn"
-                                [ngModel]="getSelectedValue({name: template.name, type: type.key, workstation: workstation})"
-                                (ngModelChange)="onChange($event, {name: template.name, type: type.key, workstation: workstation})">
-                            </ng-select>
+                            <div class="class select-printer-wrapper">
+                                <span class="text-muted">({{ 'NO_PRINTER_SELECTED' | translate }})</span>
+                                <!-- <ng-select id="printer" name="printer" [clearable]="false" class="mt-2"
+                                    [items]="printersList" bindLabel="name" bindValue="keyValue" [groupBy]="groupByFn"
+                                    [ngModel]="getSelectedValue({name: template.name, type: type.key, workstation: workstation})"
+                                    (ngModelChange)="onChange($event, {name: template.name, type: type.key, workstation: workstation})">
+                                </ng-select> -->
+                                <button class="btn btn-sm btn-secondary px-4 py-2 select-printer-btn" (click)="openSelectPrintPaperDialog(type.key, workstation, template.name)">
+                                    {{ 'SELECT_PRINTER' | translate}}
+                                </button>
+                            </div>
                         </ng-template>
                     </td>
                 </tr>

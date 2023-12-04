@@ -2,25 +2,101 @@
     <div class="card-header" style="margin-top: 20px;">
         <h4>{{"FIND_CUSTOMER" | translate}}</h4>
         <div>
-            <button type="button" class="btn btn-sm btn-light" (click)="close({ action: false })">
-                <fa-icon [icon]="faTimes"></fa-icon>
-            </button>
+            <a class="cancel my-auto" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
         </div>
     </div>
-    <div class="card-body row">
-        <div class="d-flex align-items-center">
-            <div class="position-relative w-md-400px me-md-2" style="margin-bottom: 10px;">
+    <div class="card-body">
+        <div class="row align-items-center mb-5">
+            <div class="col-4 position-relative">
                 <fa-icon [icon]="faSearch" class="text-gray-500 position-absolute top-50 translate-middle ms-6">
                 </fa-icon>
-                <input type="text" class="form-control form-control-solid ps-10" #inputElement
-                    [(ngModel)]="requestParams.searchValue" (change)="getCustomers()" name="search" value=""
-                    [placeholder]="'SEARCH' | translate" />
+                <input type="text" class="form-control form-control-solid ps-10" 
+                [(ngModel)]="requestParams.searchValue" (keyup.enter)="getCustomers()" (keyup)="customerEventHandler($event)" name="search"
+                placeholder="{{(aPlaceHolder).join(',')}}" #inputElement>
+                <!-- <input type="text" class="form-control form-control-solid ps-10" (ngModelChange)="stringDetection()" name="search"
+                    [(ngModel)]="requestParams.searchValue"  value="" placeholder="{{(aPlaceHolder).join(' ')}}" (keydown.enter)="getCustomers()"/> -->
+                    
             </div>
-            <div class="d-flex align-items-center">
-                <button type="submit" (click)="getCustomers()" class="btn btn-primary me-5"> {{ "SEARCH" |
-                    translate}}</button>
+            <!-- <div class="col-5">
+                <ng-select [clearable]="true" [multiple]="true" placeholder="{{ 'SELECT_FIELD' | translate }}"
+                    [(ngModel)]="aFilterField">
+                    <ng-option *ngFor="let item of aFilterFields" [value]="item.key">{{ item.title | translate }}</ng-option>
+                </ng-select>
+            </div> -->
+            <div class="col-3 d-flex">
+                <button class="btn btn-primary me-2" (click)="getCustomers()">{{'SEARCH' | translate}} </button>
+                <div class="d-flex align-items-center ads_search">
+                    <button class="btn btn-secondary me-2" (click)="resetFilters()">
+                        <i class="fa fa-sync"></i>
+                    </button>
+                    <button type="button" (click)="showAdvanceSearch = !showAdvanceSearch" class="btn btn-info me-3">
+                        <i class="fa fa-filter"></i>
+                    </button>
+                </div>
+                <!-- <button type="button" (click)="showFilters = !showFilters" class="btn btn-info me-5">
+                    <i class="fa fa-filter"></i>
+                </button> -->
+            </div>
+            <div class="col-5 d-flex justify-content-end">
+                <!-- <div class="btn-group me-4">
+                    <label class="form-check form-switch form-check-custom form-check-solid">
+                    <ng-select class="form-control form-control-solid p-0 w-150px"
+                    [(ngModel)]="requestParams.customerType" [clearable]="false" (change)="getCustomers()">
+                    <ng-option *ngFor="let customerType of customerTypes" [value]="customerType.value">{{customerType.key |
+                        translate}}
+                    </ng-option>
+                    </ng-select>
+                    </label>
+                </div> -->
+                <button type="button" class="btn btn-secondary" (click)="AddCustomer()"> {{ "ADD_CUSTOMER" | translate}}</button>
             </div>
         </div>
+        <div class="col-lg-12 d-flex align-items-end flex-wrap px-2" *ngIf="showAdvanceSearch">
+            <label class="col-12 small form-label fw-bolder text-dark">{{ 'ADVANCED_SEARCH' | translate }}</label>
+            <div class="col-12" *ngIf="requestParams.oFilterBy.aSearchField.length">
+                <p class="mb-0 text-muted fw-bolder small">
+                    {{"PLEASE_FOLLOW_EXAMPLE_ORDER_FOR_A_BETTER_EXPERIENCE" | translate}}
+                </p>
+                <label class="text-muted"> {{"EXAMPLE" | translate}} : {{(aInputHint).join(',')}} </label>
+                <p *ngIf="!bIsProperSearching" class="text-warning m-0"> {{ "PLEASE_SEARCH_AS_SHOWN" | translate }} </p>
+            </div>
+            <div class="col-4 me-4 customers-fields">
+                <label class="fw-bolder text-muted" for="customersGroup">{{'CUSTOMER_FIELDS' | translate}} </label>
+                <ng-select class="form-control form-control-solid p-0" [multiple]="true" [closeOnSelect]="false"
+                    [(ngModel)]="requestParams.oFilterBy.aSearchField" [clearable]="false" (ngModelChange)="setPlaceHolder()">
+                        <ng-option *ngFor="let item of aFilterFields" [value]="item.value">{{item.key | translate}}</ng-option>
+                </ng-select>
+            </div>
+            <div class="col-3 me-4 customers-fields" *ngIf="showAdvanceSearch">
+                <label class="fw-bolder text-muted" for="customersGroup">{{'CUSTOMER_GROUP' | translate}} </label>
+                <ng-select class="form-control form-control-solid p-0" [multiple]="true" [clearable]="false" [closeOnSelect]="false" 
+                    [(ngModel)]="requestParams.oFilterBy.aSelectedGroups">
+                        <ng-option *ngFor="let group of customerGroupList" [value]="group._id">{{group.sName}}</ng-option>
+                </ng-select>
+            </div>
+            <div class="col-3 me-4 customers-fields">
+                <label class="fw-bolder text-muted" for="customersGroup">{{'CUSTOMER_TYPE' | translate}} </label>
+                <ng-select class="form-control form-control-solid p-0"
+                    [(ngModel)]="requestParams.customerType" [clearable]="false" (change)="getCustomers()">
+                    <ng-option *ngFor="let customerType of customerTypes" [value]="customerType.value">{{customerType.key |
+                        translate}}
+                    </ng-option>
+                </ng-select>
+            </div>
+        </div>
+    
+        <!-- <div class="row align-items-center mb-5" [@openClose]="showFilters ? 'open' : 'closed'">
+            <ng-container *ngFor="let item of aFilterFields">
+                <div class="col-2">
+                    <label>{{item.title | translate}}</label>
+                </div>
+                <div class="col-3">
+                    <input [(ngModel)]="requestParams.oFilterBy[item.key]" class="form-control">
+                </div>
+            </ng-container>
+        </div> -->
     </div>
     <div *ngIf="customers.length" class="card-body pt-0">
         <div class="dataTables_wrapper dt-bootstrap4 no-footer">
@@ -33,58 +109,87 @@
                         </tr>
                     </thead>
                     <tbody class="fw-bold text-gray-600">
-                        <tr *ngFor='let customer of customers'>
+                        <tr *ngFor='let customer of customers | paginate: paginationConfig'>
                             <td *ngFor="let column of allColumns" class="">{{customer[column]}}</td>
-                            <td>
-                                <button class="btn btn-primary" (click)="setCustomer(customer)"> {{"SELECT" |
+                            <td *ngIf="key!='MERGE' || key==''">
+                                <button class="btn btn-primary d-flex align-items-center" (click)="setCustomer(customer)" [disabled]="customer?.loading"> 
+                                    <div *ngIf="customer?.loading" class="spinner-border me-2"></div>
+                                    <span>{{"SELECT" | translate}}</span>
+                                </button>
+                            </td>
+                            <td *ngIf="key=='MERGE'">
+                                <button class="btn btn-warning" (click)="setCustomer(customer)"> {{"MERGE" |
                                     translate}}</button>
                             </td>
                             <td>
-                                <button class="btn btn-primary" (click)="editCustomer(customer)"> {{"OPEN" |
+                                <button class="btn btn-light btn-active-light-primary"(click)="editCustomer(customer)"> {{"OPEN" |
                                     translate}}</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-        
         </div>
-        <!-- <div class="row">
-        <div class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
+        <div class="row justify-content-between">
+            <div *ngIf="customers?.length" class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
+                <div class="dataTables_length" id="kt_ecommerce_sales_table_length">
+                    <label>
+                        <select name="kt_ecommerce_sales_table_length"
+                            aria-controls="kt_ecommerce_sales_table"
+                            class="form-select form-select-sm form-select-solid"
+                            [(ngModel)]="requestParams.limit"
+                            (change)="changeItemsPerPage(requestParams.limit)">
+                            <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{ pageNum }}
+                            </option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+            <div
+                class="col-sm-12 col-md-8 d-flex align-items-center justify-content-center justify-content-md-end">
+                <pagination-controls [hidden]="customers.length === 0" (pageChange)="pageChanged($event)"
+                    (pageBoundsCorrection)="pageChanged($event)" [maxSize]="setPaginateSize"
+                    [previousLabel]="'PREVIOUS' | translate" [nextLabel]="'NEXT' | translate"
+                    screenReaderPaginationLabel="Pagination" [screenReaderPageLabel]="'PAGE' | translate">
+                </pagination-controls>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="!customers.length" class="d-flex card-body pt-0">
+        <h5 *ngIf='!customers.length && !showLoader && isCustomerSearched'> {{"NO_DATA_FOUND" |translate}}!</h5>
+        <div *ngIf="showLoader" class="spinner-border mx-auto"></div>
+    </div>
+    <!-- <div class="row">
+        <div *ngIf="customers?.length" class="col-sm-12 col-md-3 mx-4 d-flex align-items-center justify-content-center justify-content-md-start">
             <div class="dataTables_length" id="kt_ecommerce_sales_table_length">
                 <label>
-                    <select name="kt_ecommerce_sales_table_length" aria-controls="kt_ecommerce_sales_table" class="form-select form-select-sm form-select-solid"  [(ngModel)]="requestParams.limit" (change)="changeItemsPerPage(requestParams.limit)">
-                        <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{ pageNum }}</option>
+                    <select name="kt_ecommerce_sales_table_length"
+                        aria-controls="kt_ecommerce_sales_table"
+                        class="form-select form-select-sm form-select-solid"
+                        [(ngModel)]="requestParams.limit"
+                        (change)="changeItemsPerPage(requestParams.limit)">
+                        <option *ngFor="let pageNum of pageCounts" [value]="pageNum">{{ pageNum }}
+                        </option>
                     </select>
                 </label>
             </div>
         </div>
-        <div class="col-sm-12 col-md-9 d-flex align-items-center justify-content-center justify-content-md-end">
-            <pagination-controls
-                [hidden] = "customers.length == 0"
-                (pageChange)="pageChanged($event)"
-                (pageBoundsCorrection)="pageChanged($event)"
-                [maxSize]="setPaginateSize"
-                [previousLabel]="'PREVIOUS' | translate"
-                [nextLabel]="'NEXT' | translate"
-                screenReaderPaginationLabel="Pagination"
-                [screenReaderPageLabel]="'PAGE' | translate">
+        <div
+            class="col-sm-12 col-md-8 d-flex align-items-center justify-content-center justify-content-md-end">
+            <pagination-controls [hidden]="customers.length === 0" (pageChange)="pageChanged($event)"
+                (pageBoundsCorrection)="pageChanged($event)" [maxSize]="setPaginateSize"
+                [previousLabel]="'PREVIOUS' | translate" [nextLabel]="'NEXT' | translate"
+                screenReaderPaginationLabel="Pagination" [screenReaderPageLabel]="'PAGE' | translate">
             </pagination-controls>
         </div>
     </div> -->
-    </div>
-    <div class="d-flex card-body pt-0">
-        <h5 *ngIf='!customers.length && !showLoader'> {{"NO_DATA_FOUND" |translate}}!</h5>
-        <div *ngIf="showLoader" class="spinner-border mx-auto"></div>
-    </div>
-    <div class="card-footer row">
+    <!--<div class="card-footer row">
         <div class="col-md-11">
-            <button type="button" class="btn btn-secondary" (click)="AddCustomer()"> {{ "ADD_CUSTOMER" |
-                translate}}</button>
-        </div>
-        <div class="col-md-1">
+            <button type="button" class="btn btn-secondary" (click)="AddCustomer()"> {{ "ADD_CUSTOMER" | translate}}</button>
+        </div> -->
+        <!-- <div class="col-md-1">
             <button type="button" class="btn btn-secondary" (click)="close({ action: false })"> {{ "CLOSE" |
                 translate}}</button>
-        </div>
-    </div>
+        </div> 
+    </div>-->
 </div>

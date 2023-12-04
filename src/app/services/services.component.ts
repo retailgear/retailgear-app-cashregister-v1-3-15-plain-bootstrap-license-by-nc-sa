@@ -13,7 +13,7 @@ import { MenuComponent } from '../shared/_layout/components/common';
 @Component({
   selector: 'app-services',
   templateUrl: './services.component.html',
-  styleUrls: ['./services.component.sass'],
+  styleUrls: ['./services.component.scss'],
   providers: [BarcodeService]
 })
 export class ServicesComponent implements OnInit, OnDestroy {
@@ -34,8 +34,18 @@ export class ServicesComponent implements OnInit, OnDestroy {
   activities: Array<any> = [];
   businessDetails: any = {};
   userType: any = {};
+  transactionStatuses: Array<any> =  [
+    { key: 'NEW', value: 'new' },
+    { key: 'PROCESSING', value: 'processing' },
+    { key: 'CANCELLED', value: 'cancelled' },
+    { key: 'INSPECTION', value: 'inspection' },
+    { key: 'COMPLETED', value: 'completed' },
+    { key: 'REFUND' , value:'refund'},
+    { key: 'REFUNDINCASHREGISTER', value: 'refundInCashRegister' },
+    { key: 'PRODUCT_ORDERED', value: 'product-ordered' },
+    { key: 'ORDER_READY', value: 'order-ready' },
+  ]
   requestParams: any = {
-    transactionStatuses: ['new', 'processing', 'cancelled', 'inspection', 'completed', 'refund', 'refundInCashRegister'],
     selectedTransactionStatuses: [],
     locations: [],
     selectedLocations: [],
@@ -43,20 +53,25 @@ export class ServicesComponent implements OnInit, OnDestroy {
     iEmployeeId: '',
     iAssigneeId: '',
     searchValue: '',
-    sortBy: { key: '_id', selected: true, sort: 'asc' },
-    sortOrder: 'asc'
+    sortBy:'dCreatedDate',
+    sortOrder: 'asc',
+    skip: 0,
+    limit: 25
   };
-  showLoader: Boolean = false;
-  widgetLog: string[] = [];
-  pageCounts: Array<number> = [10, 25, 50, 100]
-  pageCount: number = 10;
-  pageNumber: number = 1;
-  setPaginateSize: number = 10;
+
+  /* pagination */
+  pageCounts: Array<number> = [10, 25, 50, 100];
+  setPaginateSize = 10; /* how many page number should be shown in pagintaion-control */
   paginationConfig: any = {
-    itemsPerPage: '10',
+    itemsPerPage: 25, 
     currentPage: 1,
     totalItems: 0
   };
+  /* pagination */
+
+  showLoader = false;
+  widgetLog: string[] = [];
+  
   showAdvanceSearch = false;
   transactionMenu = [
     { key: 'REST_PAYMENT' },
@@ -66,8 +81,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
   ];
   iBusinessId: any = '';
   aFilterBusinessPartner: any = [];
-
-  // Advance search fields 
 
   addDays(date: any, days: any) {
     const inputDate = new Date(date);
@@ -82,9 +95,38 @@ export class ServicesComponent implements OnInit, OnDestroy {
     estimate: {
       minDate: undefined,
       maxDate: undefined
-      // minDate: new Date('01-01-2015'),
-      // maxDate: this.addDays(new Date(new Date().setHours(23, 59, 59)), 20),
     }
+  }
+
+  // Function for reset selected filters
+  resetFilters() {
+    this.requestParams.searchValue = "";
+    this.requestParams = {
+      selectedTransactionStatuses: [],
+      locations: [],
+      selectedLocations: [],
+      aSelectedBusinessPartner: [],
+      iEmployeeId: '',
+      iAssigneeId: '',
+      searchValue: '',
+      sortBy:'dCreatedDate',
+      sortOrder: 'asc'
+    };
+    this.selectedWorkstations = [];
+    this.filterDates = {
+      create: {
+        minDate: new Date('01-01-2015'),
+        maxDate: new Date(new Date().setHours(23, 59, 59)),
+      },
+      estimate: {
+        minDate: undefined,
+        maxDate: undefined
+        // minDate: new Date('01-01-2015'),
+        // maxDate: this.addDays(new Date(new Date().setHours(23, 59, 59)), 20),
+      }
+    }
+    this.showAdvanceSearch = false;
+    this.loadTransaction();
   }
 
   paymentMethods: Array<any> = ['All', 'Cash', 'Credit', 'Card', 'Gift-Card'];
@@ -103,6 +145,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
   tableHeaders: Array<any> = [
     { key: 'ACTIVITY_NUMBER', selected: false, sort: '' },
+    {key: 'TRANSACTION_NUMBERS' , disabled: true},
     { key: 'REPAIR_NUMBER', disabled: true },
     { key: 'TYPE', disabled: true },
     { key: 'INTAKE_DATE', selected: false, sort: 'asc' },
@@ -121,8 +164,12 @@ export class ServicesComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private toastrService: ToastService,
     private barcodeService: BarcodeService,
-  ) { }
-  
+  ) {
+    this.iBusinessId = localStorage.getItem('currentBusiness') || '';
+    this.iLocationId = localStorage.getItem('currentLocation') || '';
+    this.userType = localStorage.getItem('type');
+  }
+
   async ngOnInit(): Promise<void> {
     this.apiService.setToastService(this.toastrService);
     this.barcodeService.barcodeScanned.subscribe((barcode: string) => {
@@ -136,37 +183,15 @@ export class ServicesComponent implements OnInit, OnDestroy {
       this.webOrders = true;
       this.requestParams.eType = ['webshop-revenue'] //, 'webshop-reservation'
     }
-    this.businessDetails._id = localStorage.getItem('currentBusiness');
-    this.iLocationId = localStorage.getItem('currentLocation') || '';
-    this.userType = localStorage.getItem('type');
-    this.iBusinessId = localStorage.getItem('currentBusiness');
 
-    this.showLoader = true;
+    // this.showLoader = true;
     if (this.isFor !== "activity") await this.setLocation() /* For web-orders, we will switch to the web-order location otherwise keep current location */
-    this.showLoader = false
     this.loadTransaction();
     this.fetchBusinessDetails();
 
-    const [_locationData, _workstationData, _employeeData]: any = await Promise.all([
-      this.getLocations(),
-      this.getWorkstations(),
-      this.listEmployee()
-    ]);
-
-    if (_locationData.message == 'success') {
-      this.requestParams.locations = _locationData.data.aLocation;
-    }
-
-    if (_workstationData && _workstationData.data) {
-      this.workstations = _workstationData.data;
-    }
-
-    if (_employeeData?.data?.length && _employeeData.data[0]?.result?.length) {
-      this.employees = _employeeData.data[0].result
-    }
-    // setTimeout(() => { 
-    //   MenuComponent.bootstrap();
-    // }, 200);
+    this.getLocations();
+    this.getWorkstations();
+    this.listEmployee();
   }
 
   // Function for handle event of transaction menu
@@ -186,24 +211,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
     return str;
   }
 
-  // getBusinessLocations() {
-  //   // return new Promise<any>((resolve, reject) => {
-  //     return this.apiService.getNew('core', '/api/v1/business/user-business-and-location/list')
-  //       // .subscribe((result: any) => {
-  //       //   if (result.message == "success" && result?.data) {
-  //       //     resolve(result);
-  //       //   }
-  //       //   // resolve(null);
-  //       // }
-  //       // , (error) => {
-  //       //   resolve(error);
-  //       //   console.error('error: ', error);
-  //       // })
-  //   // })
-  // }
-
   getLocations() {
-    return this.apiService.postNew('core', `/api/v1/business/${this.businessDetails._id}/list-location`, {}).toPromise();
+    this.apiService.postNew('core', `/api/v1/business/${this.iBusinessId}/list-location`, {}).subscribe((result:any)=> {
+      this.requestParams.locations = result.data.aLocation;
+    });
   }
 
   async setLocation(sLocationId: string = "") {
@@ -217,32 +228,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
             this.iLocationId = aBusiness.aInLocation.find((location: any) => location.bIsWebshop)?._id || this.iLocationId;
           }
         }
-        // resolve()
-
-        // const aBusinessLocation = _aBusinessLocation.data;
-        // console.log(218, aBusinessLocation)
-        // let oNewLocation: any
-        // let bIsCurrentBIsWebshop = false
-        // for (let k = 0; k < aBusinessLocation?.data?.aBusiness?.length; k++) {
-        //   console.log(222)
-        //   const aAllLocations = aBusinessLocation?.data?.aBusiness[k]
-        //   for (let i = 0; i < aAllLocations?.aLocation?.length; i++) {
-        //     const l = aAllLocations?.aLocation[i];
-        //     if (l.bIsWebshop) oNewLocation = l
-        //     if (l._id.toString() === this.iLocationId) {
-        //       if (l.bIsWebshop) {
-        //         bIsCurrentBIsWebshop = true
-        //         this.iLocationId = l._id.toString()
-        //         break
-        //       }
-        //     }
-        //   }
-        // }
-        // console.log(230, oNewLocation, bIsCurrentBIsWebshop)
-        // if (!bIsCurrentBIsWebshop) {
-        //   this.iLocationId = oNewLocation._id.toString()
-        //   console.log(233, this.iLocationId)
-        // }
         resolve()
       } catch (error) {
         resolve()
@@ -251,21 +236,32 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   getWorkstations() {
-    return this.apiService.getNew('cashregistry', `/api/v1/workstations/list/${this.businessDetails._id}/${this.iLocationId}`).toPromise();
+    this.apiService.getNew('cashregistry', `/api/v1/workstations/list/${this.iBusinessId}/${this.iLocationId}`).subscribe((result:any)=>{
+      if (result && result.data) {
+        this.workstations = result.data;
+      }
+    });
+  }
+  resetThePagination() {
+    this.requestParams.skip = 0;
+    this.paginationConfig.currentPage = 1; 
+    this.requestParams.limit = parseInt(this.paginationConfig.itemsPerPage);
   }
 
-  // Function for update item's per page
-  changeItemsPerPage(pageCount: any) {
-    this.paginationConfig.itemsPerPage = pageCount;
+  changeItemsPerPage() {
+    this.resetThePagination();
     this.loadTransaction();
   }
 
-  // Function for trigger event after page changes
-  pageChanged(page: any) {
-    this.requestParams.skip = (page - 1) * parseInt(this.paginationConfig.itemsPerPage);
-    this.loadTransaction();
-    this.paginationConfig.currentPage = page;
+  
+  // Function for handle page change
+  pageChanged(selctedPage: any) {
+    this.requestParams.skip = (selctedPage - 1) * parseInt(this.paginationConfig.itemsPerPage);
+    this.paginationConfig.currentPage = selctedPage;
+    this.loadTransaction(true);
   }
+
+  
 
 
   //  Function for set sort option on transaction table
@@ -298,16 +294,27 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   listEmployee() {
-    return this.apiService.postNew('auth', '/api/v1/employee/list', { iBusinessId: this.businessDetails._id }).toPromise();
+    this.apiService.postNew('auth', '/api/v1/employee/list', { iBusinessId: this.iBusinessId }).subscribe((result:any)=>{
+      if (result?.data?.length && result.data[0]?.result?.length) {
+        this.employees = result.data[0].result
+      }
+    });
   }
 
   openActivities(activity: any, openActivityId?: any) {
     if (this.webOrders) {
       let isFrom = this.router.url.includes('/business/webshop-orders') ? 'web-orders' : 'web-reservations';
-      this.dialogService.openModal(WebOrderDetailsComponent, { cssClass: 'w-fullscreen', context: { activity, businessDetails: this.businessDetails, from: isFrom } })
-        .instance.close.subscribe(result => {
-          if (this.webOrders && result) this.router.navigate(['business/till']);
-        });
+      this.dialogService.openModal(WebOrderDetailsComponent, { 
+        cssClass: 'w-fullscreen mt--5', 
+        context: { 
+          activity, 
+          businessDetails: this.businessDetails, 
+          from: isFrom 
+        },
+        hasBackdrop: true 
+      }).instance.close.subscribe(result => {
+        if (this.webOrders && result) this.router.navigate(['business/till']);
+      });
     } else {
       this.dialogService.openModal(ActivityDetailsComponent, {
         cssClass: 'w-fullscreen mt--5',
@@ -320,7 +327,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
           openActivityId,
           items: false,
           webOrders: this.webOrders,
-          from: 'services'
+          from: 'services',
+          employeesList: this.employees
         }
       }).instance.close.subscribe(result => {
         if (this.webOrders && result) this.router.navigate(['business/till']);
@@ -328,7 +336,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadTransaction() {
+  loadTransaction(isPageChanged?: boolean) {
     if (this.router.url.includes('/business/webshop-orders')) {
       this.webOrders = true;
       this.requestParams.eType = ['webshop-revenue']
@@ -340,12 +348,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
       if (this.iLocationId) this.requestParams.iLocationId = this.iLocationId
     }
     this.activities = [];
-    this.requestParams.iBusinessId = this.businessDetails._id;
-    this.requestParams.skip = this.requestParams.skip || 0;
-    this.requestParams.limit = this.paginationConfig.itemsPerPage || 50;
+    if (this.requestParams.sSearchValue && !isPageChanged) this.resetThePagination();
+    this.requestParams.iBusinessId = this.iBusinessId;
     this.requestParams.importStatus = this.importStatus == 'all' ? undefined : this.importStatus;
     // if (this.iLocationId && !this.requestParams.selectedLocations?.length) this.requestParams.selectedLocations.push(this.requestParams.selectedLocations);
-    this.showLoader = true;
 
     this.requestParams.estimateDate = {
       minDate: this.filterDates.estimate.minDate,
@@ -355,9 +361,17 @@ export class ServicesComponent implements OnInit, OnDestroy {
       minDate: this.filterDates.create.minDate,
       maxDate: this.filterDates.create.maxDate,
     }
+    this.requestParams.searchValue = this.requestParams.searchValue.trim();
+    this.showLoader = true;
+    this.activities = [];
     this.apiService.postNew('cashregistry', '/api/v1/activities', this.requestParams).subscribe((result: any) => {
-      if (result?.data?.length) this.activities = result?.data;
-      else this.activities = [];
+      if (result?.data?.length){
+        this.activities = result?.data.map((item:any) => {
+          this.setBagNumber(item);
+          return item;
+        });
+
+      }
       if (result?.aUniqueBusinessPartner && !this.aFilterBusinessPartner?.length) this.aFilterBusinessPartner = result.aUniqueBusinessPartner;
       this.paginationConfig.totalItems = result?.count;
       this.getCustomers();
@@ -369,6 +383,16 @@ export class ServicesComponent implements OnInit, OnDestroy {
     }, (error) => {
       this.showLoader = false;
     })
+  }
+
+  setBagNumber(item: any) {
+    let aBagNumber: any = [];
+    if (item?.aActivityItemMetaData?.length) {
+      item?.aActivityItemMetaData.forEach((detail: any) => {
+        if (detail?.sBagNumber && detail.sBagNumber != undefined) aBagNumber.push(detail?.sBagNumber);
+      });
+    }
+    item.sBagNumbers = aBagNumber;
   }
 
   getCustomers() {
@@ -384,11 +408,14 @@ export class ServicesComponent implements OnInit, OnDestroy {
         const customers = result.data[0].result || [];
         for (let i = 0; i < this.activities.length; i++) {
           for (let j = 0; j < customers.length; j++) {
+            if (this.activities[i]?.oCustomer?._id) continue;
             if (this.activities[i]?.iCustomerId?.toString() == customers[j]?._id?.toString()) {
               this.activities[i].oCustomer = {
                 sFirstName: customers[j].sFirstName,
                 sPrefix: customers[j].sPrefix,
-                sLastName: customers[j].sLastName
+                sLastName: customers[j].sLastName,
+                sCompanyName: customers[j]?.sCompanyName,
+                bIsCompany: customers[j]?.bIsCompany
               }
             }
           }
@@ -408,7 +435,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
       this.toastrService.show({ type: 'success', text: 'Barcode detected: ' + barcode })
       // activityitem.find({sNumber: barcode},{eTransactionItem.eKind : 1})
       let oBody: any = {
-        iBusinessId: this.businessDetails._id,
+        iBusinessId: this.iBusinessId,
         oFilterBy: {
           sNumber: barcode
         }
@@ -419,7 +446,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
         const iActivityId = activityItemResult?.data[0].result[0].iActivityId;
         const iActivityItemId = activityItemResult?.data[0].result[0]._id;
         oBody = {
-          iBusinessId: this.businessDetails._id,
+          iBusinessId: this.iBusinessId,
           oFilterBy: {
             _id: iActivityId
           }
@@ -432,7 +459,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
     } else if (barcode.startsWith("A")) {
       this.toastrService.show({ type: 'success', text: 'Barcode detected: ' + barcode })
       let oBody = {
-        iBusinessId: this.businessDetails._id,
+        iBusinessId: this.iBusinessId,
         oFilterBy: {
           sNumber: barcode
         }
@@ -447,7 +474,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
     } else if (barcode.startsWith("G")) {
       this.toastrService.show({ type: 'success', text: 'Barcode detected: ' + barcode })
       let oBody: any = {
-        iBusinessId: this.businessDetails._id,
+        iBusinessId: this.iBusinessId,
         oFilterBy: {
           sGiftCardNumber: barcode.substring(2)
         }
@@ -461,9 +488,11 @@ export class ServicesComponent implements OnInit, OnDestroy {
     } else if (barcode.startsWith("R")) {
       // activityitem.find({sRepairNumber: barcode},{eTransactionItem.eKind : 1})
     } else if (barcode.startsWith("T")) {
-      this.toastrService.show({ type: 'warning', text: 'Please go to different page to process this barcode !' })
+      this.requestParams.searchValue = barcode;
+      this.loadTransaction();
+    } else {
+      this.toastrService.show({ type: 'warning', text: 'Please go to different page to process this barcode!' })
     }
-    console.log('barcode ', barcode);
   }
 
   openCardsModal(oGiftcard?: any, oCustomer?: any) {

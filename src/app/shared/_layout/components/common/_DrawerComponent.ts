@@ -88,6 +88,11 @@ class DrawerComponent {
     });
   }
 
+  public static clearEverything = () => {
+    // DataUtil.store.clear();
+    // DOMEventHandlerUtil.store.clear();
+  }
+
   // Dismiss instances
   public static handleDismiss = () => {
     // External drawer toggle handler
@@ -137,6 +142,18 @@ class DrawerComponent {
     DrawerComponent.hideAll();
     DrawerComponent.updateAll();
     DrawerComponent.handleDismiss();
+    DrawerComponent.checkToShow();
+  }
+
+  public static checkToShow = () => {
+    const elements = document.body.querySelectorAll('[data-kt-drawer="true"]');
+    elements.forEach((el) => {
+      const item = el as HTMLElement;
+      const instance = DrawerComponent.getInstance(item);
+      if (instance.name === 'explore') {
+        instance.show();
+      }
+    });
   }
 
   private _handlers = () => {
@@ -264,6 +281,12 @@ class DrawerComponent {
 
   private _createOverlay = () => {
     if (this._getOption('overlay') === true) {
+      const overlays = document.getElementsByClassName('drawer-overlay') || [];
+      if(overlays?.length) {
+        this.overlayElement = overlays[0] as HTMLElement;
+        this._deleteOverlay();
+      } 
+      
       this.overlayElement = document.createElement('DIV');
       const elementZIndex = getCSS(this.element, 'z-index');
       if (elementZIndex) {
@@ -274,7 +297,7 @@ class DrawerComponent {
       const overlayClassOption = this._getOption('overlay-class');
       if (overlayClassOption) {
         this.overlayElement.classList.add(overlayClassOption.toString());
-      }
+      }     
       this.overlayElement.addEventListener('click', (e) => {
         e.preventDefault();
         this._hide();

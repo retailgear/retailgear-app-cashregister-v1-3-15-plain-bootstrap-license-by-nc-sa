@@ -1,16 +1,14 @@
 import { Component, Input, OnInit, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
-import { ToastService } from 'src/app/shared/components/toast';
-import { ApiService } from 'src/app/shared/service/api.service';
+import { ToastService } from '../../shared/components/toast';
+import { ApiService } from '../../shared/service/api.service';
 import { faTimes, faSync } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-customer-details-import',
   templateUrl: './customer-details-import.component.html',
-  styleUrls: ['./customer-details-import.component.sass']
+  styleUrls: ['./customer-details-import.component.scss']
 })
 export class CustomerDetailsImportComponent implements OnInit, OnChanges {
-
-
   @Input() customerDetailsForm: any;
   @Output() customerDetailsFormChange: EventEmitter<any> = new EventEmitter();
   @Input() updateTemplateForm: any;
@@ -27,7 +25,7 @@ export class CustomerDetailsImportComponent implements OnInit, OnChanges {
   overwriteForFields: Array<string> = [];
   ifUndefinedForFields: Array<string> = [];
   appendForFields: Array<string> = [];
-
+  iBusinessId: any = localStorage.getItem('currentBusiness');
 
   allFields: any = {
     first: [],
@@ -43,6 +41,12 @@ export class CustomerDetailsImportComponent implements OnInit, OnChanges {
     { name: 'FRENCH', key: 'fr' },
     { name: 'SPANISH', key: 'es' }
   ]
+  aActionHeaders: Array<any> = [
+    { key: 'DO_NOTHING', value: 'do-nothing' },
+    { key: 'OVERWRITE', value: 'overwrite' },
+    { key: 'ADD_IF_UNDEFINED', value: 'add-if-undefined' },
+    { key: 'APPEND', value: 'append' }
+  ]
 
   constructor(
     private apiService: ApiService,
@@ -56,17 +60,22 @@ export class CustomerDetailsImportComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (this.parsedCustomerData && this.parsedCustomerData.length > 0) {
+      this.allFields.all = [];
       this.headerOptions = Object.keys(this.parsedCustomerData[0]);
       this.customerDetailsForm = {};
       this.updateTemplateForm = {};
-      this.headerOptions.filter((option: any) => this.updateTemplateForm[option] = 'overwrite');
       this.getDynamicFields(false);
     }
+  }
+
+  onSetAttribute(option:any){
+    this.updateTemplateForm[option] = 'overwrite';
   }
 
   // Function for get dynamic field
   getDynamicFields(isResetAttributes: boolean) {
     let filter = {
+      iBusinessId: this.iBusinessId,
       oFilterBy: {
         "sName": "IMPORT_CUSTOMER_DETAILS"
       }
@@ -82,6 +91,7 @@ export class CustomerDetailsImportComponent implements OnInit, OnChanges {
         this.allFields['all'].filter((field: any) => {
           if (this.headerOptions.indexOf(field.sKey) > -1) {
             this.customerDetailsForm[field.sKey] = field.sKey;
+            this.updateTemplateForm[field.sKey] = 'overwrite';
           }
         });
       }
@@ -114,6 +124,13 @@ export class CustomerDetailsImportComponent implements OnInit, OnChanges {
 
   // Function for go to step(next / previous)
   gotoStep(step: string) {
+    if(step == 'previous') 
+    {
+      this.updateTemplateForm = {};
+      this.customerDetailsForm = {};
+      this.parsedCustomerData = [];
+      this.allFields.all = [];
+    }
     if (Object.keys(this.customerDetailsForm).length != this.headerOptions.length) {
       this.toasterService.show({ type: 'danger', text: 'You have not set some of the attributes exist in file.' });
     }

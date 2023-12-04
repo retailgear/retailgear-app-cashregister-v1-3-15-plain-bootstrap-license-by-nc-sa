@@ -27,9 +27,15 @@ export class DialogService {
     // Attach to the view so that the change detector knows to run
     this.applicationRef.attachView(dialogComponentRef.hostView);
 
+    
     // Listen to the close event
-    dialogComponentRef.instance.close.subscribe(() => {      
-      document.body.removeChild(popup);
+    dialogComponentRef.instance.close.subscribe(() => {
+      if(document.body.contains(popup)) document.body.removeChild(popup);
+      this.applicationRef.detachView(dialogComponentRef.hostView);
+    });
+
+    document.addEventListener('token-expired', () => {
+      if (document.body.contains(popup)) document.body.removeChild(popup);
       this.applicationRef.detachView(dialogComponentRef.hostView);
     });
 

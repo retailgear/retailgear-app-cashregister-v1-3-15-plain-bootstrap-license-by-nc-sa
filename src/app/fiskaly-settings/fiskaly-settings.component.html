@@ -1,56 +1,62 @@
-<div class="card mb-5 mb-xl-10 d-flex">
-    <div class="card-header row">
+<div class="container p-4">
+    <div class="card py-2">
+        <div class="card-header bg-white py-3 px-4">
         <div class="card-title">
             <span>{{'FISKALY_SETTINGS' | translate}}</span>
-            <!-- <span>{{'LOYALITY_POINTS_PROGRAM' | translate}}</span> -->
         </div>
     </div>
 
-    <div class="card-body">
-        <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
+    <td class="card-body px-5">
+        <table class="table table-hover dataTable">
             <thead class="fw-bold">
                 <tr>
-                    <div class="row">
-                        <div class="col-3 fw-bold">
-                            <span>{{ 'LOCATION' | translate}}</span>
-                        </div>
-                        <div class="col-3">
-                            <span>{{ 'TSS_ID' | translate}}</span>
-                        </div>
-                        <div class="col-3">
-                            <span>{{ 'TSS_STATE' | translate}}</span>
-                        </div>
-                        <div class="col-3">
-                            <span>{{ 'ACTIONS' | translate}}</span>
-                        </div>
-                    </div>
+                    <th class="col-3 fw-bold">{{ 'LOCATION' | translate}}</th>
+                    <th class="col-3">{{ 'TSS_ID' | translate}}</th>
+                    <th class="col-3">{{ 'TSS_STATE' | translate}}</th>
+                    <th class="col-3">{{ 'ACTIONS' | translate}}</th>
+
                 </tr>
             </thead>
             <tbody class="fw-bold">
-                <tr class="bg-hover-secondary">
-                    <div class="row" *ngFor="let location of businessDetails.aLocation; index as i">
-                        <div class="col-3">
-                            <label>{{location.sName}}</label>
-                        </div>
-                        <div class="col-3">
-                            <label>{{location.tssInfo ?location.tssInfo._id: 'NA'}}</label>
-                        </div>
-                        <div class="col-3">
-                            <label>{{location.tssInfo ? location.tssInfo.state: 'NA'}}</label>
-                        </div>
-                        <div class="col-3">
-                            <button *ngIf="!location.tssInfo" class="btn btn-primary"
-                                (click)="createTSS(location._id, i)">{{ "CREATE_TSS" |translate}}</button>
-                            <label *ngIf="location.tssInfo"
-                                class="form-check form-switch form-check-custom form-check-solid">
-                                <input type="checkbox" [(ngModel)]="location.tssEnabled" name="loyaltyProgram"
-                                    (ngModelChange)="changeState(location, location.tssEnabled, i)"
-                                    class="form-check-input">
-                            </label>
-                        </div>
-                    </div>
+                <tr *ngIf="fetchingTss">
+                    <td colspan="4" class="text-center">
+                        <div class="spinner-border"></div>
+                    </td>
                 </tr>
+                <ng-container *ngIf="businessDetails?.aLocation?.length && !fetchingTss">
+                    <tr class="cursor-pointer" *ngFor="let location of businessDetails.aLocation; index as i"
+                        [ngClass]="{'opacity-50': location.bUpdatingState}">
+                        <td class="col-3">
+                            <label>{{location.sName}}</label>
+                        </td>
+                        <td class="col-3">
+                            <label>{{location.tssInfo ?location.tssInfo._id: 'NA'}}</label>
+                        </td>
+                        <td class="col-3">
+                            <label *ngIf="location.tssInfo else na">{{ (location.tssEnabled) ? location.tssInfo.state :
+                                'DISABLED' }}</label>
+                        </td>
+                        <td class="col-3">
+                            <div *ngIf="!location.tssInfo">
+                                <button class="btn btn-primary" (click)="createTSS(location, i)">{{"CREATE_TSS"
+                                    |translate}}</button>
+                            </div>
+                            <div class="d-flex" *ngIf="location.tssInfo">
+                                <label class="form-check form-switch form-check-custom form-check-solid">
+                                    <input type="checkbox" [(ngModel)]="location.tssEnabled" class="form-check-input"
+                                        (ngModelChange)="changeState(location, location.tssEnabled, i)">
+                                </label>
+                                <button class="btn btn-danger btn-sm ms-3" (click)="removeTSS(location)"><i class="fa fa-trash"></i></button>
+                            </div>
+
+                        </td>
+                        <div class="center-row-abs" *ngIf="location.bUpdatingState">
+                            <div class="spinner-border"></div>
+                        </div>
+                    </tr>
+                    <ng-template #na>{{'NA'}}</ng-template>
+                </ng-container>
             </tbody>
         </table>
-    </div>
+</div>
 </div>

@@ -1,14 +1,14 @@
 import { Component, OnInit, ViewContainerRef } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { ToastService } from 'src/app/shared/components/toast';
-import { ApiService } from 'src/app/shared/service/api.service';
-import { DialogComponent } from 'src/app/shared/service/dialog';
-import { PrintService } from 'src/app/shared/service/print.service';
+import { ToastService } from '../../shared/components/toast';
+import { ApiService } from '../../shared/service/api.service';
+import { DialogComponent } from '../../shared/service/dialog';
+import { PrintService } from '../../shared/service/print.service';
 
 @Component({
   selector: 'app-printer-tool',
   templateUrl: './printer-tool.component.html',
-  styleUrls: ['./printer-tool.component.sass']
+  styleUrls: ['./printer-tool.component.scss']
 })
 export class PrinterToolComponent implements OnInit {
   dialogRef: DialogComponent;
@@ -27,6 +27,7 @@ export class PrinterToolComponent implements OnInit {
   iLocationId = ''
   iWorkstationId !: any;
   labelPrintSettings !: any;
+  businessDetails: any;
 
   constructor(
     private viewContainerRef: ViewContainerRef,
@@ -41,7 +42,7 @@ export class PrinterToolComponent implements OnInit {
     this.iBusinessId = localStorage.getItem('currentBusiness') || '';
     this.iLocationId = localStorage.getItem('currentLocation') || '';
     this.iWorkstationId = localStorage.getItem("currentWorkstation") || '';
-    this.getPrintSetting()
+    this.getPrintSetting();
   }
   close(data: any) {
     this.dialogRef.close.emit(data);
@@ -52,13 +53,20 @@ export class PrinterToolComponent implements OnInit {
       this.toastService.show({ type: 'danger', text: 'Check your business -> printer settings' });
       return;
     }
-    const printRawContentResult: any = await this.printService.printRawContent(this.iBusinessId, this.zplCode, this.labelPrintSettings?.nPrinterId, this.labelPrintSettings?.nComputerId, 1, { title: 'Print label' }, '')
-    if (printRawContentResult) {
+    const printRawContentResult: any = await this.printService.printRawContent(this.iBusinessId, this.zplCode, this.labelPrintSettings?.nPrinterId, this.labelPrintSettings?.nComputerId, 1, 'Print label', { title: "Print Title" }, this.businessDetails.oPrintNode.sApiKey)
+    console.log(printRawContentResult);
+    if (printRawContentResult.status != 'PRINTJOB_NOT_CREATED') {
       this.toastService.show({
         type: 'success',
         title: 'deviceStatus: ' + printRawContentResult?.deviceStatus,
         text: printRawContentResult?.status
-      })
+      });
+    }else{
+      this.toastService.show({
+        type: 'danger',
+        title: 'deviceStatus: ' + printRawContentResult?.deviceStatus,
+        text: printRawContentResult?.status
+      });
     }
   }
   clear() {
@@ -70,10 +78,13 @@ export class PrinterToolComponent implements OnInit {
 
   // Function for get print settings
   getPrintSetting() {
-    this.apiService.getNew('cashregistry', `/api/v1/print-settings/${this.iBusinessId}/${this.iWorkstationId}/labelDefinition/default`).subscribe(
+    /*Are we opening this modal with other types? e.g. TSPL WIP*/
+    let type = 'zpl';
+    this.apiService.getNew('cashregistry', `/api/v1/print-settings/${this.iBusinessId}/${this.iWorkstationId}/labelDefinition/${type}`).subscribe(
       (result: any) => {
         if (result?.data?._id) {
           this.labelPrintSettings = result?.data;
+          console.log(this.labelPrintSettings);
         } else {
           this.toastService.show({ type: 'danger', text: 'Check your business -> printer settings' });
         }

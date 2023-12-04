@@ -1,227 +1,644 @@
-<div class="card mb-5 mb-xl-10 d-flex" data-kt-scroll-section="cash-settings">
-  <div class="card-header row">
-    <div class="card-title">
-      <div class="col-md-9">
-        <span>{{ 'CASH_REGISTER' | translate}}</span>
-      </div>
-    </div>
-  </div>
-  <div class="card-body border-bottom">
-    <div class="row">
-      <div class="col-md-2">
-        <label class="form-check form-switch form-check-custom form-check-solid">{{ 'BOOK_KEEPING_MODE' |
-          translate}}</label>
-      </div>
-      <div class="col-md-1">
-        <label class="form-check form-switch form-check-custom form-check-solid">
-          <input type="checkbox" class="form-check-input" [(ngModel)]="bookKeepingMode"
-            (click)="bookKeepingMode = !bookKeepingMode; updateBookkeepingSetting(bookKeepingMode)">
-        </label>
-      </div>
-    </div>
-    <div class="mt-3">
-      <form name="thermalPrinterForm">
-        <div class="row mb-5">
-          <div class="col-6">
-            <label for="line_n">{{"LAST_RECEIPT_NUMBER" | translate}}</label>
-            <input type="number" id="line_n" name="line_n" class="form-control"
-              [(ngModel)]="settings.nLastReceiptNumber"
-              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');">
-          </div>
-          <div class="col-6">
-            <label for="line_l">{{"LAST_INVOICE_NUMBER" | translate}}</label>
-            <input type="number" id="line_l" name="line_l" class="form-control"
-              [(ngModel)]="settings.nLastInvoiceNumber"
-              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');">
-          </div>
+<div class="container p-4">
+  <div class="card py-2 mb-5" data-kt-scroll-section="cash-settings">
+    <div class="card-header bg-white py-3 px-4">
+      <div class="card-title">
+        <div class="col-md-9">
+          <h2 class="fw-bolder m-0">{{ 'CASH_REGISTER' | translate}}</h2>
         </div>
+      </div>
+    </div>
+    <div class="card-body">
 
-        <div class="row mb-5">
-          <p>{{"I_WANT_TO_CLOSE_MY_CASHR_BY" | translate}}</p>
-          <div class="col-3">
-            <label class="btn btn-outline btn-outline-dashed btn-outline-default active d-flex text-start p-3"
-              data-kt-button="true" [ngClass]="{'active': settings.sDayClosurePeriod == 'week'}">
-              <!--begin::Radio button-->
-              <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
-                <input class="form-check-input" type="radio" name="sDayClosurePeriod" value="week"
-                  [(ngModel)]="settings.sDayClosurePeriod" />
-              </span>
-              <!--end::Radio button-->
-              <span class="ms-5">
-                <span class="fs-6 fw-bolder mb-1 d-block">{{"WEEK" | translate}}</span>
-                <!-- <span class="fw-bold fs-7 text-gray-600"></span> -->
-              </span>
+      <div class="row d-flex justify-content-between px-2">
+        <div class="col-6 d-flex flex-column justify-content-between">
+          <div class="form-field">
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              {{ 'BOOK_KEEPING_MODE' | translate}} - CV1.3.15
+            </label>
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              <input type="checkbox" class="form-check-input" [(ngModel)]="bookKeepingMode"
+                (click)="bookKeepingMode = !bookKeepingMode; updateBookkeepingSetting(bookKeepingMode)">
             </label>
           </div>
 
-          <div class="col-3">
-            <label class="btn btn-outline btn-outline-dashed btn-outline-default active d-flex text-start p-3"
-              data-kt-button="true" [ngClass]="{'active': settings.sDayClosurePeriod == 'day'}">
-              <!--begin::Radio button-->
-              <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
-                <input class="form-check-input" type="radio" name="sDayClosurePeriod" value="day"
-                  [(ngModel)]="settings.sDayClosurePeriod" />
-              </span>
-              <!--end::Radio button-->
-              <span class="ms-5">
-                <span class="fs-6 fw-bolder mb-1 d-block">{{"DAY" | translate}}</span>
-                <!-- <span class="fw-bold fs-7 text-gray-600"></span> -->
-              </span>
+          <div class="form-field">
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              {{ 'OPEN_DRAWER_ON_CASH_PAYMENT'|translate}}
+            </label>
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              <input type="checkbox" class="form-check-input" [(ngModel)]="settings.bOpenCashDrawer">
+            </label>
+          </div>
+
+          <div class="form-field">
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              {{ 'LOCK_CASH_REGISTER_AFTER_EACH_TRANSACTION' | translate}}
+            </label>
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              <input type="checkbox" class="form-check-input" [(ngModel)]="settings.bLockCashRegisterAfterTransaction">
+            </label>
+          </div>
+
+          <div class="form-field">
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              {{ 'ENABLE_CASH_REGISTER_FOR_GENERAL_PROFILE' | translate}}
+            </label>
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              <input type="checkbox" class="form-check-input" [(ngModel)]="settings.bEnableCashRegisterForGeneral">
+            </label>
+          </div>
+
+          <div class="form-field">
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              {{ 'OPEN_FORM_WHEN_SELECTING_PRODUCT' | translate}}
+            </label>
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              <input type="checkbox" class="form-check-input" [(ngModel)]="settings.bShowForm">
             </label>
           </div>
         </div>
 
-        <div class="d-flex justify-content-end align-items-center">
-          <div *ngIf="updatingSettings" class="spinner-border mx-2"></div>
-          <button type="submit" class="btn btn-primary mt-4 float-end" (click)="updateSettings($event)">
-            {{"SAVE" | translate}}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div class="card-body p-9 border-bottom" data-kt-scroll-section="payment-methods">
-    <div class="card-title fw-bold row">
-      <div class="col-md-10">
-        <span class="fw-bold">
-          <h3>{{ 'PAYMENT_METHODS' | translate}}</h3>
-        </span>
-      </div>
-      <div class="col-md-2">
-        <button class="btn btn-primary float-end" (click)="createPaymentMethod()">{{ 'NEW' | translate}}</button>
-      </div>
-    </div>
-    <div *ngIf="payMethods.length" class="dataTables_wrapper dt-bootstrap4 no-footer">
-      <div class="table-responsive">
-        <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
-          <thead class="fw-bold">
-            <tr>
+        <div class="col-6">
+          <div class="row">
+            <div class="m-0">
               <div class="row">
-                <div class="col-md-8 fw-bold">
-                  <span>{{ 'NAME' | translate}}</span>
+                <div class="col-6 mb-5">
+                  <label>{{"LAST_RECEIPT_NUMBER" | translate}}</label>
+                  <input type="number" id="line_n" name="line_n" class="form-control"
+                    [(ngModel)]="settings.nLastReceiptNumber"
+                    oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');">
                 </div>
-                <div class="col-md-3">
-                  <span *ngIf="bookKeepingMode">{{ 'LEDGER_NUMBER' | translate}}</span>
-                </div>
-                <div class="col-md-1">
-                  <span>{{ 'DELETE' | translate}}</span>
+                <div class="col-6 mb-5">
+                  <label for="line_l">{{"LAST_INVOICE_NUMBER" | translate}}</label>
+                  <input type="number" id="line_l" name="line_l" class="form-control"
+                    [(ngModel)]="settings.nLastInvoiceNumber"
+                    oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');">
                 </div>
               </div>
-            </tr>
-          </thead>
-          <tbody class="fw-bold">
-            <tr *ngFor="let method of payMethods" class="bg-hover-secondary">
-              <div class="row">
-                <div class="col-md-8" (click)="viewDetails(method)">
-                  <label>{{method.sName}}</label>
-                </div>
-                <div class="col-md-3">
-                  <input type="number" *ngIf="bookKeepingMode" class="form-control form-control-solid"
-                    [(ngModel)]="method.sLedgerNumber" (focusout)="updateLedgerNumber(method)" />
-                </div>
-                <div class="col-md-1 text-gray-500" (click)="deleteMethod(method)">
-                  <fa-icon icon="trash"></fa-icon>
-                </div>
-              </div>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="d-flex">
-      <h5 *ngIf='!payMethods.length && !payMethodsLoading'>{{ 'NO_DATA_FOUND' | translate}}</h5>
-      <div *ngIf="payMethodsLoading" class="spinner-border mx-auto"></div>
-    </div>
-  </div>
-  <div class="card-body" data-kt-scroll-section="quick-buttons">
-    <div class="card-title fw-bold row">
-      <div class="col-md-8">
-        <span class="fw-bold">
-          <h3>{{ 'QUICK_BUTTONS' | translate}}</h3>
-        </span>
-      </div>
-      <div class="col-md-3">
-        <button class="btn btn-primary float-end" (click)="saveFavourites($event)">{{ 'SAVE_SEQUENCE' |
-          translate}}</button>
-      </div>
-      <div class="col-md-1">
-        <button class="btn btn-primary float-end" (click)="createFavourite()">{{ 'NEW' | translate}}</button>
-      </div>
-    </div>
-    <div class="">
-      <div *ngIf="quickButtonsLoading" class="spinner-border mx-auto"></div>
-      <h5 *ngIf='!quickButtons.length && !quickButtonsLoading'>{{ 'NO_DATA_FOUND' | translate}}</h5>
-      <ul *ngIf="quickButtons.length && !quickButtonsLoading" class="list-group">
-        <li class="list-group-item" *ngFor="let button of quickButtons; let i = index">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <span class="d-flex justify-content-start align-items-center my-3">
-                <h4 class="text-gray-800 fw-bold fs-6 lh-1 text-center mb-0">{{button.sName}}</h4>
-                <span class="text-gray-600 mx-3"> ({{button.nPrice | currency: '€'}})</span>
-                <!-- todo: color per quick button <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span> -->
-              </span>
-            </div>
-            <div>
-              <button class="btn p-3 hover" (click)="shiftQuickButton('up', i)">
-                <i class="fa fa-arrow-up"></i>
-              </button>
-              <button class="btn p-3 hover" (click)="shiftQuickButton('down', i)">
-                <i class="fa fa-arrow-down"></i>
-              </button>
-              <button class="btn p-3 hover" (click)="editQuickButton(button)">
-                <i class="fa fa-edit"></i>
-              </button>
-              <button class="btn p-3 hover" (click)="removeQuickButton(button)">
-                <i class="fa fa-trash" style="color:red"></i>
-              </button>
             </div>
           </div>
-        </li>
-      </ul>
-    </div>
+        </div>
+      </div>
 
-  </div>
-</div>
-<div class="card" *ngIf="bookKeepingMode">
-  <div class="card-header row mt-4">
-    <div class="col-md-4">
-      <div class="d-flex align-items-center position-relative my-2">
-        <span class="svg-icon svg-icon-4 position-absolute ms-4">
-          <fa-icon icon="search"></fa-icon>
-        </span>
-        <input type="text" class="form-control form-control-solid w-250px ps-14" (value)="searchValue"
-          [(ngModel)]="searchValue" (change)="getGeneralLedgerNumber()" placeholder="SEARCH">
-        <button class="btn btn-primary ms-xl-1" title="{{'RELOAD_THIS_PAGE' | translate}}">
-          <fa-icon icon="sync"></fa-icon>
+      <div class="row mb-5 px-5" *ngIf="settings?.currentLocation">
+
+        <div class="col-6">
+          <div class="box">
+            <h4 class="fw-bolder">{{'BAG_NUMBER' | translate}}</h4>
+
+            <div class="d-flex align-items-center mb-3">
+              <label class="col-2 me-2">{{"PREFIX" | translate}}</label>
+              <input type="text" class="form-control" [(ngModel)]="settings.currentLocation.sPrefix">
+              <label class="col-3 mx-2">{{"LAST_BAG_NUMBER" | translate}}</label>
+              <input type="number" class="form-control" [(ngModel)]="settings.currentLocation.nLastBagNumber">
+            </div>
+
+            <div class="form-field">
+              <label>{{ 'AUTO_INCREMENT' | translate}}</label>
+              <label class="form-check form-switch form-check-custom form-check-solid">
+                <input type="checkbox" class="form-check-input"
+                  [(ngModel)]="settings.currentLocation.bAutoIncrementBagNumbers">
+              </label>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <label>{{ 'PREFILL_IN_CASH_REGISTER' | translate}}</label>
+              <label class="form-check form-switch form-check-custom form-check-solid">
+                <input type="checkbox" class="form-check-input"
+                  [(ngModel)]="settings.currentLocation.bPrefillBagNumbers">
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="box">
+            <h4 class="fw-bolder">{{'SHOW_IN_CASH_REGISTER' | translate}}</h4>
+
+            <div class="form-field">
+              <label>{{"ORDER" | translate}}</label>
+              <label class="form-check form-switch form-check-custom form-check-solid">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="settings.bShowOrder">
+              </label>
+            </div>
+
+            <div class="form-field">
+              <label class="form-check form-switch form-check-custom form-check-solid">{{"GOLD_PURCHASE" |
+                translate}}</label>
+              <label class="form-check form-switch form-check-custom form-check-solid">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="settings.bShowGoldPurchase">
+              </label>
+            </div>
+
+            <div class="form-field">
+              <label class="form-check form-switch form-check-custom form-check-solid">{{"OPEN_DRAWER" |
+                translate}}</label>
+              <label class="form-check form-switch form-check-custom form-check-solid">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="settings.bShowOpenDrawer">
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row mt-3 px-5" *ngIf="settings?.currentLocation">
+        <div class="col-6">
+          <div class="box h-100">
+            <h4 class="fw-bolder">{{'PREFILL' | translate}}</h4>
+            <div class="form-field">
+              <label>{{ 'ARTICLE_GROUP_NAME' | translate}}</label>
+              <label class="form-check form-switch form-check-custom form-check-solid">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="settings.currentLocation.bArticleGroup">
+              </label>
+            </div>
+
+            <div class="form-field">
+              <label>{{ 'LABEL_DESCRIPTION' | translate }}</label>
+              <label class="form-check form-switch form-check-custom form-check-solid">
+                <input type="checkbox" class="form-check-input"
+                  [(ngModel)]="settings.currentLocation.bLabelDescription">
+              </label>
+            </div>
+
+            <div class="form-field">
+              <label>{{ 'PRODUCT_NUMBER' | translate}}</label>
+              <label class="form-check form-switch form-check-custom form-check-solid">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="settings.currentLocation.bProductNumber">
+              </label>
+            </div>
+
+            <div class="form-field">
+              <label>{{ 'PRODUCT_NAME' | translate}}</label>
+              <label class="form-check form-switch form-check-custom form-check-solid">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="settings.currentLocation.bProductName">
+              </label>
+            </div>
+
+            <div class="form-field">
+              <label>{{ 'DIAMOND_DETAILS' | translate}}</label>
+              <label class="form-check form-switch form-check-custom form-check-solid">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="settings.currentLocation.bDiamondDetails">
+              </label>
+            </div>
+
+            <div class="form-field">
+              <label>{{"DESCRIPTION_FIELD" | translate}}</label>
+              <ng-select class="w-100 ms-5" [multiple]="true" [clearable]="true"
+                [(ngModel)]="settings.aDescriptionFieldToPrefill" placeholder="{{ 'SELECT' | translate }}">
+                <ng-option value="sInternalDescription">{{ 'INTERNAL_DESCRIPTION' | translate}} </ng-option>
+                <ng-option value="oShortDescription">{{ 'SHORT_DESCRIPTION' | translate}} </ng-option>
+                <ng-option value="sDiamond">{{ 'DIAMOND' | translate}} </ng-option>
+              </ng-select>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="box mb-5">
+            <h4 class="fw-bolder">{{'DEFAULT_ARTICLE_GROUP' | translate}}</h4>
+
+            <div class="form-field">
+              <label class="w-50">{{ "ORDER" | translate }}</label>
+              <ng-select class="form-control form-control-solid p-0" [clearable]="false"
+                [(ngModel)]="settings.iDefaultArticleGroupForOrder">
+                <ng-option *ngFor="let article of articleGroupList" [value]="article._id">
+                  {{article?.oName[selectedLanguage]}} </ng-option>
+              </ng-select>
+            </div>
+
+            <div class="form-field">
+              <label class="w-50">{{"REPAIR" | translate}}</label>
+              <ng-select class="form-control form-control-solid p-0" [clearable]="false"
+                [(ngModel)]="settings.iDefaultArticleGroupForRepair">
+                <ng-option *ngFor="let article of articleGroupList" [value]="article._id">
+                  {{article?.oName[selectedLanguage]}} </ng-option>
+              </ng-select>
+            </div>
+          </div>
+          <div class="box">
+            <h4 class="fw-bolder">{{'CLOSING_CASH_REGISTER' | translate}}</h4>
+            <div class="row mb-5">
+              <p>{{"I_WANT_TO_CLOSE_MY_CASHR_BY" | translate}}</p>
+              <div class="col-6">
+                <label class="btn btn-outline btn-outline-dashed btn-outline-default active d-flex text-start p-3"
+                  data-kt-button="true" [ngClass]="{'active': settings.sDayClosurePeriod == 'week'}">
+                  <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
+                    <input class="form-check-input" type="radio" name="sDayClosurePeriod" value="week"
+                      [(ngModel)]="settings.sDayClosurePeriod" />
+                  </span>
+                  <span class="ms-5">
+                    <span class="fs-6 fw-bolder mb-1 d-block">{{"WEEK" | translate}}</span>
+                  </span>
+                </label>
+              </div>
+
+              <div class="col-6">
+                <label class="btn btn-outline btn-outline-dashed btn-outline-default active d-flex text-start p-3"
+                  data-kt-button="true" [ngClass]="{'active': settings.sDayClosurePeriod == 'day'}">
+                  <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
+                    <input class="form-check-input" type="radio" name="sDayClosurePeriod" value="day"
+                      [(ngModel)]="settings.sDayClosurePeriod" />
+                  </span>
+                  <span class="ms-5">
+                    <span class="fs-6 fw-bolder mb-1 d-block">{{"DAY" | translate}}</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+            <div class="row mb-5">
+              <p>{{"I_WANT_TO_CLOSE_MY_CASHR_METHOD" | translate}}</p>
+              <div class="col-6">
+                <label class="btn btn-outline btn-outline-dashed btn-outline-default active d-flex text-start p-3"
+                  data-kt-button="true" [ngClass]="{'active': settings.sDayClosureMethod == 'location'}">
+                  <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
+                    <input class="form-check-input" type="radio" name="sDayClosureMethod" value="location"
+                      [(ngModel)]="settings.sDayClosureMethod" (change)="onChangeDayClosureMethod('workstation')" />
+                  </span>
+                  <span class="ms-5">
+                    <span class="fs-6 fw-bolder mb-1 d-block">{{"LOCATION" | translate}}</span>
+                  </span>
+                </label>
+              </div>
+
+              <div class="col-6">
+                <label class="btn btn-outline btn-outline-dashed btn-outline-default active d-flex text-start p-3"
+                  data-kt-button="true" [ngClass]="{'active': settings.sDayClosureMethod == 'workstation'}">
+                  <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
+                    <input class="form-check-input" type="radio" name="sDayClosureMethod" value="workstation"
+                      [(ngModel)]="settings.sDayClosureMethod" (change)="onChangeDayClosureMethod('location')" />
+                  </span>
+                  <span class="ms-5">
+                    <span class="fs-6 fw-bolder mb-1 d-block">{{"WORKSTATION" | translate}}</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+
+      </div>
+      <div class="d-flex justify-content-end align-items-center px-5">
+        <div *ngIf="updatingSettings" class="spinner-border mx-2"></div>
+        <button type="submit" class="btn btn-primary mt-4 float-end" (click)="UpdateSettings()"
+          [disabled]="updatingSettings">
+          {{"SAVE" | translate}}
         </button>
       </div>
+
+      <div class="row mt-5 py-3 border border-secondary mx-4" *ngIf="settings?.currentLocation">
+        <h4 class="fw-bolder mb-3">{{'CUSTOMERS_SETTINGS' | translate}}</h4>
+
+        <div class="col-5 d-flex align-items-center justify-content-between mb-3">
+          <label class="form-check form-switch form-check-custom form-check-solid">{{"UPDATE_NCLIENT_ID" |
+            translate}}</label>
+          <label class="form-check form-switch form-check-custom form-check-solid">
+            <input type="checkbox" class="form-check-input" [(ngModel)]="bUpdateNclientID">
+          </label>
+        </div>
+
+        <div class="col-12  d-flex align-items-center justify-content-between">
+          <div class="col-5 me-3 mb-6 d-flex align-items-center">
+            <label class="col-5 form-check form-switch form-check-custom form-check-solid me-3">{{ 'LAST_NCLIENT_ID' |
+              translate}}</label>
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              <input type="number" class="form-control" min="0" [(ngModel)]="settings.nLastClientID"
+                [disabled]="!bUpdateNclientID">
+            </label>
+          </div>
+          <!-- <div class="col-6 mb-6">
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              <input type="number" class="form-control" min="0" [(ngModel)]="settings.nLastClientID">
+            </label>
+          </div> -->
+
+          <div class="col-6 mb-6 d-flex align-items-center justify-content-between">
+            <label class="col-5 form-check form-switch form-check-custom form-check-solid">{{
+              'CUSTOMER_SEARCH_PREFILLED' | translate}}</label>
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              <ng-select class="form-control form-control-solid p-0" [multiple]="true"
+                [(ngModel)]="settings.aCustomerSearch" [clearable]="false" placeholder="">
+                <ng-option *ngFor="let item of aFilterFields" [value]="item.value">{{item.key | translate}}</ng-option>
+              </ng-select>
+            </label>
+          </div>
+          <!-- <div class="col-6 mb-6">
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              <ng-select class="form-control form-control-solid p-0" [multiple]="true" [(ngModel)]="settings.aCustomerSearch"
+                [clearable]="false" placeholder="">
+                <ng-option *ngFor="let item of aFilterFields" [value]="item.value">{{item.key | translate}}</ng-option>
+              </ng-select>
+            </label>
+          </div> -->
+        </div>
+        <div class="col-12">
+          <div class="form-group col-12">
+            <label class="form-control-label col-3">{{ "MESSAGE_TO_SEND" |translate}}</label>
+          </div>
+          <div class="form-group my-3">
+            <textarea cols="30" rows="3" class="form-control form-control-solid" name="sMessage"
+              placeholder="{{ 'MESSAGE_TO_SEND' | translate}}" lines="10" [(ngModel)]="settings.sMessage"></textarea>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+          <div *ngIf="updatingCustomerSettings" class="spinner-border mx-2"></div>
+          <button type="submit" class="btn btn-primary" (click)="updateCustomerSettings()"
+            [disabled]="updatingCustomerSettings">
+            {{"CUSTOMER_SETTINGS_SAVE" | translate}}
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="col-md-8"></div>
   </div>
-  <div class="card-body pt-0">
-    <table class="table-fixed w-100">
-      <thead>
-        <tr>
-          <th class="border border-green-100 p-4" *ngFor="let column of overviewColumns">
-            <span *ngIf="column.name !== 'action'">{{ column.name | translate }}</span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let column of bookKeepings; let i = index" class="fw-bold border border-green-100 p-4">
-          <td class="border border-green-100 p-4">
-            <span>{{column.sDescription | translate }}</span>
-          </td>
-          <td class="border border-green-100 p-4">
-            <input type="number" *ngIf="bookKeepingMode" class="form-control form-control-solid"
-              [(ngModel)]="column.nNumber" (focusout)="updateGeneralLedgerNumber(column)" />
-          </td>
-      </tbody>
-    </table>
+
+  <div class="card py-2 mb-5" data-kt-scroll-section="payment-methods">
+    <div class="card-header bg-white py-3 px-4">
+      <div class="card-title d-flex justify-content-between align-items-center">
+        <div class="col-4">
+          <h2 class="fw-bolder m-0">{{ 'PAYMENT_METHODS' | translate}}</h2>
+        </div>
+        <div class="col-8 d-flex justify-content-end">
+          <!-- <div class="d-flex me-3">
+            <label class="form-check form-switch form-check-custom form-check-solid fs-6">
+              {{ 'SHOW_DEFAULT_PAYMENT_METHODS' | translate}}
+            </label>
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              <input type="checkbox" class="ms-2 form-check-input" [(ngModel)]="bShowDefault">
+            </label>
+          </div> -->
+          <button class="btn btn-light-primary me-3" (click)="setSequenceForCashRegister()">{{ 'CASH_REGISTER_ORDER' |
+            translate}}</button>
+          <button class="btn btn-primary" (click)="createPaymentMethod()">{{ 'NEW' | translate}}</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body px-5">
+      <div class="d-flex">
+        <h5 *ngIf='!payMethods.length && !payMethodsLoading'>{{ 'NO_DATA_FOUND' | translate}}</h5>
+        <div *ngIf="payMethodsLoading" class="spinner-border mx-auto"></div>
+      </div>
+      <p class="text-gray-800 mb-2 fw-bolder fs-5">{{"YOUR_CUSTOM_PAYMENT_METHODS" | translate}}</p>
+      <div *ngIf="payMethods.length" class="dataTables_wrapper dt-bootstrap4 no-footer">
+        <div class="table-responsive">
+          <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
+            <thead>
+              <tr>
+                <th>
+                  <p class="fw-bolder text-uppercase mb-0 fs-6 text-gray-700">{{ 'NAME' | translate}}</p>
+                </th>
+                <th *ngIf="bookKeepingMode">
+                  <p class="fw-bolder text-uppercase mb-0 fs-6 text-gray-700">{{ 'LEDGER_NUMBER' | translate}}</p>
+                </th>
+                <th *ngIf="!bookKeepingMode">
+                  <p class="fw-bolder text-uppercase mb-0 fs-6 text-gray-700 text-center">{{ 'DEFAULT_OR_CUSTOM' |
+                    translate}}</p>
+                </th>
+                <th>
+                  <p class="fw-bolder text-uppercase mb-0 fs-6 text-gray-700 text-center">{{ 'SHOW_IN_CASH_REGISTER' |
+                    translate}}</p>
+                </th>
+                <th>
+                  <p class="fw-bolder text-uppercase mb-0 fs-6 text-gray-700 text-center">{{ 'EARN_LOYALTY_POINTS' |
+                    translate}}</p>
+                </th>
+                <th>
+                  <p class="fw-bolder text-uppercase mb-0 fs-6 text-gray-700">{{ 'ACTION' | translate}}</p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let method of payMethods">
+                <td (click)="viewDetails(method)" class="w-200px">
+                  {{method.sName}}<br>
+                  <span class="badge bg-info text-bg-light mt-2" *ngIf="method.bUseTerminal">
+                    {{"USE_TERMINAL" | translate }}
+                  </span>
+                </td>
+                <td *ngIf="bookKeepingMode">
+                  <input type="number" class="form-control form-control-solid w-125px"
+                    [(ngModel)]="method.sLedgerNumber" (focusout)="updateLedgerNumber(method)" />
+                </td>
+                <td class="text-center" *ngIf="!bookKeepingMode"><span class="w-80px badge bg-info">{{ "CUSTOM" |
+                    translate }}</span></td>
+                <td class="text-center"><span class="w-80px"
+                    [ngClass]="method.bShowInCashRegister?'badge bg-success':'badge bg-danger'">{{
+                    (method.bShowInCashRegister ? 'YES' : 'NO') | translate }}</span></td>
+                <td class="text-center"><span class="w-80px"
+                    [ngClass]="method.bAssignSavingPoints?'badge bg-success':'badge bg-danger'">{{
+                    (method.bAssignSavingPoints ? 'YES' : 'NO') | translate }}</span></td>
+                <td>
+                  <div class="d-flex">
+                    <button class="btn p-3 hover" (click)="viewDetails(method)">
+                      <span *ngIf="!method.bIsDefaultPaymentMethod"><i class="fa fa-edit"></i></span>
+                      <span *ngIf="method.bIsDefaultPaymentMethod"><i class="fa fa-copy"></i></span>
+                    </button>
+                    <button class="btn p-3 hover text-danger" (click)="deleteMethod(method)"
+                      *ngIf="!method.bIsDefaultPaymentMethod">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card-body px-5">
+      <div class="d-flex">
+        <h5 *ngIf='!aDefaultPaymentMethods.length && !aDefaultPaymentMethods'>{{ 'NO_DATA_FOUND' | translate}}</h5>
+        <div *ngIf="bDefaultPayMethodsLoading" class="spinner-border mx-auto"></div>
+      </div>
+      <p class="text-warning mb-2 fw-bolder fs-5">{{"DEFAULT_PAYMENT_METHODS" | translate}}</p>
+      <div *ngIf="aDefaultPaymentMethods.length" class="dataTables_wrapper dt-bootstrap4 no-footer">
+        <div class="table-responsive">
+          <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
+            <thead>
+              <tr>
+                <th>
+                  <p class="fw-bolder text-uppercase mb-0 fs-6 text-gray-700">{{ 'NAME' | translate}}</p>
+                </th>
+                <th *ngIf="bookKeepingMode">
+                  <p class="fw-bolder text-uppercase mb-0 fs-6 text-gray-700">{{ 'LEDGER_NUMBER' | translate}}</p>
+                </th>
+                <th *ngIf="!bookKeepingMode">
+                  <p class="fw-bolder text-uppercase mb-0 fs-6 text-gray-700 text-center">{{ 'DEFAULT_OR_CUSTOM' |
+                    translate}}</p>
+                </th>
+                <th>
+                  <p class="fw-bolder text-uppercase mb-0 fs-6 text-gray-700 text-center">{{ 'SHOW_IN_CASH_REGISTER' |
+                    translate}}</p>
+                </th>
+                <th>
+                  <p class="fw-bolder text-uppercase mb-0 fs-6 text-gray-700 text-center">{{ 'EARN_LOYALTY_POINTS' |
+                    translate}}</p>
+                </th>
+                <th>
+                  <p class="fw-bolder text-uppercase mb-0 fs-6 text-gray-700">{{ 'ACTION' | translate}}</p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let method of aDefaultPaymentMethods">
+                <td class="w-200px">
+                  <span class="text-dark fs-8" *ngIf="bookKeepingMode && method.bIsDefaultPaymentMethod">({{"DEFAULT" |
+                    translate}})</span>
+                  <br>{{method.sName}}<br>
+                  <span class="badge bg-info text-bg-light mt-2" *ngIf="method.bUseTerminal">
+                    {{"USE_TERMINAL" | translate }}
+                  </span>
+                </td>
+                <td *ngIf="bookKeepingMode">
+                  <input type="number" class="form-control form-control-solid w-125px"
+                    [(ngModel)]="method.sLedgerNumber" (focusout)="updateLedgerNumber(method)" />
+                </td>
+                <td class="text-center" *ngIf="!bookKeepingMode"><span class="w-80px badge bg-dark">{{ "DEFAULT" |
+                    translate }}</span></td>
+                <td class="text-center"><span class="w-80px"
+                    [ngClass]="method.bShowInCashRegister?'badge bg-success':'badge bg-danger'">{{
+                    (method.bShowInCashRegister ? 'YES' : 'NO') | translate }}</span></td>
+                <td class="text-center"><span class="w-80px"
+                    [ngClass]="method.bAssignSavingPoints?'badge bg-success':'badge bg-danger'">{{
+                    (method.bAssignSavingPoints ? 'YES' : 'NO') | translate }}</span></td>
+                <td class="text-center">
+                  <div class="d-flex justify-content-center">
+                    <button class="btn p-3  hover" (click)="viewDetails(method)">
+                      <span *ngIf="method.bIsDefaultPaymentMethod"><i class="fa fa-cog"></i></span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="d-flex">
-    <h5 *ngIf='!bookKeepings.length && !loading'>{{ 'NO_DATA_FOUND' | translate}}</h5>
-    <div *ngIf="loading" class="spinner-border mx-auto"></div>
+
+  <div class="card py-2 mb-5" data-kt-scroll-section="quick-buttons">
+    <div class="card-header bg-white py-3 px-4">
+      <div class="card-title d-flex justify-content-between align-items-center">
+        <div class="col-4">
+          <h2 class="fw-bolder m-0">{{ 'QUICK_BUTTONS' | translate}}</h2>
+        </div>
+        <div class="col-8 text-end">
+          <button class="btn btn-light-primary" (click)="saveFavourites($event)">{{ 'SAVE_SEQUENCE' |
+            translate}}</button>
+          <button class="btn btn-primary ms-3" (click)="createFavourite()">{{ 'NEW' | translate}}</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body px-5">
+      <div class="">
+        <div *ngIf="quickButtonsLoading" class="spinner-border mx-auto"></div>
+        <h5 *ngIf='!quickButtons.length && !quickButtonsLoading'>{{ 'NO_DATA_FOUND' | translate}}</h5>
+        <div class="table-responsive" *ngIf="quickButtons.length && !quickButtonsLoading">
+          <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
+            <thead>
+              <tr class="text-uppercase text-gray-700 fs-6">
+                <th>
+                  <p class="m-0 fw-bolder">{{ 'PRODUCT' | translate}}</p>
+                </th>
+                <th>
+                  <p class="m-0 fw-bolder">{{ 'TYPE' | translate}}</p>
+                </th>
+                <th>
+                  <p class="m-0 fw-bolder">{{ 'PRICE' | translate}}</p>
+                </th>
+                <th>
+                  <p class="m-0 fw-bolder">{{ 'KEYBOARD_SHORTCUT' | translate}}</p>
+                </th>
+                <th>
+                  <p class="m-0 fw-bolder">{{ 'ACTION' | translate}}</p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="" *ngFor="let button of quickButtons; let i = index">
+                <td>{{button.sName}}</td>
+                <td>
+                  <span class="badge" [ngClass]="button.oType.bRefund ? 'badge-danger':'badge-success'">
+                    <p class="m-0" *ngIf="button.oType.bRefund">{{ 'REFUND' | translate}}</p>
+                    <p class="m-0" *ngIf="!button.oType.bRefund">{{ 'RETURN' | translate}}</p>
+                  </span>
+                </td>
+                <td>{{button.nPrice | currency: tillService.currency}}</td>
+                <td>
+                  <p class="m-0" [ngClass]="button.bIsDuplicateHK? 'badge bg-danger p-3' : ''">
+                    {{ button.oKeyboardShortcut?.sKey1 }}
+                    <span class="mx-2" *ngIf="button.oKeyboardShortcut?.sKey1 && button.oKeyboardShortcut?.sKey2"> +
+                    </span>
+                    {{ button.oKeyboardShortcut?.sKey2 }}
+                  </p>
+                </td>
+                <td>
+                  <div>
+                    <button class="btn p-3 hover" (click)="shiftQuickButton('up', i)">
+                      <i class="fa fa-arrow-up"></i>
+                    </button>
+                    <button class="btn p-3 hover" (click)="shiftQuickButton('down', i)">
+                      <i class="fa fa-arrow-down"></i>
+                    </button>
+                    <button class="btn p-3 hover" (click)="editQuickButton(button)">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button class="btn p-3 hover" (click)="removeQuickButton(button)">
+                      <i class="fa fa-trash" style="color:#a63b55"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card py-2 mb-5" *ngIf="bookKeepingMode">
+    <div class="card-header bg-white py-3 px-5">
+      <div class="col-md-4">
+        <div class="d-flex align-items-center position-relative my-2">
+          <span class="svg-icon svg-icon-4 position-absolute ms-4">
+            <fa-icon [icon]="faSearch"></fa-icon>
+          </span>
+          <input type="text" class="form-control form-control-solid w-250px ps-5" (value)="searchValue"
+            [(ngModel)]="searchValue" (change)="getGeneralLedgerNumber()" placeholder="SEARCH">
+          <button class="btn btn-primary ms-xl-1" title="{{'RELOAD_THIS_PAGE' | translate}}">
+            <fa-icon [icon]="faSync"></fa-icon>
+          </button>
+        </div>
+      </div>
+      <div class="col-md-8"></div>
+    </div>
+    <div class="card-body px-5">
+      <table class="table-fixed w-100">
+        <thead>
+          <tr>
+            <th class="border border-green-100 p-4" *ngFor="let column of overviewColumns">
+              <span *ngIf="column.name !== 'action'">{{ column.name | translate }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let column of bookKeepings; let i = index" class="fw-bold border border-green-100 p-4">
+            <td class="border border-green-100 p-4">
+              <span>{{column.sDescription | translate }}</span>
+            </td>
+            <td class="border border-green-100 p-4">
+              <input type="number" *ngIf="bookKeepingMode" class="form-control form-control-solid"
+                [(ngModel)]="column.nNumber" (focusout)="updateGeneralLedgerNumber(column)" />
+            </td>
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex">
+      <h5 *ngIf='!bookKeepings.length && !loading'>{{ 'NO_DATA_FOUND' | translate}}</h5>
+      <div *ngIf="loading" class="spinner-border mx-auto"></div>
+    </div>
   </div>
 </div>

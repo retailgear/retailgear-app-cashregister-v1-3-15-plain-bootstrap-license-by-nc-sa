@@ -5,7 +5,7 @@ export class ToastData {
     title?: string;
     text?: string;
     template?: TemplateRef<any>;
-    templateContext?: {};
+    templateContext?:any = {};
     apiUrl?: string;
     noAutoClose?: boolean;
 }

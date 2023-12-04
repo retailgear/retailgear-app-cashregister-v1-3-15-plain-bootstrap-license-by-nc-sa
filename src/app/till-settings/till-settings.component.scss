@@ -6,3 +6,20 @@
     background-color: #f3f3f3;
     transition: background-color 0.5s;
 }
+
+.customersetting {
+    margin-right: 60px;
+}
+
+.box {
+    border: 1px solid #E4E6EF;
+    border-radius: 5px;
+    padding: 0.5rem;
+}
+
+.form-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}

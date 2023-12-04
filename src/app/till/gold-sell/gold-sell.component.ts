@@ -3,7 +3,7 @@ import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
 @Component({
   selector: '[till-goldsell]',
   templateUrl: './gold-sell.component.html',
-  styleUrls: ['./gold-sell.component.sass'],
+  styleUrls: ['./gold-sell.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
 export class GoldSellComponent implements OnInit {

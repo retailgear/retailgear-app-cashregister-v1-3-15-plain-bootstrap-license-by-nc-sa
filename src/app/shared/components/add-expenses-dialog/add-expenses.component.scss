@@ -1,0 +1,55 @@
+.country-list-container {
+    padding: 0 !important;
+
+    .country-list-input {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
+.row {
+    margin-bottom: 10px;
+}
+
+.card {
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+
+        h4 {
+            margin-bottom: 0;
+        }
+
+        a.cancel {
+            cursor: pointer;
+            color: #a63b55;
+
+            i {
+                font-size: 2.5rem !important;
+            }
+        }
+    }
+}
+
+.form_control {
+    padding: 0 10px;
+}
+
+.form_control label {
+    padding-left: 0;
+}
+
+.form_control input,
+.form_control textarea {
+    border: 1px solid #cccccc;
+}
+
+form .card-body {
+    padding: 20px 20px 0 20px;
+}
+
+form .card-footer {
+    padding: 20px;
+}

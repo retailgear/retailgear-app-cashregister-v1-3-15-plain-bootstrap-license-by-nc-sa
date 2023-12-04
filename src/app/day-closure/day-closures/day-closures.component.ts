@@ -1,13 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { ToastService } from 'src/app/shared/components/toast';
-import { ApiService } from 'src/app/shared/service/api.service';
+import { ToastService } from '../../shared/components/toast';
+import { ApiService } from '../../shared/service/api.service';
+import { TillService } from '../../shared/service/till.service';
 
 @Component({
   selector: 'app-day-closures',
   templateUrl: './day-closures.component.html',
-  styleUrls: ['./day-closures.component.sass']
+  styleUrls: ['./day-closures.component.scss']
 })
 export class DayClosuresComponent implements OnInit, OnDestroy {
 
@@ -42,10 +43,12 @@ export class DayClosuresComponent implements OnInit, OnDestroy {
     currentPage: 1,
     totalItems: 0
   };
+  sDayClosureMethod:any;
   constructor(private apiService: ApiService,
     private route: ActivatedRoute,
     private router: Router,
-    private toastrService: ToastService
+    private toastrService: ToastService,
+    public tillService: TillService
   ) {
     this.iBusinessId = localStorage.getItem('currentBusiness') || '';
     this.iLocationId = localStorage.getItem('currentLocation') || '';
@@ -54,11 +57,14 @@ export class DayClosuresComponent implements OnInit, OnDestroy {
     const _oUser = localStorage.getItem('currentUser');
     if (_oUser) this.oUser = JSON.parse(_oUser);
     this.paginationConfig.currentPage = this.route?.snapshot?.queryParams?.page ? this.route?.snapshot?.queryParams?.page : this.paginationConfig.currentPage
-
+    
   }
-
-  ngOnInit(): void {
+  
+  async ngOnInit() {
     this.apiService.setToastService(this.toastrService);
+    await this.tillService.fetchSettings();
+    this.sDayClosureMethod = this.tillService.settings?.sDayClosureMethod || 'workstation';
+    // console.log(this.sDayClosureMethod, this.tillService.settings);
     this.fetchDayClosureList();
     this.fetchBusinessLocation();
     this.getWorkstations();
@@ -82,18 +88,20 @@ export class DayClosuresComponent implements OnInit, OnDestroy {
         console.error(error)
       }
   }
+  
   changeItemsPerPage(pageCount: any) {
     this.paginationConfig.itemsPerPage = pageCount;
+    this.requestParams.skip = 0;
+    this.paginationConfig.currentPage = 1; 
     this.fetchDayClosureList();
   }
+
   pageChanged(page: any) {
     this.requestParams.skip = (page - 1) * this.requestParams.limit;
-    // this.requestParams.limit = page * this.requestParams.limit;
-
     this.fetchDayClosureList();
-
     this.paginationConfig.currentPage = page;
   }
+
   fetchDayClosureList() {
     this.aDayClosure = [];
     this.showLoader = true;
@@ -102,13 +110,21 @@ export class DayClosuresComponent implements OnInit, OnDestroy {
       oFilter: {
         iLocationId: this.iLocationId,
         aLocationId: this?.aSelectedLocation?.length ? this.aSelectedLocation : [],
-        iWorkstationId: [this.oSelectedWorkStation?._id],
       },
       ...this.requestParams
     }
+
+    if (this.tillService.settings?.sDayClosureMethod === 'workstation') {
+      oBody.iWorkstationId = [this.oSelectedWorkStation?._id];
+    }
     this.dayClosureListSubscription = this.apiService.postNew('cashregistry', `/api/v1/statistics/day-closure/list`, oBody).subscribe((result: any) => {
       if (result?.data?.length) {
-        this.aDayClosure = result.data[0]?.result;
+        this.aDayClosure = result.data[0]?.result.map((el:any) => {
+          el.nTotalRevenue = +(el.aRevenuePerBusinessPartner.reduce((a:any, b:any) => a + b.nTotalRevenue, 0).toFixed(2));
+          el.nPaymentMethodTotal = +(el.aPaymentMethods.reduce((a: any, b: any) => a + b.nAmount, 0).toFixed(2));
+          return el;
+        });
+        
         this.paginationConfig.totalItems = result.data[0].count.totalData;
 
       }
@@ -125,8 +141,18 @@ export class DayClosuresComponent implements OnInit, OnDestroy {
     this.aWorkStation = this.aWorkStationList.filter((workstation:any)=> this.aSelectedLocation.includes(workstation.iLocationId));
   }
 
-  goToView(iStatisticsId: any, dOpenDate: any, dCloseDate:any){
-    this.router.navigate(['../../transactions-audit/view', iStatisticsId], { relativeTo: this.route, state: { dStartDate: dOpenDate, dEndDate: dCloseDate } }); 
+  goToView(item:any){
+    this.router.navigate(
+      ['../../transactions-audit/view', item._id], 
+      { 
+        relativeTo: this.route, 
+        state: { 
+          dStartDate: item.dOpenDate, 
+          dEndDate: item.dCloseDate,
+          iLocationId: item.iLocationId,
+          iWorkstationId: item.iWorkstationId
+        }
+      }); 
   }
 
   ngOnDestroy(): void {
@@ -134,7 +160,4 @@ export class DayClosuresComponent implements OnInit, OnDestroy {
     if (this.workstationListSubscription) this.workstationListSubscription.unsubscribe();
     if (this.dayClosureListSubscription) this.dayClosureListSubscription.unsubscribe();
   }
-
-  // viewStatistics(oDayClosure: any) {
-  // }
 }

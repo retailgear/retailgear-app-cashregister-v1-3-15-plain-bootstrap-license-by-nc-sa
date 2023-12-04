@@ -1,13 +1,15 @@
 <div class="card">
-    <div class="card-header" style="margin-top: 20px;">
+    <div class="card-header p-4 d-flex justify-content-between align-items-center">
         <div class="card-title">
             <span>{{ 'WORKSTATION' | translate}}</span>
         </div>
-        <button type="button" class="btn btn-sm btn-light float-end" (click)="close(false)">
-            <fa-icon [icon]="faTimes"></fa-icon>
-        </button>
+        <div>
+            <a class="cancel my-auto" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
+        </div>
     </div>
-    <div class="card-body p-9">
+    <div class="card-body p-4">
         <div class="row">
             <div class="col-md-6 pt-2">
                 <label> {{ "NAME" | translate }}</label>
@@ -37,7 +39,7 @@
             </div>
         </div>
     </div>
-    <div class="card-footer">
+    <div class="card-footer p-4">
         <button class="btn btn-primary" type="submit" (click)="updateWorkstation()">{{ (workstation._id ? 'UPDATE' :
             'CREATE') | translate}}</button>
     </div>

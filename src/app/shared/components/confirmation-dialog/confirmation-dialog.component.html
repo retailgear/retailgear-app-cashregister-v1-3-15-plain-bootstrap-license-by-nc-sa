@@ -1,10 +1,10 @@
 <div class="card shadow-sm">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title">{{ header | translate}}</h3>
         <div class="card-toolbar">
-            <button type="button" class="btn btn-sm btn-light" (click)="confirmed(false)">
-                <fa-icon [icon]="faTimes"></fa-icon>
-            </button>
+          <a class="cancel my-auto" (click)="confirmed(false)">
+              <i class="fa fa-times fabutton"></i>
+          </a>
         </div>
     </div>
     <div class="card-body card-scroll">
@@ -12,8 +12,8 @@
         {{ bodyText | translate}}
       </p>
     </div>
-    <div class="card-footer">
-      <div class="input-group mb-5">
+    <div class="card-footer py-3">
+      <div class="d-flex align-items-center justify-content-end">
         <button class="btn" [ngClass]="btn.class" (click)="confirmed(btn.value)" *ngFor="let btn of buttonDetails">{{ btn.text | translate}}</button>
       </div>
     </div>

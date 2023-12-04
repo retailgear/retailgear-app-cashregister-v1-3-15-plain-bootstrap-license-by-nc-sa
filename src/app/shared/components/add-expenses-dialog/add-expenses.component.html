@@ -1,45 +1,61 @@
 <div class="card shadow-sm">
-    <div class="card-header" style="margin-top: 20px;">
+    <div class="card-header">
         <h4>{{ 'ADD_EXPENSES' | translate}}</h4>
-        <div mat-dialog-actions>
-            <button mat-dialog-close type="button" class="btn btn-sm btn-light" (click)="close(false)">
-                <fa-icon [icon]="faTimes"></fa-icon>
-            </button>
+        <div>
+            <a class="cancel my-auto" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
         </div>
     </div>
     <div>
         <form [formGroup]="expenseForm" (ngSubmit)="submit(); submitted = true">
             <div class="card-body">
-                <label for="amount">{{ "AMOUNT" | translate}}</label>
-                <input type="number" name="amount" id="amount" class="form-control" formControlName="amount">
-                <div *ngIf="submitted && f.amount.errors">
-                    <span class="text-danger">{{"AMOUNT_SHOULD_BE_GREATER_THAN" | translate}} €1.</span>
+
+                <div class="row form_control">
+                    <label>{{ "AMOUNT" | translate}}</label>
+                    <input type="number" class="form-control" formControlName="nAmount">
+                    <div *ngIf="submitted && f.nAmount.errors">
+                        <span class="text-danger">{{"AMOUNT_SHOULD_BE_GREATER_THAN" | translate}} €1.</span>
+                    </div>
                 </div>
-                <label for="taxRate">{{ "TAX" | translate}}</label>
-                <ng-select name="tax" id="taxRate" class="form-control" formControlName="tax" [clearable]="false">
-                    <ng-option *ngFor="let option of taxes" [value]="option.nRate">{{option.sName}} - {{option.nRate}}%
-                    </ng-option>
-                </ng-select>
-                <label for="ledgerDescription">{{ "LEDGER_NUMBER_DESCRIPTION" | translate}}</label>
-                <ng-select name="ledgerDescription" id="ledgerDescription" class="form-control"
-                    formControlName="expenseType" (change)="assignArticleGroup()" [clearable]="false">
-                    <ng-option *ngFor="let option of ledgerDescriptions" [value]="option">{{option| titlecase}}
-                    </ng-option>
-                </ng-select>
-                <div *ngIf="submitted && f.expenseType.errors">
+
+                <div class="row">
+                    <label>{{ "TAX" | translate}}</label>
+                    <ng-select class="" formControlName="nTax" [clearable]="false">
+                        <ng-option *ngFor="let option of taxes" [value]="option.nRate">{{option.sName}} -
+                            {{option.nRate}}%
+                        </ng-option>
+                    </ng-select>
+                </div>
+
+                <div class="row">
+                    <label>{{ "LEDGER_NUMBER_DESCRIPTION" | translate}}</label>
+                    <ng-select class="" formControlName="oExpenseType" [clearable]="false">
+                        <ng-option *ngFor="let option of tillService.ledgerDescriptions"
+                            [value]="option">{{option.title| titlecase}}
+                        </ng-option>
+                    </ng-select>
+                </div>
+
+                <div *ngIf="submitted && f.oExpenseType.errors">
                     <span class="text-danger">{{ "LEDGER_NUMBER_DESCRIPTION" | translate}} {{ "REQUIRED" |
                         translate}}.</span>
                 </div>
-                <label for="description">{{ "DESCRIPTION" | translate}}</label>
-                <textarea class="form-control" name="description" placeholder="{{ 'DESCRIPTION' | translate}}"
-                    lines="10" formControlName="description"></textarea>
-                <div *ngIf="submitted && f.description.errors">
-                    <span class="text-danger">{{"DESCRIPTION_IS_REQUIRED"}}.</span>
+
+                <div class="row form_control">
+                    <label>{{ "DESCRIPTION" | translate}}</label>
+                    <textarea class="form-control " placeholder="{{ 'DESCRIPTION' | translate}}" lines="10"
+                        formControlName="sDescription"></textarea>
+                    <div *ngIf="submitted && f.sDescription.errors">
+                        <span class="text-danger">{{"DESCRIPTION_IS_REQUIRED"}}.</span>
+                    </div>
                 </div>
+
             </div>
             <div class="card-footer">
-                <button class="btn btn-primary" type="submit" [disabled]="!expenseForm.valid">{{"SUBMIT" |
+                <button class="btn btn-primary" type="submit" [disabled]="!expenseForm.valid || bLoading">{{"SUBMIT" |
                     translate}}</button>
+                <div *ngIf="bLoading" class="spinner-border mx-3"></div>
             </div>
         </form>
     </div>

@@ -1,11 +1,11 @@
 <div class="card">
-    <div class="card-header" style="margin-top: 20px;">
+    <div class="card-header d-flex justify-content-between align-items-center py-3">
         <h4>{{ 'CREATE_NEW_PRINT_SETTING' | translate}}</h4>
         <div>
-            <button type="button" class="btn btn-sm btn-light" (click)="close(false)">
-                <fa-icon [icon]="faTimes"></fa-icon>
-            </button>
-            </div>
+            <a class="cancel my-auto" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
+        </div>
     </div>
     <div class="card-body p-9">
         <div class="row">

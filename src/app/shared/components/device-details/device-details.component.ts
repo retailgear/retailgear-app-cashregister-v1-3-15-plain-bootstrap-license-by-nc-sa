@@ -6,7 +6,7 @@ import { DialogComponent } from '../../service/dialog';
 @Component({
   selector: 'app-device-details',
   templateUrl: './device-details.component.html',
-  styleUrls: ['./device-details.component.sass']
+  styleUrls: ['./device-details.component.scss']
 })
 export class DeviceDetailsComponent implements OnInit {
 

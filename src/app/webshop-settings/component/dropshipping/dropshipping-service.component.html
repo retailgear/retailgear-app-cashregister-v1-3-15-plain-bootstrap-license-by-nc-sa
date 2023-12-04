@@ -1,0 +1,27 @@
+<div class="mb-4 d-flex">
+    <div class="my-auto"> {{ "SHOW_PRODUCTS_OF_BRAND_THAT_THE_SUPPLIER_HAS_IN_STOCK" | translate }}</div>
+    <button class="btn btn-sm btn-primary ms-auto" (click)="addEditDropshipper()">
+        <fa-icon [icon]="faPlus"></fa-icon> &nbsp; {{ "ADD_NEW_DROPSHIPPER" | translate }}
+    </button>
+</div>
+<div class="row mt-2" *ngFor="let dropShipper of dropShipperList">
+    <div class="card card-dashed h-xl-100 flex-row flex-stack flex-wrap p-6">
+        <div class="col-10">
+            <span>{{dropShipper.oBrandMetaData?.sName || 'Unkown'}}</span>
+            <span class="badge badge-light-success fs-7 ms-2">{{ "PRIMARY" | translate}}</span>
+            <div class="fs-6 fw-bold text-gray-600 ms-2">{{dropShipper.oBrandMetaData?.sAlias || ''}}</div>
+        </div>
+        <div class="col-2 d-flex">
+            <button class="btn btn-sm btn-default me-3" (click)="addEditDropshipper(dropShipper)">
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+            <button class="btn btn-sm btn-default text-center" (click)="deleteShipper(dropShipper)"
+                title="{{'REMOVE' | translate }}">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+    <div *ngIf="dropShipperList?.length == 0" class="col-12 d-flex w-100">
+        <h3 class="mx-auto">{{ 'NO_FOUND' | translate }}</h3>
+    </div>
+</div>

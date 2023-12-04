@@ -1,0 +1,109 @@
+a.cancel {
+    cursor: pointer;
+    color: #a63b55;
+}
+.fabutton {
+    font-size: 30px;
+}
+.product_image {
+    max-width: 80px;
+    height: auto;
+}
+
+.card-body.main {
+    overflow: auto;
+    height: calc(100vh - 250px);
+    box-sizing: border-box;
+}
+
+td {
+    vertical-align: middle;
+}
+
+.createrImage {
+    object-fit: contain;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.default {
+    width: 40px;
+    height: 40px;
+}
+
+span.invalid,
+span.valid {
+    font-weight: bold;
+}
+
+span.invalid,
+.fa-trash {
+    color: red;
+}
+
+span.valid {
+    color: green;
+}
+
+.overlay-full {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #56acacc4;
+    z-index: 9999;
+}
+
+.cstm-btn {
+    padding: 8px !important;
+    font-size: 12px;
+    margin-left: 50px;
+    width: 150px !important;
+}
+.invoice {
+    margin-top: 10px;
+}
+
+.custom-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+ul.list_group {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+        margin: 0.5rem;
+
+        button {
+            padding: calc(0.55rem + 1px) calc(1.25rem + 1px);
+            color: #7e829a;
+            font-size: 0.925rem;
+            border-radius: 0.475rem;
+            cursor: pointer !important;
+            fa-icon {
+                color: #7e8299;
+            }
+
+            &:hover {
+                color: var(--bs-primary);
+                fa-icon {
+                    color: var(--bs-primary);
+                }
+                background: #f1faff !important;
+            }
+
+            label {
+                cursor: pointer !important;
+            }
+        }
+    }
+}

@@ -1,10 +1,10 @@
 <div class="card shadow-sm">
     <div class="card-header" style="margin-top: 20px;">
         <h4>{{ 'ALL_PAYMENT_METHODS' | translate}}</h4>
-        <div mat-dialog-actions>
-            <button mat-dialog-close type="button" class="btn btn-sm btn-light" (click)="close(false)">
-                <fa-icon [icon]="faTimes"></fa-icon>
-            </button>
+        <div>
+            <a class="cancel my-auto" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
         </div>
     </div>
     <div class="card-body">

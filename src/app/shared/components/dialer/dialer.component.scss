@@ -1,0 +1,20 @@
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {  
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] { 
+  -moz-appearance: textfield;
+}
+
+.dialer_container{
+  margin-bottom: 20px;
+  button{
+    background: #f5f8fa;
+  }
+  input{
+    width: 40px;
+    margin-left: 5px;
+  }
+}

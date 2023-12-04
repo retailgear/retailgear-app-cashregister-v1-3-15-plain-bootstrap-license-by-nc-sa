@@ -1,0 +1,50 @@
+<div class="row step-container mb-6">
+    <div class="col-md-12">
+        <p>{{ "FLEXIBLE_IMPORT_ALLOWS_IMPORT_PRODUCTS_REGARDLESS_THEIR_SIZE" | translate}}</p>
+        <hr>
+        <h4>{{ ("STEP_1_DETERMINE_CATEGORY_AND_FILE" | translate) | uppercase }}</h4>
+    </div>
+    <div class="col-md-3 my-3">
+        <label for="delimiter"> {{ "SEPARATOR" | translate}} ( {{ "SEPARATOR_HINT" | translate}} ) </label>
+        <br>
+        <input id="delimiter" type="text" placeholder="{{ 'SEPARATOR' | translate}}" [disabled]="bDelimiter" [(ngModel)]="delimiter"
+            class="form-control w-100">
+    </div>
+    <div class="col-md-9" *ngIf="delimiter != ''">
+        <file-upload [control]="control" accept=".csv" class="business-logo-uploader cursor-pointer"
+            id="productCSVUploader">
+            <ng-template let-isFileDragDropAvailable="isFileDragDropAvailable" #placeholder>
+                <div *ngIf="control.size === 0">
+                    <div class="upload-text">
+                        <b>{{"SELECT_CSV_FILE" | translate}}</b>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template let-i="index" let-file="file" let-control="control" #item>
+                <div class="overlay flex">
+                    <span class="csv-file-name">
+                        {{ file.name }}
+                        <span class="delete-button ml-4" (click)="control.removeFile(file);bDelimiter=false;">
+                            <fa-icon [icon]="faTimes"></fa-icon>
+                        </span>
+                    </span>
+                </div>
+            </ng-template>
+        </file-upload>
+    </div>
+    <div class="col-md-12 rounded bg-gray-200 p-3 mt-3">
+        <h4 class="m-0 mb-3 fw-bolder"> {{ "CONDITIONS_FOR_IMPORT_FILE" | translate}} </h4>
+        <ul class="px-15 import-conditions-list mb-0">
+            <li>{{ "PATH_TO_IMAGES_MUST_BE_FULL_LINK" | translate}}</li>
+            <li>{{ "FILE_CONTAINS_CSV_FORMAT" | translate}}</li>
+            <li>{{ "MARKING_ILLUSTRATION_PRODUCTNUMBER_ARE_MANDATORY" | translate}}</li>
+            <li>{{ "MAX_THOUSAND_ITEM_PER_FILE" | translate}}</li>
+        </ul>
+    </div>
+    <div class="col-md-12 mt-3 d-flex justify-content-end p-0">
+        <button class="m-0" class="btn btn-primary" (click)="nextStep('next')" [disabled]="validateImport()">
+            {{"NEXT_STEP" | translate}}
+        </button>
+    </div>
+</div>

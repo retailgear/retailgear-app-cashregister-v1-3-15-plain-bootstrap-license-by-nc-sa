@@ -1,0 +1,32 @@
+<div class="card shadow-sm">
+    <div class="card-header" style="margin-top: 20px;">
+        <h4>{{"BANK_CONFIRMATION" | translate}}</h4>
+        <div>
+            <a class="cancel my-auto" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <label class="col-form-label fw-bold fs-6">
+                    {{"PAYMENT_CONFIRMATION_DATE" | translate}}</label>
+                <input type="date" class="form-control form-control form-control-solid" name="dDateConfirmed"
+                    [ngModel]="bankConfirmation.dDateConfirmed | date:'yyyy-MM-dd'"
+                    (ngModelChange)="bankConfirmation.dDateConfirmed = $event" />
+
+            </div>
+            <div class="col-12">
+                <label class="col-form-label fw-bold fs-6">
+                    {{"AMOUNT" | translate}}</label>
+                <input type="number" class="form-control form-control-solid" name="amount"
+                    [(ngModel)]="bankConfirmation.nAmount">
+            </div>
+            <div class="col-12 my-4">
+                <button class="btn btn-primary" [disabled]="isShowLoading" (click)="submit()">{{'BANK_CONFIRMATION' |
+                    translate}}</button>
+            </div>
+        </div>
+    </div>
+</div>

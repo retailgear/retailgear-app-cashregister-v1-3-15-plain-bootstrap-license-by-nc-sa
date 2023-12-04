@@ -1,0 +1,76 @@
+<div class="card shadow-sm">
+    <div class="card-header" style="margin-top: 20px;">
+        <h4>{{ "DROPSHIPPING_TITLE" | translate}}</h4>
+        <div>
+            <a class="cancel my-auto" (click)="close(false)">
+                <i class="fa fa-times fabutton"></i>
+            </a>
+        </div>
+    </div>
+    <form [formGroup]="dropshipperFormGroup" novalidate (ngSubmit)="save()">
+        <div class="card-body row">
+            <div class="col-md-6 mt-2">
+                <label> {{"SELECT_BRAND" | translate}}</label>
+            </div>
+            <div class="col-md-6 mt-2">
+                <ng-select formControlName="oBrandDetails" id="formFieldIp" [clearable]="false" [items]="brandsList | async"  [typeahead]="brandInput$" [loading]="brandLoading"
+                    [minTermLength]="2" [placeholder]="'ENTER_2_OR_MORE_CHARACTERS_FOR_SEARCH' | translate">
+                    <ng-template ng-label-tmp let-item="item" let-clear="clear">
+                         <span class="ng-value-label">{{item.sName}} <ng-container *ngIf="item.sAlias && item.sAlias!= ''">( {{ item.sAlias }} )</ng-container></span>
+                        <span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true">×</span>
+                    </ng-template>
+                    <ng-template ng-option-tmp let-item="item">
+                        {{item.sName}} ( {{ item.sAlias}} )
+                    </ng-template>
+                </ng-select>
+            </div>
+            <div class="col-md-3 mt-2">
+                <label> {{"SELL_ON_WEBSHOP" | translate}}</label>
+            </div>
+            <div class="col-md-3 mt-2">
+                <div class="form-check form-check-solid form-switch fv-row lh-xxl">
+                    <input id="bShowProducts" type="checkbox" class="form-check-input w-45px h-30px"
+                        formControlName='bShowProducts' />
+                </div>
+            </div>
+            <ng-container *ngIf="dropshipperFormGroup.controls.bShowProducts.value">
+                <div class="col-md-3 mt-2" >
+                    <label> {{"DEFAULT_SHIPPER" | translate}}</label>
+                </div>
+                <div class="col-md-3 mt-2">
+                    <div class="form-check form-check-solid form-switch fv-row lh-xxl">
+                        <input id="bDefaultDropshipper" type="checkbox" class="form-check-input w-45px h-30px"
+                            formControlName='bDefaultDropshipper' />
+                    </div>
+                </div>
+                <div class="col-md-3 mt-2">
+                    <label> {{"RESERVE_PRODUCT" | translate}}</label>
+                </div>
+                <div class="col-md-3 mt-2">
+                    <div class="form-check form-check-solid form-switch fv-row lh-xxl">
+                        <input id="bCanReserve" type="checkbox" class="form-check-input w-45px h-30px"
+                            formControlName='bCanReserve' />
+                    </div>
+                </div>
+                <div class="col-md-3 mt-2">
+                    <label> {{"DELIVER_PRODUCT" | translate}}</label>
+                </div>
+                <div class="col-md-3 mt-2">
+                    <div class="form-check form-check-solid form-switch fv-row lh-xxl">
+                        <input id="bCanDeliver" type="checkbox" class="form-check-input w-45px h-30px"
+                            formControlName='bCanDeliver' />
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+        <div class="card-footer row">
+            <div class="col-md-11">
+                <button type="submit" class="btn btn-primary">{{ "SAVE" | translate}}</button>
+            </div>
+            <div class="col-md-1">
+                <button type="reset" class="btn btn-secondary" (click)="close({ action: false })">{{ "CLOSE" |
+                    translate}}</button>
+            </div>
+        </div>
+    </form>
+</div>

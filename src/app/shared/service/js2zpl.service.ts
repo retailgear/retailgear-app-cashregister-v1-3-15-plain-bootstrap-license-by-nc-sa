@@ -67,7 +67,7 @@ export class Js2zplService {
     this.width = Number(this.convertToDots(template.width));
     this.height = Number(this.convertToDots(template.height));
 
-    this.dateformat = (typeof template.dateformat !== 'undefined') ? template.dateformat : 'MMYY'; //0620
+    this.dateformat = (typeof template.dateformat !== 'undefined') ? template.dateformat : 'MM/YY'; //0620
     this.print_rate = (typeof template.print_rate !== 'undefined') ? template.print_rate : 2;
     this.media_darkness = (typeof template.media_darkness !== 'undefined') ? template.media_darkness : 12;
     this.media_type = (typeof template.media_type !== 'undefined') ? template.media_type : 'T';
@@ -116,7 +116,7 @@ export class Js2zplService {
     return '^BXN,' + dotsize + ',' + quality + ',' + columns + ',' + rows + ',' + format + '^F' + fieldtype + data + '^FS';
   }
 
-  drawText(data = 'No data', fontid = 'Q', max = 0, blockwidth = 0, blocktextalign = "L", blocklines = 1, fieldtype = 'D', euro_prefix = false) {
+  drawText(data = 'No data', fontid = 'Q', max = 0, blockwidth = 0, blocktextalign = "L", blocklines = 1, fieldtype = 'D', euro_prefix = false, pound_prefix = false) {
 
     if (blockwidth > 0) {
       var block = this.createTextBlock(blockwidth, blocktextalign, blocklines);
@@ -130,6 +130,7 @@ export class Js2zplService {
 
     var fh = ''
     var hex_euro = ''
+    var hex_pound = ''
 
     if (euro_prefix && fieldtype === 'D') {
       if (this.encoding == 28) {
@@ -140,10 +141,19 @@ export class Js2zplService {
       }
     }
 
-    return '^A' + fontid.toUpperCase() + 'N' + block + fh + '^F' + fieldtype + hex_euro + data + '^FS';
+    if (pound_prefix && fieldtype === 'D') {
+      if (this.encoding == 28) {
+        fh = '^FH'
+        hex_pound = '_C2_A3'
+      } else {
+        console.warn('Pound prefix only works with encoding 28..')
+      }
+    }
+
+    return '^A' + fontid.toUpperCase() + 'N' + block + fh + '^F' + fieldtype + hex_euro + hex_pound + data + '^FS';
   }
 
-  drawScalableText(data = 'No data', charwidth = 15, charheight = 15, max = 0, blockwidth = 0, blocktextalign = "L", blocklines = 1, fieldtype = 'D', euro_prefix = false) {
+  drawScalableText(data = 'No data', charwidth = 15, charheight = 15, max = 0, blockwidth = 0, blocktextalign = "L", blocklines = 1, fieldtype = 'D', euro_prefix = false, pound_prefix = false) {
 
     if (blockwidth > 0) {
       var block = this.createTextBlock(blockwidth, blocktextalign, blocklines);
@@ -157,6 +167,7 @@ export class Js2zplService {
 
     var fh = ''
     var hex_euro = ''
+    var hex_pound = ''
 
     if (euro_prefix && fieldtype === 'D') {
       if (this.encoding == 28) {
@@ -174,7 +185,23 @@ export class Js2zplService {
       }
     }
 
-    return '^A0,' + charheight + ',' + charwidth + 'N' + block + fh + '^F' + fieldtype + hex_euro + data + '^FS';
+    if (pound_prefix && fieldtype === 'D') {
+      if (this.encoding == 28) {
+        fh = '^FH'
+        hex_pound = '_C2_A3'
+      } else {
+        console.warn('Pound prefix only works with encoding 28..')
+      }
+    } else {
+      if (!pound_prefix && String(data).startsWith('£')) {
+        fh = '^FH'
+        hex_pound = '_C2_A3'
+        data = data.substring(1)
+        console.warn('Replaced pound symbol with prefix..')
+      }
+    }
+
+    return '^A0,' + charheight + ',' + charwidth + 'N' + block + fh + '^F' + fieldtype + hex_euro + hex_pound + data + '^FS';
   }
 
   createTextBlock(blockwidth: any, blocktextalign: any, blocklines: any) {
@@ -194,7 +221,7 @@ export class Js2zplService {
   }
 
   isValidElement(element: any) {
-    console.log('checking element validity', element)
+    // console.log('checking element validity', element)
     //check if the element exists and if the neccesary parameters of the element type are present
     if (element.type !== undefined && Js2zplService.knownElements.indexOf(element.type) > -1) {
       switch (element.type) {
@@ -215,7 +242,7 @@ export class Js2zplService {
           break;
 
         case 'barcode':
-          console.log(218, "pnfield" in element)
+          // console.log(218, "pnfield" in element)
           return ("pnfield" in element) ? true : false;
           break;
 
@@ -274,16 +301,11 @@ export class Js2zplService {
     return value;
   }
 
-  getSettings(use_old_width = true) {
+  getSettings() {
 
     var settings = '^CI' + this.encoding;
 
-    if (use_old_width === false) {
-      settings += '^PW' + this.width + '^ML' + this.height
-    } else {
-      settings += '^ML' + this.width
-    }
-
+    settings += '^PW' + this.width + '^ML' + this.height
     settings += (this.inverted) ? '^POI' : '^PON';
     settings += '^PMN'
       + '^LS' + this.labelleft
@@ -314,10 +336,10 @@ export class Js2zplService {
     return '~jc';
   }
 
-  generateCommand(request: any, data: any, print_command = true) {
-    if (!data || !request) return;
+  generateCommand(request: any, data: any, layout_command = true) {
+    if (!request) return
+    if (data) { this.alldata = data; }
 
-    this.alldata = data;
 
     //override label parameters if provided
     this.overrideVariables(request);
@@ -328,7 +350,7 @@ export class Js2zplService {
 
     if (this.layout_name.length > 0) {
 
-      if (print_command === true) {
+      if (layout_command === true) {
         command += '^XF' + this.layout_storage + ':' + this.layout_name + '.ZPL';
       } else {
         if (this.layout_name.length > 0)
@@ -338,21 +360,20 @@ export class Js2zplService {
       fieldtype = 'N'; //Will be used as ^FN(+field number) to reference a field in the layout
     }
 
-    if (print_command === false) {
+    if (layout_command === false) {
       command += this.getSettings();
     }
 
-    command += this.addFieldsToCommand(request, print_command, fieldtype);
+    command += this.addFieldsToCommand(request, layout_command, fieldtype);
 
     command += this.endCommand();
 
     if (!data['%%QUANTITY%%']) {
       data['%%QUANTITY%%'] = 1;
     }
-
     command = command.replace('^XA', '^XA^PQ' + data['%%QUANTITY%%'])
 
-    console.warn("Generated: ", command, String(command).split(/(?=\^)/g));
+    console.warn("Generated: ", layout_command, command, String(command).split(/(?=\^)/g));
 
     return this.validateCommand(command);
   }
@@ -378,7 +399,7 @@ export class Js2zplService {
     return command;
   }
 
-  addFieldsToCommand(request: any, print_command: any, fieldtype: any, preview = false) {
+  addFieldsToCommand(request: any, layout_command: any, fieldtype: any, preview = false) {
 
     var command = '';
 
@@ -422,11 +443,12 @@ export class Js2zplService {
             }
           }
 
-          if (print_command === true) {
-            if (element.type !== 'rectangle' && element.type !== 'circle' && element.type !== 'barcode') {
+          if (layout_command === true) { // print actual data
+            if (element.type !== 'rectangle' && element.type !== 'circle') {
 
               var fh = ''
               var hex_euro = ''
+              var hex_pound = ''
               var prefix = ''
 
               if (element.euro_prefix) {
@@ -438,31 +460,41 @@ export class Js2zplService {
                 }
               }
 
+              if (element.pound_prefix) {
+                if (this.encoding == 28) {
+                  fh = '^FH'
+                  hex_pound = '_C2_A3'
+                } else {
+                  console.warn('Pound prefix only works with encoding 28..')
+                }
+              }
+
               if (element.prefix && element.prefix !== "") {
                 prefix = element.prefix
               }
 
               if (this.can_rotate) {
-                command += '^FN' + field_id + fh + rotate + '^FD' + hex_euro + prefix + this.getFieldData(element.pnfield) + '^FS';
+                command += '^FN' + field_id + fh + rotate + '^FD' + hex_euro + hex_pound + prefix + this.getFieldData(element.pnfield) + '^FS';
               } else {
-                command += '^FN' + field_id + fh + '^FD' + hex_euro + prefix + this.getFieldData(element.pnfield) + '^FS';
-              }
-            } else {
-              switch (element.type) {
-                case 'rectangle':
-                  command += this.changePosition(element.x, element.y) + rotate + this.drawRectangle(element.width, element.height, element.border, element.color, element.rounding)
-                  break;
-                case 'circle':
-                  command += rotate + this.drawCircle(element.size, element.border, element.color)
-                  break;
-                case 'barcode':
-                  element.width = (element.width == 0) ? 1 : element.width;
-                  element.height = (element.height == 0) ? 15 : element.height;
-                  command += rotate + this.drawBarcode(this.getFieldData(element.pnfield), element.width, element.height, element.barcodetype, element.showdata, 'D')
-                  break;
+                command += '^FN' + field_id + fh + '^FD' + hex_euro + hex_pound + prefix + this.getFieldData(element.pnfield) + '^FS';
               }
             }
-            
+            // } else {  
+            //   switch (element.type) {
+            //     case 'rectangle':
+            //       command += this.changePosition(element.x, element.y) + rotate + this.drawRectangle(element.width, element.height, element.border, element.color, element.rounding)
+            //       break;
+            //     case 'circle':
+            //       command += rotate + this.drawCircle(element.size, element.border, element.color)
+            //       break;
+            //     case 'barcode':
+            //       element.width = (element.width == 0) ? 1 : element.width;
+            //       element.height = (element.height == 0) ? 15 : element.height;
+            //       command += rotate + this.drawBarcode(this.getFieldData(element.pnfield), element.width, element.height, element.barcodetype, element.showdata, 'D')
+            //       break;
+            //   }
+            // }
+
           } else {
             element.x = (element?.x) ? this.convertElementPosition(element.x, this.width) : 0;
             element.y = (element?.y) ? this.convertElementPosition(element.y, this.height) : 0;
@@ -485,7 +517,7 @@ export class Js2zplService {
                 element.pnfield = field_id;
               }
             }
-            
+
             switch (element.type) {
               case 'rectangle':
                 command += this.drawRectangle(element.width, element.height, element.border, element.color, element.rounding)
@@ -496,12 +528,12 @@ export class Js2zplService {
                 break;
 
               case 'text':
-                command += this.drawText(element.pnfield, element.font, element.max, element.blockwidth, element.blocktextalign, element.blocklines, fieldtype, element.euro_prefix)
+                command += this.drawText(element.pnfield, element.font, element.max, element.blockwidth, element.blocktextalign, element.blocklines, fieldtype, element.euro_prefix, element.pound_prefix)
                 break;
 
               case 'scalabletext':
                 //element.pnfield = this.getFieldData(element.pnfield);
-                command += this.drawScalableText(element.pnfield, element.charwidth, element.charheight, element.max, element.blockwidth, element.blocktextalign, element.blocklines, fieldtype, element.euro_prefix)
+                command += this.drawScalableText(element.pnfield, element.charwidth, element.charheight, element.max, element.blockwidth, element.blocktextalign, element.blocklines, fieldtype, element.euro_prefix, element.pound_prefix)
                 break;
 
               case 'barcode':
@@ -558,7 +590,7 @@ export class Js2zplService {
 
           var newval = this.alldata[extractedVariable];
 
-          if (String(extractedVariable) == "%%LAST_DELIVIERY_DATE%%") {
+          if (String(extractedVariable) == "%%LAST_DELIVERY_DATE%%") {
 
             if (newval) {
               var date: any = new Date(newval)

@@ -1,5 +1,6 @@
-<div class="row mb-4 col-md-3">
-    <button class="btn btn-sm btn-primary" (click)="addEditCoupon()">
+<div class="mb-4 d-flex">
+    <div class="my-auto"> </div>
+    <button class="btn btn-sm btn-primary ms-auto" (click)="addEditCoupon()">
         <fa-icon [icon]="faPlus"></fa-icon> &nbsp; {{ "ADD_NEW_COUPON" | translate }}
     </button>
 </div>
@@ -11,15 +12,28 @@
                 <th>{{"COUPON_AMOUNT" | translate }}</th>
                 <th>{{"USAGE_LIMIT" | translate }}</th>
                 <th>{{"EXPIRT_DATE" | translate }}</th>
+                <th>{{"ACTION" | translate }}</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+            <tr *ngFor="let coupon of couponList">
+                <td> {{ coupon.sCouponCode }}</td>
+                <td> {{ coupon.nAmount }}</td>
+                <td> {{ coupon.nLimit }}</td>
+                <td> {{ coupon.dDateExpired | date:'yyyy-MM-dd'}}</td>
+                <td>
+                    <button class="btn text-center" (click)="addEditCoupon(coupon)" title="{{'EDIT' | translate }}">
+                        <i class="fa fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-default text-center" (click)="deleteCoupon(coupon)"
+                        title="{{'REMOVE' | translate }}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
             </tr>
         </tbody>
     </table>
+    <div *ngIf="couponList?.length == 0" class="d-flex w-100">
+        <h3 class="mx-auto">{{ 'NO_FOUND' | translate }}</h3>
+    </div>
 </div>

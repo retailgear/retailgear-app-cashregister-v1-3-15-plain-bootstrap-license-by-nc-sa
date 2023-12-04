@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { faTimes, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
-import { ToastService } from 'src/app/shared/components/toast';
-import { CreateArticleGroupService } from 'src/app/shared/service/create-article-groups.service';
-import { PriceService } from 'src/app/shared/service/price.service';
+import { ToastService } from '../../shared/components/toast';
+import { CreateArticleGroupService } from '../../shared/service/create-article-groups.service';
+import { PriceService } from '../../shared/service/price.service';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -28,14 +28,14 @@ export class LoyaltyPointsDiscountComponent implements OnInit {
   }
 
   deleteItem(): void {
-    this.itemChanged.emit('delete')
+    this.itemChanged.emit({ type: 'delete'})
   }
   getDiscount(item: any): string {
     return this.priceService.getDiscount(item.nDiscount)
   }
 
   checkArticleGroups() {
-    this.createArticleGroupService.checkArticleGroups('Loyalty Points')
+    this.createArticleGroupService.checkArticleGroups('loyalty-points')
       .subscribe((res: any) => {
         if (1 > res.data.length) {
           this.createArticleGroup();

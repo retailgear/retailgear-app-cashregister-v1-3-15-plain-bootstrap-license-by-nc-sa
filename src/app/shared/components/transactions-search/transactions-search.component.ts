@@ -25,14 +25,20 @@ export class TransactionsSearchComponent implements OnInit, AfterViewInit {
   business: any = {}
   transactions: Array<any> = [];
   activities: Array<any> = [];
-  selectedWorkstations: Array<any> = [];
   selectedLocations: Array<any> = [];
   requestParams: any = {
     searchValue: '',
     limit: 5,
     skip: 0,
   }
-
+  setPaginateSize: number = 10;
+  paginationConfig: any = {
+    itemsPerPage: '10',
+    currentPage: 1,
+    totalItems: 0
+  };
+  pageCounts: Array<number> = [10, 25, 50, 100]
+  pageCount:any = 10;
   page = 1;
 
   @ViewChildren('inputElement') inputElement!: QueryList<ElementRef>;
@@ -55,7 +61,22 @@ export class TransactionsSearchComponent implements OnInit, AfterViewInit {
     this.apiService.setToastService(this.toastService);
     this.business._id = localStorage.getItem("currentBusiness");
     this.requestParams.iBusinessId = this.business._id;
+    this.findTransactions()
   }
+
+
+  changeItemsPerPage(pageCount: any) {
+    this.paginationConfig.itemsPerPage = pageCount;
+    this.findTransactions();
+  }
+
+  // Function for trigger event after page changes
+  pageChanged(page: any) {
+    this.requestParams.skip = (page - 1) * parseInt(this.paginationConfig.itemsPerPage);
+    this.findTransactions();
+    this.paginationConfig.currentPage = page;
+  }
+
 
   findTransactions() {
     this.transactions = [];
@@ -63,19 +84,34 @@ export class TransactionsSearchComponent implements OnInit, AfterViewInit {
     this.activities = [];
     this.totalActivities = 0;
     this.requestParams.type = 'transaction';
-    this.requestParams.iWorkstationId = undefined // we need to work on this once devides are available.
-    this.requestParams.workstations = this.selectedWorkstations;
-    this.requestParams.locations = this.selectedLocations;
+    this.requestParams.limit = this.paginationConfig.itemsPerPage || 50;
     this.showLoader = true;
+    this.requestParams.searchValue = this.requestParams.searchValue.trim();
     this.apiService.postNew('cashregistry', '/api/v1/transaction/search', this.requestParams).subscribe((result: any) => {
-      this.transactions = result.transactions.records;
-      this.totalTransactions = result.transactions.count;
-      this.activities = result.activities.records;
-      this.totalActivities = result.activities.count;
+      this.paginationConfig.totalItems = result?.data?.count;
+      this.activities = result?.data?.records;
+      this.activities.forEach((item: any) =>{
+        this.prepareRecordMetadata(item);
+        item.sActivityItemNumbers = item?.aActivityItemMetaData?.map((oActivityItem: any) => oActivityItem.sActivityItemNumber?.split('-').shift()).join(' , ');
+        item.sTransactionNumbers = item?.aTransactionMetaData?.map((oTransaction: any) => oTransaction.sNumber?.split('-').shift()).join(' , ');
+        item.sReceiptNumber = item?.aTransactionMetaData?.map((oTransaction: any) => oTransaction.sReceiptNumber?.split('-').shift()).join(' , ');
+        item.sInvoiceNumber = item?.aTransactionMetaData?.map((oTransaction: any) => oTransaction.sInvoiceNumber?.split('-').shift()).join(' , ');
+      });
+      this.totalActivities = result?.data?.count;
       this.showLoader = false;
     }, (error) => {
       this.showLoader = false;
     })
+  }
+
+  prepareRecordMetadata(item: any) {
+    let aBagNumber: any = [];
+    if (item?.aActivityItemMetaData?.length) {
+      item?.aActivityItemMetaData.forEach((detail: any) => {
+        if (detail?.sBagNumber && detail.sBagNumber != undefined) aBagNumber.push(detail?.sBagNumber);
+      });
+    }
+    item.sBagNumbers = aBagNumber;
   }
 
   counter(i: number) {
@@ -84,9 +120,21 @@ export class TransactionsSearchComponent implements OnInit, AfterViewInit {
   }
 
   openTransaction(transaction: any, itemType: any) {
-    this.dialogService.openModal(TransactionItemsDetailsComponent, { cssClass: "modal-xl", context: { transaction, itemType } }).instance.close.subscribe(result => {
+    // console.log('transaction search openTransaction: ', transaction, itemType);
+    this.dialogService.openModal(TransactionItemsDetailsComponent, 
+    { 
+      cssClass: "modal-xl", 
+      context: { transaction, itemType },
+      hasBackdrop: true,
+      closeOnBackdropClick: false,
+      closeOnEsc: false 
+    }).instance.close.subscribe(result => {
+      // console.log('transaction search response of transaction item details component: ', JSON.parse(JSON.stringify(result)));
       if(result?.transaction) {
-        this.close(this.tillService.processTransactionSearchResult(result));
+        // console.log('now sending to tillservice processTransactionSearchResult: ', result);
+        const temp = this.tillService.processTransactionSearchResult(result);
+        // console.log('response of tillservice processTransactionSearchResult closing search dialog', JSON.parse(JSON.stringify(temp)))
+        this.close(temp);
       }
     });
   }

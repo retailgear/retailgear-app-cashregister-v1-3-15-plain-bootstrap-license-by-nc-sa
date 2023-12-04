@@ -1,0 +1,128 @@
+a.cancel {
+    cursor: pointer;
+    color: #a63b55;
+}
+
+.fabutton {
+    font-size: 30px;
+}
+
+:host ::ng-deep .tab-content ul.nav {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+:host ::ng-deep .nav-link.active {
+    border-bottom-width: 3px !important;
+}
+
+:host ::ng-deep .nav-link:hover {
+    border-bottom-width: 3px !important;
+}
+
+:host ::ng-deep .tab-pane.active {
+    max-height: 400px !important;
+    overflow-y: auto;
+}
+
+:host ::ng-deep .tab-pane.active thead {
+    position: sticky;
+    top: 0;
+    background: #fff;
+}
+
+.tab-gap {
+    height: 1.25rem;
+    background: #F5F8FA;
+}
+
+.block-buttons .btn {
+    width: 100%;
+}
+
+.card-body.main {
+    overflow: auto;
+    height: calc(100vh - 250px);
+    box-sizing: border-box;
+}
+
+.panel-card .card-header {
+    background-color: #f3f3f3;
+}
+
+.panel-card {
+    border: 1px solid #f3f3f3;
+}
+
+.mw-100 {
+    min-width: 100px;
+}
+
+.mw-200 {
+    min-width: 200px;
+}
+
+.capitalize-first {
+    text-transform: capitalize;
+}
+
+.createrImage {
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.group-text-align {
+    text-align: start;
+}
+
+.btn-delet {
+    margin-left: 890px;
+}
+
+.top-lable {
+    margin-left: 20px;
+}
+
+.custom-number {
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+        /* Firefox */
+    }
+}
+
+.nav-tabs li.nav-item:after {
+    display: block;
+    content: '';
+    border-bottom: solid 3px var(--bs-primary);
+    transform: scaleX(0);
+    transition: color .2s ease, background-color .2s ease;
+}
+
+.nav-tabs li.nav-item {
+
+    .nav-link:focus,
+    .nav-link:hover {
+        border-bottom: 3px solid var(--bs-primary) !important;
+    }
+}
+
+.nav-tabs li.nav-item button.nav-link {
+    border: none !important;
+    color: #a1a5b7 !important;
+}
+
+.nav-tabs li.nav-item button.nav-link.active {
+    border-bottom: 3px solid var(--bs-primary) !important;
+}
+
+h2.nameText {
+    font-size: 1.5rem !important;
+}
