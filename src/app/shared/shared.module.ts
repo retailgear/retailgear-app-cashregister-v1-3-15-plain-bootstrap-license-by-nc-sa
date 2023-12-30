@@ -9,7 +9,7 @@ import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontaweso
 
 import { NgSelectModule } from "@ng-select/ng-select";
 import { PaginatePipe } from 'ngx-pagination';
-import { DialogService } from "./service/dialog";
+import { DialogComponent, DialogService } from "./service/dialog";
 import { CustomerDialogComponent } from './components/customer-dialog/customer-dialog.component';
 import { DialerComponent } from './components/dialer/dialer.component';
 import { AlertComponent } from './components/alert/alert.component';
@@ -74,9 +74,13 @@ import { ClosingDaystateDialogComponent } from "./components/closing-daystate-di
 import { SetPaymentMethodSequenceComponent } from "./components/set-payment-method-sequence-dialog/set-payment-method-sequence.component";
 import { ClosingDaystateHelperDialogComponent } from "./components/closing-daystate-helper-dialog/closing-daystate-helper-dialog.component";
 import { CalendarGanttViewDialogComponent } from './components/calendar-gantt-view-dialog/calendar-gantt-view-dialog.component';
+import { DiscountDialogComponent } from "../till/dialogs/discount-dialog/discount-dialog.component";
+import { SupplierWarningDialogComponent } from "../till/dialogs/supplier-warning-dialog/supplier-warning-dialog.component";
+
 
 @NgModule({
   declarations: [
+    DialogComponent,
     CustomerDialogComponent,
     TerminalDialogComponent,
     DialerComponent,
@@ -122,7 +126,9 @@ import { CalendarGanttViewDialogComponent } from './components/calendar-gantt-vi
     ClosingDaystateDialogComponent,
     SetPaymentMethodSequenceComponent,
     ClosingDaystateHelperDialogComponent,
-    CalendarGanttViewDialogComponent
+    CalendarGanttViewDialogComponent,
+    DiscountDialogComponent,
+    SupplierWarningDialogComponent
   ],
   imports: [
     CommonModule,
@@ -172,9 +178,27 @@ import { CalendarGanttViewDialogComponent } from './components/calendar-gantt-vi
     ClosingDaystateHelperDialogComponent,
     CalendarGanttViewDialogComponent,
     TranslateModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    DiscountDialogComponent,
+    SupplierWarningDialogComponent
   ],
-  providers: [CurrencyPipe, CommonPrintSettingsService, PdfService, ReceiptService, TransactionsPdfService , PaginatePipe]
+  providers: [CurrencyPipe, CommonPrintSettingsService, PdfService, ReceiptService, TransactionsPdfService , PaginatePipe],
+  entryComponents: [
+    DialogComponent,
+    SelectArticleDialogComponent,
+    AddExpensesComponent,
+    TransactionsSearchComponent,
+    CardsComponent,
+    MorePaymentsDialogComponent,
+    CustomerDialogComponent,
+    AddExpensesComponent,
+    TerminalDialogComponent,
+    TransactionActionDialogComponent,
+    ActivityDetailsComponent,
+    DiscountDialogComponent,
+    SupplierWarningDialogComponent,
+    CustomerDetailsComponent
+  ]
 })
 
 export class SharedModule {

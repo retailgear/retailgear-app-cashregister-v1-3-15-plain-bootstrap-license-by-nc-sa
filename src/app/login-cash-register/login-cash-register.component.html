@@ -47,11 +47,12 @@
                                             enter to add item)</label>
                                         <ng-select #organizationRef bindLabel="sName" bindValue="_id"
                                             name="iOrganizationid"
-                                            [ngClass]="{ highlightSearch: bIsSupplierSelectActive }"
+                                            [ngClass]="isOrgFetched ? 'verified_org' : 'not_verified_org'"
                                             class="form-control form-control-solid p-0 w-100"
                                             [(ngModel)]="user.iOrganizationid"
                                             placeholder="{{'Search any public organization or type in a name'}}"
-                                            autofocus [addTag]="true" [selectOnTab]="false" [clearable]="false"
+                                            autofocus [addTag]="true" [selectOnTab]="false" [clearable]="true"
+                                            (clear)="onClearOrg($event)"
                                             [clearOnBackspace]="true" (change)="onChangeOrg($event)">
                                             <ng-option *ngFor="let option of aOrganizationList" [value]="option">
                                                 {{ option.sName || "Unknown" }}

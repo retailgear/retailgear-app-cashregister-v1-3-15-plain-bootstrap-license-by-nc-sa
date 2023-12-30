@@ -351,7 +351,7 @@
                                         <td class="text-muted">{{'LOYALTY_POINTS_REDEEMED' | translate}}</td>
                                     </ng-container>
                                     <td class="text-muted"
-                                        *ngIf="tillService.oSavingPointSettings.bEnabled && !transaction?.oCustomer?.bCounter">
+                                        *ngIf="tillService.oSavingPointSettings?.bEnabled && !transaction?.oCustomer?.bCounter">
                                         {{'SAVING_POINTS' | translate}}</td>
                                     <td class="text-muted">{{'TAX' | translate}}</td>
                                     <td class="text-muted">{{'PAID_AMOUNT' | translate}}</td>
@@ -436,7 +436,7 @@
                                     </td>
                                     <td *ngIf="item.bShowGiftcardDiscountField || transaction.totalGiftcardDiscount > 0">{{ (item?.nGiftcardDiscount || 0) | currency: tillService.currency}}</td>
                                     <td *ngIf="item?.bShowLoyaltyPointsDiscountField || transaction.totalRedeemedLoyaltyPoints > 0">{{ item?.nRedeemedPointsPerQty || 0  }} </td>
-                                    <td *ngIf="tillService.oSavingPointSettings.bEnabled && !transaction?.oCustomer?.bCounter">{{item?.nSavingsPoints || 0}} </td>
+                                    <td *ngIf="tillService.oSavingPointSettings?.bEnabled && !transaction?.oCustomer?.bCounter">{{item?.nSavingsPoints || 0}} </td>
                                     <td>{{item.nVatRate}} % ({{(item.vat || 0) | currency: tillService.currency }})</td>
                                     <td>
                                         <div class="d-flex align-items-center justify-content-between">
@@ -471,7 +471,7 @@
                                     <ng-container *ngIf="transaction?.totalRedeemedLoyaltyPoints">
                                         <td>{{transaction.totalRedeemedLoyaltyPoints}}</td>
                                     </ng-container>
-                                    <td *ngIf="tillService.oSavingPointSettings.bEnabled && !transaction?.oCustomer?.bCounter">{{
+                                    <td *ngIf="tillService.oSavingPointSettings?.bEnabled && !transaction?.oCustomer?.bCounter">{{
                                         transaction.totalSavingPoints }}</td>
                                     <td>{{ transaction.totalVat | currency: tillService.currency }}</td>
                                     <td>{{ transaction.total | currency: tillService.currency}}</td>

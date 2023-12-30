@@ -25,6 +25,7 @@ export class LoginCashRegisterComponent implements OnInit {
     selectedWorkStation: any;
 
     bIsLoading: boolean = false;
+    isOrgFetched: boolean = false;
 
     private sCurrentLocationId = localStorage.getItem('currentLocation') ?? '';
     $currentLocation: Subject<any> = new Subject<any>();
@@ -110,7 +111,6 @@ export class LoginCashRegisterComponent implements OnInit {
     }
 
     async login(formData: any) {
-
         if (!formData.form.value.iOrganizationid) {
             this.getOrganizationByName(formData.form.value.iOrganizationid);
             alert("You must select valid organization!");
@@ -145,26 +145,26 @@ export class LoginCashRegisterComponent implements OnInit {
                 localStorage.setItem('alternateToken', result.data.authorization);
                 localStorage.setItem('failedAttempts', '0');
                 localStorage.setItem('locked', 'false');
-                this.apiService.setAPIHeaders();
                 this.getOrganizationDetailsByID(formData.form.value.iOrganizationid);
                 delete result.data.authorization;
-                const iBusinessId =
+                this.iBusinessId =
                     result?.data?.aBusiness?.length && result?.data?.aBusiness[0]._id
                         ? result?.data?.aBusiness[0]._id
                         : '';
-                if (iBusinessId) {
-                    localStorage.setItem('currentBusiness', iBusinessId);
-                    this.iBusinessId = iBusinessId;
-                    const oBusiness = await this.getBusiness(iBusinessId).toPromise();
-                    localStorage.setItem('dudaEmail', oBusiness.data.sDudaEmail);
-                    this.apiService.setBusinessDetails({ _id: iBusinessId });
-                    //   this.fetchUserAccessRole(iBusinessId); // To do check of accessibility at front-end side
-                    // this.fetchBusinessSetting(iBusinessId); // Fetching business setting to check weather opening modal or not
+                if (this.iBusinessId) {
+                    // const oBusiness = await this.getBusiness(this.iBusinessId).toPromise();
+                    this.apiService.getNew('core', `/api/v1/business/${this.iBusinessId}`).subscribe((oBusiness:any)=>{
+                        localStorage.setItem('currentBusiness', this.iBusinessId);
+                        localStorage.setItem('dudaEmail', oBusiness.data.sDudaEmail);
+                        this.apiService.setBusinessDetails({ _id: this.iBusinessId });
+                    })
                     const response: any = await this.apiService
-                        .getNew('auth', `/api/v1/access-role/user/list/${iBusinessId}`)
+                        .getNew('auth', `/api/v1/access-role/user/list/${this.iBusinessId}`)
                         .toPromise();
                     localStorage.setItem('aRights', JSON.stringify(response.data));
                     this.appInitService.changeRights(response.data);
+                    //   this.fetchUserAccessRole(iBusinessId); // To do check of accessibility at front-end side
+                    // this.fetchBusinessSetting(iBusinessId); // Fetching business setting to check weather opening modal or not
                 }
 
                 let userName = `${result?.data?.sFirstName || ''} ${result?.data?.sLastName || ''
@@ -181,6 +181,7 @@ export class LoginCashRegisterComponent implements OnInit {
                 );
                 localStorage.setItem('type', result.data.eUserType);
                 this.apiService.setUserDetails(result.data);
+                
                 await this.setLocation();
                 this.ngZone.run(() => this.routes.navigate(['/home'])).then();
                 if (localStorage?.org) {
@@ -195,9 +196,11 @@ export class LoginCashRegisterComponent implements OnInit {
     onChangeOrg(event: any) {
         if (event._id) {
             this.user.iOrganizationid = event._id;
+            this.isOrgFetched = true;
         } else {
             this.getOrganizationByName(event.label);
             this.user.iOrganizationid = event.label;
+            this.isOrgFetched = true;
         }
     }
 
@@ -217,6 +220,7 @@ export class LoginCashRegisterComponent implements OnInit {
         if (result?.data) {
             this.organizationDetails = result.data;
             localStorage.setItem('org', JSON.stringify(this.organizationDetails));
+            this.apiService.setAPIHeaders();
         }
     }
 
@@ -286,7 +290,7 @@ export class LoginCashRegisterComponent implements OnInit {
     async getLocations() {
         this.sCurrentLocationId = localStorage.getItem('currentLocation') ?? '';
         return new Promise((resolve, reject) => {
-            const iBusinessId = localStorage.getItem('currentBusiness');
+            const iBusinessId:any = this.iBusinessId || localStorage.getItem('currentBusiness');
             this.apiService
                 .postNew('core', `/api/v1/business/${iBusinessId}/list-location`, {})
                 // .getNew('core', `/api/v1/business/user-business-and-location/list`, {})
@@ -311,21 +315,21 @@ export class LoginCashRegisterComponent implements OnInit {
                 const location: any = await this.getLocations();
                 let oNewLocation: any = location?.data?.aLocation[0];
                 let bIsCurrentBIsWebshop = false;
-                for (let i = 0; i < location?.data?.aLocation.length; i++) {
-                    const l = location?.data?.aLocation[i];
-                    if (l.bIsWebshop) oNewLocation = l;
-                    if (l._id.toString() === this.sCurrentLocationId) {
-                        if (l.bIsWebshop) {
-                            bIsCurrentBIsWebshop = true;
-                            this.$currentLocation.next({
-                                selectedLocation: l,
-                                sName: location?.data?.sName,
-                            });
-                            localStorage.setItem('currentLocation', l._id.toString());
-                            break;
-                        }
-                    }
-                }
+                // for (let i = 0; i < location?.data?.aLocation.length; i++) {
+                //     const l = location?.data?.aLocation[i];
+                //     if (l.bIsWebshop) oNewLocation = l;
+                //     if (l._id.toString() === this.sCurrentLocationId) {
+                //         if (l.bIsWebshop) {
+                //             bIsCurrentBIsWebshop = true;
+                //             this.$currentLocation.next({
+                //                 selectedLocation: l,
+                //                 sName: location?.data?.sName,
+                //             });
+                //             localStorage.setItem('currentLocation', l._id.toString());
+                //             break;
+                //         }
+                //     }
+                // }
                 if (!bIsCurrentBIsWebshop) {
                     localStorage.setItem('currentLocation', oNewLocation._id.toString());
                     this.$currentLocation.next({
@@ -352,7 +356,7 @@ export class LoginCashRegisterComponent implements OnInit {
             //     this.iLocationId = this.selectedBusiness["selectedLocation"]._id
             // }
 
-            const iBusinessId = localStorage.getItem('currentBusiness');
+            const iBusinessId = this.iBusinessId || localStorage.getItem('currentBusiness');
             const iLocationId = localStorage.getItem('currentLocation');
 
             // const headers = {
@@ -437,11 +441,17 @@ export class LoginCashRegisterComponent implements OnInit {
                 this.aOrganizationList.push(org.data)
             }
             this.bIsLoading = false;
+            this.isOrgFetched = true;
         }, err => {
             alert("Please enter valid organization!");
             this.user.iOrganizationid = [];
             this.aOrganizationList = [];
             this.bIsLoading = false;
+            this.isOrgFetched = false;
         })
+    }
+
+    onClearOrg(event:any){
+        this.isOrgFetched = false;
     }
 }

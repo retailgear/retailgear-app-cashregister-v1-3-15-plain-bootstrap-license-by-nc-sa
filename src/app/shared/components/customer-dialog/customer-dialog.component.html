@@ -1,5 +1,5 @@
 <div class="card shadow-sm">
-    <div class="card-header" style="margin-top: 20px;">
+    <div class="card-header  d-flex align-items-center justify-content-between py-3">
         <h4>{{"FIND_CUSTOMER" | translate}}</h4>
         <div>
             <a class="cancel my-auto" (click)="close(false)">
@@ -10,9 +10,9 @@
     <div class="card-body">
         <div class="row align-items-center mb-5">
             <div class="col-4 position-relative">
-                <fa-icon [icon]="faSearch" class="text-gray-500 position-absolute top-50 translate-middle ms-6">
+                <fa-icon [icon]="faSearch" class="text-gray-500 position-absolute top-50 translate-middle ms-4">
                 </fa-icon>
-                <input type="text" class="form-control form-control-solid ps-10" 
+                <input type="text" class="form-control form-control-solid ps-5" 
                 [(ngModel)]="requestParams.searchValue" (keyup.enter)="getCustomers()" (keyup)="customerEventHandler($event)" name="search"
                 placeholder="{{(aPlaceHolder).join(',')}}" #inputElement>
                 <!-- <input type="text" class="form-control form-control-solid ps-10" (ngModelChange)="stringDetection()" name="search"

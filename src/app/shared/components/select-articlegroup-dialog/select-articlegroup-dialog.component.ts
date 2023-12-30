@@ -188,12 +188,12 @@ export class SelectArticleDialogComponent implements OnInit {
   }
 
   changeInBrand(brand:any) {
-    // if (!this.supplier) {
-    //   if (this.from && this.from === 'repair') {
-    //     this.brand.iBusinessPartnerId = this.brand.iRepairerId ? this.brand.iRepairerId : this.brand.iBusinessPartnerId
-    //   }
-    //   this.fetchBusinessPartners([this.brand.iBusinessPartnerId]);
-    // }
+    if (!this.supplier) {
+      if (this.from && this.from === 'repair') {
+        this.brand.iBusinessPartnerId = this.brand.iRepairerId ? this.brand.iRepairerId : this.brand.iBusinessPartnerId
+      }
+      this.fetchBusinessPartners([this.brand.iBusinessPartnerId]);
+    }
 
     this.brand = brand;
     let newSupplier = this.partnersList.find((el: any) => el.iSupplierId === brand.iSupplierId)

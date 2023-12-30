@@ -52,7 +52,8 @@ export class TillSettingsComponent implements OnInit, OnDestroy {
     nLastInvoiceNumber: 0,
     nLastClientID:0,
     bOpenCashDrawer:true,
-    id: null
+    id: null,
+    eInvoiceGenerationMethod: 'auto-generate'
   };
   overviewColumns = [
     // { key:'', name:'action'}, 
@@ -98,6 +99,11 @@ export class TillSettingsComponent implements OnInit, OnDestroy {
     { key: 'STREET', value: 'sStreet' },
     { key: 'COMPANY_NAME', value: 'sCompanyName' },
     { key: 'NCLIENTID', value: 'nClientId'}
+  ];
+
+  aSalesOrderNoTypes: Array<any> = [
+    { sName: 'AUTO_GENERATE', value: 'auto-generate' },
+    { sName: 'MANUAL', value: 'manual' }
   ];
   
   bUpdateNclientID: boolean = false;
@@ -359,7 +365,8 @@ export class TillSettingsComponent implements OnInit, OnDestroy {
           }
         }
         this.bDefaultPayMethodsLoading = false;
-        for (let i = 0; i < this.payMethods.length; i++) { this.getLedgerNumber(this.payMethods[i]._id, i) }
+        // Comment tihs line for temporary solution for stackblitz
+        // for (let i = 0; i < this.payMethods.length; i++) { this.getLedgerNumber(this.payMethods[i]._id, i) }
       }
      
     }, (error) => {
@@ -447,7 +454,8 @@ export class TillSettingsComponent implements OnInit, OnDestroy {
       bLockCashRegisterAfterTransaction: this.settings?.bLockCashRegisterAfterTransaction || false,
       bEnableCashRegisterForGeneral: this.settings?.bEnableCashRegisterForGeneral || true,
       bShowForm: this.settings?.bShowForm,
-      aDescriptionFieldToPrefill: this.settings?.aDescriptionFieldToPrefill  
+      aDescriptionFieldToPrefill: this.settings?.aDescriptionFieldToPrefill,
+      eInvoiceGenerationMethod: this.settings?.eInvoiceGenerationMethod
     };
     this.updatingSettings = true;
     this.updateSettingsSubscription = this.apiService.putNew('cashregistry', '/api/v1/settings/update/' + this.requestParams.iBusinessId, body)

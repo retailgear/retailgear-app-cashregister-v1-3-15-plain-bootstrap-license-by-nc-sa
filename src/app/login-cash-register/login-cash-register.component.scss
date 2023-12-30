@@ -28,11 +28,19 @@ a {
   display: none !important;
 }
 
-::ng-deep .ng-select span.ng-arrow-wrapper:before {
+::ng-deep ng-select.verified_org span.ng-arrow-wrapper:before {
   content: "\f00c";
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
   font-size: inherit;
   color: #56acacc4;
+  text-rendering: auto;
+}
+::ng-deep ng-select.not_verified_org span.ng-arrow-wrapper:before {
+  content: "\f0d7";
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  color: #222;
   text-rendering: auto;
 }

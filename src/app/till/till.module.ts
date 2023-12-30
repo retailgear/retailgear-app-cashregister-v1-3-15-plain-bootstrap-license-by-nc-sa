@@ -17,10 +17,8 @@ import { GoldSellComponent } from './gold-sell/gold-sell.component';
 import { OfferComponent } from './offer/offer.component';
 import { ProductComponent } from './product/product.component';
 import { SharedModule } from "../shared/shared.module";
-import { DiscountDialogComponent } from './dialogs/discount-dialog/discount-dialog.component';
 import { OtherComponent } from './other/other.component';
 import { LoyaltyPointsDiscountComponent } from './loyalty-points-discount/loyalty-points-discount.component';
-import { SupplierWarningDialogComponent } from './dialogs/supplier-warning-dialog/supplier-warning-dialog.component';
 
 @NgModule({
   declarations: [
@@ -32,8 +30,6 @@ import { SupplierWarningDialogComponent } from './dialogs/supplier-warning-dialo
     GoldSellComponent,
     OfferComponent,
     ProductComponent,
-    DiscountDialogComponent,
-    SupplierWarningDialogComponent,
     OtherComponent,
     LoyaltyPointsDiscountComponent
   ],
@@ -59,7 +55,7 @@ import { SupplierWarningDialogComponent } from './dialogs/supplier-warning-dialo
     DropdownModule,
     ButtonModule,
     InputTextModule,
-    ToolbarModule
+    ToolbarModule,
   ],
   bootstrap: [
     TillComponent

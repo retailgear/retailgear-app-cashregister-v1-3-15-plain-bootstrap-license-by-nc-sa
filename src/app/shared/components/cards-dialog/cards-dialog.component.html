@@ -1,5 +1,5 @@
 <div class="card shadow-sm">
-    <div class="card-header" style="margin-top: 20px;">
+    <div class="card-header  d-flex align-items-center justify-content-between py-3">
         <h4>{{ 'CARD_PAYMENTS' | translate}}</h4>
         <div>
             <a class="cancel my-auto" (click)="close(false)">
@@ -8,8 +8,17 @@
         </div>
     </div>
     <div class="card-body">
-        <app-pn-tabs class="tab-content" [activeTabIndex]="activeTabIndex">
-            <app-pn-tab tabTitle="{{ 'CUSTOM_GIFTCARDS' | translate}}">
+        
+        
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+              <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab" aria-controls="tab1" aria-selected="true">{{ 'CUSTOM_GIFTCARDS' | translate}}</button>
+              <button class="nav-link" id="tab-2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab" aria-controls="tab2" aria-selected="false">{{ 'EXTERNAL_GIFTCARDS' | translate}}</button>
+              <button class="nav-link" id="tab-3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab" aria-controls="tab3" aria-selected="false">{{ 'LOYALTY_POINTS' | translate}}</button>
+            </div>
+          </nav>
+          <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane p-4  fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab" tabindex="0">
                 <div class="dataTables_wrapper dt-bootstrap4 no-footer">
                     <div class="row mb-4">
                         <div class="col-6">
@@ -64,8 +73,8 @@
                         </div>
                     </div>
                 </div>
-            </app-pn-tab>
-            <app-pn-tab tabTitle="{{ 'EXTERNAL_GIFTCARDS' | translate}}" #externalGiftcards>
+            </div>
+            <div class="tab-pane p-4 fade" id="tab2" role="tabpanel" aria-labelledby="tab-2-tab" tabindex="0">
                 <div class="dataTables_wrapper dt-bootstrap4 no-footer">
                     <div class="row">
                         <div class="col-5">
@@ -127,8 +136,8 @@
                         </div>
                     </div> -->
                 </div>
-            </app-pn-tab>
-            <app-pn-tab *ngIf="tillService.oSavingPointSettings.bEnabled" tabTitle="{{ 'LOYALTY_POINTS' | translate}}" #loyaltyPointElem> <!-- (click)="nAmount = 0" -->
+            </div>
+            <div class="tab-pane p-4  fade" id="tab3" role="tabpanel" aria-labelledby="tab-3-tab" tabindex="0">
                 <div class="dataTables_wrapper dt-bootstrap4 no-footer">
                     <div class="row" *ngIf="!customer">
                         {{"COUNTER_CUSTOMER_SELECTED" | translate}}
@@ -154,8 +163,8 @@
                         </div> -->
                     </div>
                 </div>
-            </app-pn-tab>
-        </app-pn-tabs>
+            </div>
+          </div>
     </div>
     <div class="card-footer justify-content-end d-flex">
         <button class="btn btn-warning me-5" type="button" (click)="close(false)">{{"CANCEL" | translate }}</button>

@@ -29,6 +29,7 @@ import { SharedModule } from '../shared/shared.module';
     NgSelectModule,
     TranslateModule,
   ],
+  entryComponents: [TransactionDetailsComponent],
   providers: [ 
     DialogService,
     DialogComponent,

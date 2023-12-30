@@ -78,6 +78,8 @@ export class ApiService {
       let details: any = localStorage.getItem('org');
       let organization = JSON.parse(details);
       this.defaultHeaders['organization-id'] = organization.sName
+    }else{
+      this.defaultHeaders['organization-id'] = 'Prismanote2'
     }
   }
 

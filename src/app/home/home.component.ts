@@ -62,10 +62,10 @@ export class HomeComponent {
             title: 'STATISTICS_SETTINGS',
             path: '/home/statistics-settings'
           },
-          {
-            title: 'FISKALY_SETTINGS',
-            path: '/home/fiskaly-settings'
-          },
+          // {
+          //   title: 'FISKALY_SETTINGS',
+          //   path: '/home/fiskaly-settings'
+          // },
           {
             title: 'PAYMENT_INTEGRATIONS',
             path: '/home/payment-account-management',

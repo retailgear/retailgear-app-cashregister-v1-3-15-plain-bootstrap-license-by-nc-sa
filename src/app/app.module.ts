@@ -22,6 +22,8 @@ import { RecaptchaModule, RecaptchaFormsModule } from 'ng-recaptcha';
 import { ToastModule } from './shared/components/toast';
 import { NgSelectModule } from '@ng-select/ng-select';
 
+import { SharedModule } from "./shared/shared.module";
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -42,7 +44,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
     RecaptchaFormsModule,
     RecaptchaModule,
     ToastModule,
-    NgSelectModule
+    NgSelectModule,
+    SharedModule
   ],
   providers: [
     AppInitService,

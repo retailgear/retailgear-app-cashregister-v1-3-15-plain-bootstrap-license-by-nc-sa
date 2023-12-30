@@ -2,3 +2,26 @@
   justify-content: flex-end;
   display: flex;
 }
+
+.badge-light-primary {
+  color: #3ba68c !important;
+  background-color: #f1faff;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.5em 0.85em;
+  font-size: .85rem;
+  font-weight: 600;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: initial;
+  border-radius: 0.475rem;
+}
+
+.btn.btn-light {
+  color: #7e8299;
+  background-color: #f5f8fa;
+}

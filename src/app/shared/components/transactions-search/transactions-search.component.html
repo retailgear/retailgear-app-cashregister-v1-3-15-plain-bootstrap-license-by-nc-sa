@@ -1,5 +1,5 @@
 <div class="card shadow-sm">
-    <div class="card-header" style="margin-top: 20px;">
+    <div class="card-header d-flex align-items-center justify-content-between py-3">
         <h4>{{"FIND_TRANSACTIONS" | translate}}</h4>
         <div>
             <a class="cancel my-auto" (click)="close(false)">
@@ -9,9 +9,9 @@
     </div>
     <div class="card-body d-flex">
         <div class="position-relative w-md-400px me-md-2">
-            <fa-icon [icon]="faSearch" class="text-gray-500 position-absolute top-50 translate-middle ms-6">
+            <fa-icon [icon]="faSearch" class="text-gray-500 position-absolute top-50 translate-middle ms-4">
             </fa-icon>
-            <input type="text" class="form-control form-control-solid ps-10" #inputElement
+            <input type="text" class="form-control form-control-solid ps-5" #inputElement
                 [(ngModel)]="requestParams.searchValue" name="search" value="" [placeholder]="'SEARCH' | translate"
                 (keyup.enter)="findTransactions()" />
         </div>
